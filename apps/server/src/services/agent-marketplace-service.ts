@@ -6,6 +6,7 @@ import {
   MARKETPLACE_LEGACY_NAME_TO_PERSON,
 } from "@airin/core";
 import type { ProfileResponse } from "@airin/core/contract";
+import type { DatabaseAdapter } from "@airin/db";
 import type { ProfileService } from "./profile-service";
 
 export interface AgentMarketplaceListItem {
@@ -22,9 +23,7 @@ export interface AgentMarketplaceListResponse {
   agents: AgentMarketplaceListItem[];
 }
 
-export interface AgentMarketplaceInstallResponse {
-  profile: ProfileResponse;
-}
+export type AgentMarketplaceInstallResponse = ProfileResponse;
 
 function marketplaceNameKey(name: string): string {
   return name.trim().toLowerCase();
@@ -46,7 +45,10 @@ function installedNameKeysForEntry(entry: AgentMarketplaceEntry): Set<string> {
 }
 
 export class AgentMarketplaceService {
-  constructor(private readonly profiles: ProfileService) {}
+  constructor(
+    private readonly profiles: ProfileService,
+    private readonly db?: DatabaseAdapter
+  ) {}
 
   async list(orgId: string): Promise<AgentMarketplaceListResponse> {
     await this.renameLegacyMarketplaceProfiles(orgId);
@@ -113,21 +115,55 @@ export class AgentMarketplaceService {
       );
     }
 
-    const profile = await this.profiles.createProfile(
+    const soulFiles: Record<string, string> = {
+      "INSTRUCTIONS.md": entry.instructions,
+      "SOUL.md": entry.soul,
+      "STYLE.md": entry.style,
+    };
+
+    if (entry.roleOneLiner) {
+      soulFiles["INSTRUCTIONS.md"] =
+        `${entry.instructions}\n\n## Role one-liner\n\n${entry.roleOneLiner}`;
+    }
+
+    if (entry.memoryMarkdown) {
+      soulFiles["MEMORY.md"] = entry.memoryMarkdown;
+    }
+
+    const created = await this.profiles.createProfile(
       orgId,
       {
+        ...(entry.preferredProfileId ? { id: entry.preferredProfileId } : {}),
         name: entry.name,
-        soulFiles: {
-          "INSTRUCTIONS.md": entry.instructions,
-          "SOUL.md": entry.soul,
-          "STYLE.md": entry.style,
-        },
+        soulFiles,
         systemPrompt: entry.systemPrompt,
       },
       owner
     );
 
-    return { profile };
+    await this.assignBundledSkills(
+      created.profile.id,
+      entry.bundledSkillNames ?? []
+    );
+
+    return created;
+  }
+
+  private async assignBundledSkills(
+    profileId: string,
+    names: readonly string[]
+  ): Promise<void> {
+    if (!this.db || names.length === 0) {
+      return;
+    }
+
+    for (const name of names) {
+      const skill = await this.db.getSkillByName(name);
+
+      if (skill) {
+        await this.db.assignSkillToProfile(profileId, skill.id);
+      }
+    }
   }
 }
 

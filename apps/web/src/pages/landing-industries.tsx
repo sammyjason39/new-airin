@@ -22,39 +22,41 @@ function Integrations() {
         </h2>
       </div>
       <div className="landing-app-rows">
-        {[integrations.slice(0, 4), integrations.slice(4)].map(
-          (row, rowIndex) => (
-            <div className="landing-marquee" key={row[0].name}>
-              <div
-                className={`landing-marquee-track landing-marquee-row-${rowIndex}`}
-              >
-                {[false, true].map((duplicate) => (
-                  <ul
-                    aria-hidden={duplicate || undefined}
-                    key={String(duplicate)}
-                  >
-                    {row.map((app) => (
-                      <li key={app.name}>
-                        <img
-                          alt=""
-                          height={32}
-                          loading="lazy"
-                          src={`/icons/${app.icon}`}
-                          width={32}
-                        />
-                        <span>{app.name}</span>
-                        <Link01Icon aria-hidden />
-                      </li>
-                    ))}
-                  </ul>
-                ))}
-              </div>
+        {[
+          integrations.slice(0, Math.ceil(integrations.length / 2)),
+          integrations.slice(Math.ceil(integrations.length / 2)),
+        ].map((row, rowIndex) => (
+          <div className="landing-marquee" key={row[0]?.name ?? rowIndex}>
+            <div
+              className={`landing-marquee-track landing-marquee-row-${rowIndex}`}
+            >
+              {[false, true].map((duplicate) => (
+                <ul
+                  aria-hidden={duplicate || undefined}
+                  key={String(duplicate)}
+                >
+                  {row.map((app) => (
+                    <li key={app.name}>
+                      <img
+                        alt=""
+                        height={28}
+                        loading="lazy"
+                        src={`/icons/${app.icon}`}
+                        width={28}
+                      />
+                      <span>{app.name}</span>
+                      <Link01Icon aria-hidden />
+                    </li>
+                  ))}
+                </ul>
+              ))}
             </div>
-          )
-        )}
+          </div>
+        ))}
       </div>
       <p className="landing-integration-note">
-        Hubungkan kanal dan aplikasi lewat konektor yang tersedia.
+        WhatsApp, Google Sheets, POS, dan aplikasi lain lewat konektor yang
+        tersedia.
       </p>
     </section>
   );

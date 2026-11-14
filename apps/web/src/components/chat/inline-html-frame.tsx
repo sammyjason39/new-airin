@@ -1,6 +1,7 @@
 import { cn } from "@airin/ui/utils";
 import { useEffect, useRef, useState } from "react";
 import { z } from "zod";
+import { useTheme } from "@/context/use-theme";
 import {
   ARTIFACT_FRAME_READY,
   ARTIFACT_FRAME_URL,
@@ -23,9 +24,10 @@ export function InlineHtmlFrame({
   html: string;
   className?: string;
 }) {
+  const { resolvedTheme } = useTheme();
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [height, setHeight] = useState(240);
-  const prepared = `${htmlForArtifactPreview(html)}<script>(()=>{const report=()=>parent.postMessage({airinArtifactHeight:Math.ceil(document.documentElement.scrollHeight)},"*");new ResizeObserver(report).observe(document.documentElement);addEventListener("load",report);report();})();</script>`;
+  const prepared = `${htmlForArtifactPreview(html, resolvedTheme)}<script>(()=>{const report=()=>parent.postMessage({airinArtifactHeight:Math.ceil(document.documentElement.scrollHeight)},"*");new ResizeObserver(report).observe(document.documentElement);addEventListener("load",report);report();})();</script>`;
 
   useEffect(() => {
     const frame = iframeRef.current;

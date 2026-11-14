@@ -25,8 +25,8 @@ function GroupsOnboardingSections() {
               keahliannya.
             </p>
             <p>
-              Kamu cukup mulai dengan satu brief, ikut dalam diskusinya, lalu
-              tinjau hasil bersama.
+              Di mode Simple, buka Grup dari sidebar. Mulai dengan satu brief,
+              ikut diskusinya, lalu tinjau hasil bersama.
             </p>
             <a className="landing-button" href="#daftar-tunggu">
               Bangun AI superteam kamu <ArrowRight01Icon aria-hidden />

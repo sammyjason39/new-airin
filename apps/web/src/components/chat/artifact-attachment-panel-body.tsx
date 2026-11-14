@@ -6,6 +6,7 @@ import { ArtifactMarkdownToc } from "@/components/chat/artifact-markdown-toc";
 import type { ArtifactPreviewMode } from "@/components/chat/artifact-preview-mode-toggle";
 import { SpreadsheetGrid } from "@/components/chat/artifact-spreadsheet-editor";
 import { useAuth } from "@/context/use-auth";
+import { useTheme } from "@/context/use-theme";
 import {
   ARTIFACT_FRAME_READY,
   ARTIFACT_FRAME_URL,
@@ -257,6 +258,7 @@ function ArtifactHtmlPreview({
   profileId?: string;
 }) {
   const { activeOrg } = useAuth();
+  const { resolvedTheme } = useTheme();
   const orgId = activeOrg?.id;
 
   const [preview, setPreview] = useState<{
@@ -309,7 +311,10 @@ function ArtifactHtmlPreview({
 
   return (
     <ArtifactHtmlFrame
-      html={htmlForArtifactPreview(profileId ? (current?.html ?? "") : content)}
+      html={htmlForArtifactPreview(
+        profileId ? (current?.html ?? "") : content,
+        resolvedTheme
+      )}
       sandbox={htmlSandbox}
       title={filename}
     />

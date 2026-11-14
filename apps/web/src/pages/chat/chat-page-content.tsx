@@ -1,4 +1,3 @@
-import { hasActiveAgentQuestionnaire } from "@airin/core/agent-questionnaire";
 import { Button } from "@airin/ui/button";
 import {
   Dialog,
@@ -19,26 +18,20 @@ import {
 } from "react";
 import { PromptInputProvider } from "@/components/ai-elements/prompt-input";
 import { ChatCognitoControl } from "@/components/chat/chat-cognito-control";
-import { ChatComposer } from "@/components/chat/chat-composer";
 import { OwnerAgentSettingsDialog } from "@/components/OwnerAgentSettingsDialog";
-import { ChatAttachmentPanelProvider } from "@/context/chat-attachment-panel-context";
 import { useUiMode } from "@/context/use-ui-mode";
+import { useAppNavigation } from "@/hooks/use-app-navigation";
 import { useChatUsageVisible } from "@/hooks/use-chat-usage-visible";
 import { usePostTurnSkillReviewOverlay } from "@/hooks/use-post-turn-skill-review-overlay";
-import { formatSessionChannelLabel } from "@/lib/chat-history";
 import { sumChatUsage } from "@/lib/chat-usage";
-import { extractModelId } from "@/lib/models";
+import { shouldShowCognitoControl } from "@/pages/chat/chat-page.shared";
+import { ChatPageComposerSection } from "@/pages/chat/chat-page-content-composer";
+import { ChatPageEmptyState } from "@/pages/chat/chat-page-content-empty";
+import { ChatConversation } from "@/pages/chat/chat-page-conversation";
 import {
-  emptyStateControlClass,
-  shouldShowCognitoControl,
-} from "@/pages/chat/chat-page.shared";
-import {
-  ChatConversation,
-  EmptyChatBody,
-  NewChatTopBar,
-} from "@/pages/chat/chat-page-conversation";
-import { ChatPageColumn, ChatWelcome } from "@/pages/chat/chat-page-layout";
-import { ChatStatusButton } from "@/pages/chat/chat-status-panel";
+  ChatHistoryButton,
+  ChatStatusButton,
+} from "@/pages/chat/chat-status-panel";
 import { useOnboarding } from "@/pages/chat/use-chat-onboarding";
 import type { ChatPageState } from "@/pages/chat/use-chat-page";
 
@@ -156,6 +149,13 @@ export function ChatPageContent({
   const ownerMode = uiMode === "owner";
   const showUsage = !ownerMode && chatUsageSetting;
   const [agentSettingsOpen, setAgentSettingsOpen] = useState(false);
+  const { navigateToNewChat } = useAppNavigation();
+
+  const startNewChat = () => {
+    if (profileId) {
+      navigateToNewChat(profileId);
+    }
+  };
 
   const ownerAgentSettingsButton =
     ownerMode && activeProfile && !isEmptyState ? (
@@ -171,118 +171,80 @@ export function ChatPageContent({
       </Button>
     ) : null;
 
-  const readOnlyBanner = readOnlySession ? (
-    <p className="mb-3 rounded-md border border-border bg-muted/40 px-3 py-2 text-muted-foreground text-sm">
-      View-only {formatSessionChannelLabel(sessionChannel)} conversation. Reply
-      from {formatSessionChannelLabel(sessionChannel)}.
-    </p>
+  const ownerHistoryButton = ownerMode ? (
+    <ChatHistoryButton profileId={profileId} />
   ) : null;
 
-  const composerClassName =
-    isEmptyState && !error
-      ? "z-10 py-0 [&>p:first-child]:min-h-0"
-      : "z-10 py-0";
-
-  const composerShared = {
-    busy,
-    canStop,
-    chatStatus,
-    className: composerClassName,
-    disabled: composerDisabled,
-    draftStorageKey: composerDraftKey,
-    error,
-    onEditQueuedMessage: editQueuedMessage,
-    onRemoveQueuedMessage: removeQueuedMessage,
-    onSendQueuedMessageNow: sendQueuedMessageNow,
-    onStop: stopStreaming,
-    onSubmit: (text: string, files: Parameters<typeof sendMessage>[1]) => {
-      void sendMessage(text, files);
-    },
-    placeholder: isEmptyState
-      ? ownerMode
-        ? `Message ${activeProfile?.name ?? "agent"}`
-        : composerEntry.placeholder
-      : undefined,
-    promptHistoryRef,
-    queuedMessages,
-    todos: hasActiveAgentQuestionnaire(agentQuestionnaire) ? [] : agentTodos,
-  } as const;
-
-  const composer = ownerMode ? (
-    <>
-      {readOnlyBanner}
-      <ChatComposer
-        {...composerShared}
-        profileId={profileId}
-        variant="minimal"
-      />
-    </>
-  ) : (
-    <>
-      {readOnlyBanner}
-      <ChatComposer
-        {...composerShared}
-        availableSkills={availableSkills}
-        contextUsage={contextUsage}
-        currentModelSelection={currentModelSelection}
-        headerNotice={skillReviewBanner}
-        modelPickerTriggerRef={modelPickerTriggerRef}
-        onBtw={onBtw}
-        onConnectProvider={() => setProviderDialogOpen(true)}
-        onModelChange={handleModelChange}
-        onThinkingEffortChange={handleThinkingEffortChange}
-        primarySupportsVision={activeModelSupportsVision}
-        profileId={profileId}
-        profileModelId={extractModelId(currentModelSelection)}
-        providerConfigured={health?.providerConfigured}
-        providerModelGroups={providerModelGroups}
-        renderModelLabel={renderModelLabel}
-        sessionUsage={sessionUsage}
-        showOfflineHint={showOfflineHint}
-        showTips={isEmptyState}
-        thinkingEffort={thinkingEffort}
-        thinkingEffortDisabled={thinkingEffortDisabled}
-        thinkingEffortOptions={thinkingEffortOptions}
-        thinkingEffortVisible={thinkingEffortVisible}
-      />
-    </>
+  const composer = (
+    <ChatPageComposerSection
+      modelPickerTriggerRef={modelPickerTriggerRef}
+      onBtw={onBtw}
+      onConnectProvider={() => setProviderDialogOpen(true)}
+      onNewChat={startNewChat}
+      ownerMode={ownerMode}
+      skillReviewBanner={skillReviewBanner}
+      state={{
+        activeModelSupportsVision,
+        activeProfile,
+        agentQuestionnaire,
+        agentTodos,
+        availableSkills,
+        busy,
+        canStop,
+        chatStatus,
+        composerDisabled,
+        composerDraftKey,
+        composerEntry,
+        contextUsage,
+        currentModelSelection,
+        editQueuedMessage,
+        error,
+        handleModelChange,
+        handleThinkingEffortChange,
+        health,
+        isEmptyState,
+        profileId,
+        promptHistoryRef,
+        providerModelGroups,
+        queuedMessages,
+        readOnlySession,
+        removeQueuedMessage,
+        renderModelLabel,
+        sendMessage,
+        sendQueuedMessageNow,
+        sessionChannel,
+        sessionUsage,
+        showOfflineHint,
+        stopStreaming,
+        thinkingEffort,
+        thinkingEffortDisabled,
+        thinkingEffortOptions,
+        thinkingEffortVisible,
+      }}
+    />
   );
 
   const content = isEmptyState ? (
-    <ChatAttachmentPanelProvider below={below} key={session?.id ?? "new"}>
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-        {cognitoSurface ? null : (
-          <NewChatTopBar
-            actions={ownerAgentSettingsButton}
-            toggle={cognitoToggle}
-          />
-        )}
-        <ChatPageColumn
-          centered
-          cognito={cognitoSurface}
-          wallpaper={ownerMode && !cognitoSurface}
-        >
-          {cognitoControl(
-            emptyStateControlClass(cognitoSurface),
-            ownerMode ? ownerAgentSettingsButton : undefined
-          )}
-          <div className="mx-auto mb-12 flex w-full max-w-3xl flex-col gap-1">
-            <EmptyChatBody onboarding={onboarding}>
-              <ChatWelcome
-                cognito={cognito}
-                onProfileSwitch={handleProfileSwitch}
-                ownerMode={ownerMode}
-                profile={activeProfile}
-                profileId={profileId}
-                profileSwitchDisabled={busy}
-                profiles={profiles}
-              />
-              {composer}
-            </EmptyChatBody>
-          </div>
-        </ChatPageColumn>
-      </div>
-    </ChatAttachmentPanelProvider>
+    <ChatPageEmptyState
+      below={below}
+      cognito={cognito}
+      cognitoControl={cognitoControl}
+      cognitoSurface={cognitoSurface}
+      cognitoToggle={cognitoToggle}
+      composer={composer}
+      onboarding={onboarding}
+      ownerAgentSettingsButton={ownerAgentSettingsButton}
+      ownerHistoryButton={ownerHistoryButton}
+      ownerMode={ownerMode}
+      sessionId={session?.id}
+      state={{
+        activeProfile,
+        busy,
+        handleProfileSwitch,
+        profileId,
+        profiles,
+      }}
+    />
   ) : (
     <ChatConversation
       below={below}
@@ -290,6 +252,7 @@ export function ChatPageContent({
       cognitoControl={cognitoControl(
         "sm:hidden",
         <>
+          {ownerHistoryButton}
           {ownerAgentSettingsButton}
           <ChatStatusButton />
         </>
@@ -299,6 +262,7 @@ export function ChatPageContent({
       composer={composer}
       onSwitchModel={() => modelPickerTriggerRef.current?.click()}
       ownerAgentSettingsButton={ownerAgentSettingsButton}
+      ownerHistoryButton={ownerHistoryButton}
       ownerMode={ownerMode}
       showSessionBar={!cognitoLocked}
       showUsage={showUsage}

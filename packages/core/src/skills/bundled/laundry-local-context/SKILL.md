@@ -19,4 +19,6 @@ description: Jakarta neighborhood laundry demo context — tone, services, and w
 
 ## Numbers
 
-- Use MEMORY.md, user messages, sheets, or tools — never silent guesses.
+- Use MEMORY.md, user messages, Data View sheets, or tools — never silent guesses.
+- When Data View is assigned, prefer **list_sheets** / **read_sheet** before guessing shop facts (machines, customers, daily kg).
+- Shop weather city: Jakarta (or the kecamatan/city the owner sets in MEMORY).

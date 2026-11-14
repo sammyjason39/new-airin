@@ -484,4 +484,48 @@ describe("ensureBundledSkillFiles", () => {
       );
     }
   });
+
+  test("installs the locked HTML report template beside artifact-design", async () => {
+    await ensureBundledSkillFiles();
+
+    const report = await readFile(
+      join(
+        configDir,
+        "agent",
+        "skills",
+        "artifact-design",
+        "assets",
+        "report.html"
+      ),
+      "utf8"
+    );
+
+    expect(report).toContain("Executive summary");
+    expect(report).toContain('data-theme="light"');
+    expect(report).toContain("--bg: #ffffff");
+    expect(report).toContain('class="exec"');
+    expect(report).toContain('class="bars"');
+  });
+
+  test("installs hr-uu-ketenagakerjaan references from scraped UU/PP text", async () => {
+    await ensureBundledSkillFiles();
+
+    const skillDir = join(
+      configDir,
+      "agent",
+      "skills",
+      "hr-uu-ketenagakerjaan"
+    );
+    const skill = await readFile(join(skillDir, "SKILL.md"), "utf8");
+    const uu13 = await readFile(
+      join(skillDir, "references", "uu-13-2003.md"),
+      "utf8"
+    );
+
+    expect(skill).toContain("hr-uu-ketenagakerjaan");
+    expect(uu13).toContain("NOMOR 13 TAHUN 2003");
+    expect(
+      await readFile(join(skillDir, "references", "pp-35-2021.md"), "utf8")
+    ).toContain("PP No. 35");
+  });
 });

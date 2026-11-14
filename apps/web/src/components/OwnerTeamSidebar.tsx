@@ -7,7 +7,6 @@ import { cn } from "@airin/ui/utils";
 import { ContextMenu } from "@base-ui/react/context-menu";
 import {
   Calendar03Icon,
-  DashboardSquare01Icon,
   Delete02Icon,
   NotificationOff01Icon,
   PanelLeftCloseIcon,
@@ -26,7 +25,6 @@ import { SidebarUserMenu } from "@/components/SidebarUserMenu";
 import { useOwnerSimpleUi } from "@/context/owner-simple-ui-context";
 import { useAuth } from "@/context/use-auth";
 import { useLocale } from "@/context/use-locale";
-import { useUiMode } from "@/context/use-ui-mode";
 import {
   useAgentGroupsQuery,
   useRailPinsQuery,
@@ -53,7 +51,7 @@ export function OwnerTeamSidebar({
   onNavigate,
   variant = "shell",
 }: {
-  /** Hides the shell sidebar below `lg`, or closes the phone drawer. */
+  /** Hides the shell sidebar, or closes the phone drawer. */
   onHide?: () => void;
   onNavigate?: () => void;
   variant?: "drawer" | "shell";
@@ -67,7 +65,6 @@ export function OwnerTeamSidebar({
   const openGroupId = groupRouteFromPath(location.pathname)?.groupId ?? null;
   const { activeOrg } = useAuth();
   const ownerSimple = useOwnerSimpleUi();
-  const { setUiMode } = useUiMode();
   const { t } = useLocale();
   const [createOpen, setCreateOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<ProfileSummary | null>(null);
@@ -162,10 +159,7 @@ export function OwnerTeamSidebar({
             <IconTip label={t("owner.hideSidebar")}>
               <button
                 aria-label={t("owner.hideSidebar")}
-                className={cn(
-                  "inline-flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-background hover:text-foreground",
-                  !drawer && "lg:hidden"
-                )}
+                className="inline-flex size-8 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-background hover:text-foreground"
                 onClick={onHide}
                 type="button"
               >
@@ -217,9 +211,14 @@ export function OwnerTeamSidebar({
           ))}
         </ul>
 
-        {!ownerSimple && groups.length > 0 ? (
+        {groups.length > 0 ? (
           <div className="mt-4">
-            <p className="px-3 pb-1 font-medium text-2xs text-muted-foreground uppercase tracking-wide">
+            <p
+              className={cn(
+                "px-3 pb-1 font-medium text-muted-foreground uppercase tracking-wide",
+                ownerSimple ? "text-xs" : "text-2xs"
+              )}
+            >
               {t("owner.groups")}
             </p>
             <ul className="flex flex-col gap-0.5">
@@ -231,6 +230,7 @@ export function OwnerTeamSidebar({
                       count: group.memberIds.length,
                     })}
                     group={group}
+                    largeType={ownerSimple}
                     onNavigate={onNavigate}
                     profiles={orderedProfiles}
                   />
@@ -242,23 +242,22 @@ export function OwnerTeamSidebar({
       </div>
 
       <div className="shrink-0 border-border/50 border-t px-2 pt-2 pb-3">
+        <OwnerFooterLink
+          active={location.pathname.startsWith(PAGE_PATHS.marketplace)}
+          href={PAGE_PATHS.marketplace}
+          icon={Store01Icon}
+          label={t("owner.marketplace")}
+          largeType={ownerSimple}
+          onNavigate={onNavigate}
+        />
         {ownerSimple ? null : (
-          <>
-            <OwnerFooterLink
-              active={location.pathname.startsWith(PAGE_PATHS.marketplace)}
-              href={PAGE_PATHS.marketplace}
-              icon={Store01Icon}
-              label={t("owner.marketplace")}
-              onNavigate={onNavigate}
-            />
-            <OwnerFooterLink
-              active={location.pathname.startsWith(PAGE_PATHS.automations)}
-              href={pathForPage("automations")}
-              icon={Calendar03Icon}
-              label={t("owner.automations")}
-              onNavigate={onNavigate}
-            />
-          </>
+          <OwnerFooterLink
+            active={location.pathname.startsWith(PAGE_PATHS.automations)}
+            href={pathForPage("automations")}
+            icon={Calendar03Icon}
+            label={t("owner.automations")}
+            onNavigate={onNavigate}
+          />
         )}
         <OwnerFooterLink
           active={location.pathname.startsWith(PAGE_PATHS.settings)}
@@ -268,22 +267,6 @@ export function OwnerTeamSidebar({
           largeType={ownerSimple}
           onNavigate={onNavigate}
         />
-        {ownerSimple ? null : (
-          <button
-            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-muted-foreground text-sm transition-colors hover:bg-background/70 hover:text-foreground"
-            onClick={() => {
-              setUiMode("advanced");
-              onNavigate?.();
-            }}
-            type="button"
-          >
-            <DashboardSquare01Icon
-              aria-hidden="true"
-              className="size-4 shrink-0"
-            />
-            {t("owner.advanced")}
-          </button>
-        )}
         <div className="mt-2 flex items-center justify-between gap-2 px-2">
           <p className="truncate text-muted-foreground text-xs">
             {activeOrg?.name ?? t("owner.organization")}
@@ -440,30 +423,38 @@ function GroupRow({
   onNavigate,
   profiles,
   agentsCountLabel,
+  largeType = false,
 }: {
   group: AgentGroup;
   active: boolean;
   onNavigate?: () => void;
   profiles: ProfileSummary[];
   agentsCountLabel: string;
+  largeType?: boolean;
 }) {
   return (
     <Link
       aria-current={active ? "page" : undefined}
       className={cn(
-        "flex w-full items-center gap-2.5 rounded-xl px-2 py-2 transition-colors",
+        "flex w-full items-center gap-2.5 rounded-xl px-2 transition-colors",
+        largeType ? "min-h-12 py-2.5" : "py-2",
         active ? "bg-background shadow-sm" : "hover:bg-background/70"
       )}
       onClick={() => onNavigate?.()}
       to={groupPath(group.id)}
     >
       <GroupAvatar
-        className="size-9 shrink-0"
+        className={cn("shrink-0", largeType ? "size-10" : "size-9")}
         group={group}
         profiles={profiles}
       />
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-medium text-foreground text-sm">
+        <span
+          className={cn(
+            "block truncate font-medium text-foreground",
+            largeType ? "text-base" : "text-sm"
+          )}
+        >
           {group.name}
         </span>
         <span className="block truncate text-muted-foreground text-xs">

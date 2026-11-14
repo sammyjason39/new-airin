@@ -163,12 +163,22 @@ async function spreadsheetInfo(context, spreadsheetId, gid) {
     title: title === String(title) ? title : tabTitle
   };
 }
-async function fetchPublic(spreadsheetId, gid) {
-  const response = await fetch(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`);
+async function fetchPublicCsv(spreadsheetId, gid) {
+  const query = gid === null ? "format=csv" : `format=csv&gid=${encodeURIComponent(gid)}`;
+  const response = await fetch(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?${query}`);
   if (!(response.ok && response.headers.get("content-type")?.includes("csv"))) {
     return null;
   }
-  const grid = parseCsv(await response.text());
+  return parseCsv(await response.text());
+}
+async function fetchPublic(spreadsheetId, gid) {
+  let grid = await fetchPublicCsv(spreadsheetId, gid);
+  if (!grid && gid === "0") {
+    grid = await fetchPublicCsv(spreadsheetId, null);
+  }
+  if (!grid) {
+    return null;
+  }
   let title = "Untitled sheet";
   try {
     const page = await fetch(`https://docs.google.com/spreadsheets/d/${spreadsheetId}/edit`);
@@ -345,9 +355,9 @@ async function run(input, context) {
   }
 }
 export {
-  changedCells,
-  columnLetter,
-  parseCsv,
+  run,
   parseSheetUrl,
-  run
+  parseCsv,
+  columnLetter,
+  changedCells
 };

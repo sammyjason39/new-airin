@@ -493,6 +493,19 @@ export function sessionStorageKey(profileId: string): string {
   return `airin:session:${profileId}`;
 }
 
+/** Last web session for this agent on this browser, if the user opened one. */
+export function readStoredSessionId(profileId: string): string | null {
+  if (typeof localStorage === "undefined" || !profileId) {
+    return null;
+  }
+
+  try {
+    return localStorage.getItem(sessionStorageKey(profileId));
+  } catch {
+    return null;
+  }
+}
+
 export function lastChatModelStorageKey(profileId: string): string {
   return `airin:last-model:${profileId}`;
 }

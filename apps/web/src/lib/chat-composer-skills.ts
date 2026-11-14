@@ -105,6 +105,14 @@ const BTW_SLASH_COMMAND: ReservedSlashCommand = {
 
 const BTW_COMMAND_PATTERN = /^\/btw(?:\s+([\s\S]*))?$/i;
 
+/** Starts a blank chat with the current agent. Client-only; not sent to the model. */
+const NEW_SLASH_COMMAND: ReservedSlashCommand = {
+  description: "Start a new chat",
+  name: "new",
+};
+
+const NEW_COMMAND_PATTERN = /^\/new$/i;
+
 /** `@` tokens the server acts on (`@image` asks the agent for generate_image). */
 const COMPOSER_MENTIONS: ReservedSlashCommand[] = [
   {
@@ -210,6 +218,11 @@ export function matchComposerBtwCommand(text: string): string | null {
   return match ? (match[1] ?? "").trim() : null;
 }
 
+/** True when the composer should start a new chat instead of sending. */
+export function matchComposerNewCommand(text: string): boolean {
+  return NEW_COMMAND_PATTERN.test(text.trim());
+}
+
 /** Plugin pages that match `/o`, `/open`, or `/open dat`, by id or label. */
 function filterOpenPluginSuggestions(
   plugins: ComposerOpenPlugin[],
@@ -287,9 +300,16 @@ export function filterComposerSlashSuggestions(
   options: {
     enableAddCommands?: boolean;
     enableBtw?: boolean;
+    enableNewChat?: boolean;
     openPlugins?: ComposerOpenPlugin[];
   } = {}
 ): ComposerSlashSuggestion[] {
+  const newCommands = options.enableNewChat
+    ? filterReservedSlashCommands(query, [NEW_SLASH_COMMAND]).map(
+        (command) => ({ command, kind: "command" as const })
+      )
+    : [];
+
   const btwCommands = options.enableBtw
     ? filterReservedSlashCommands(query, [BTW_SLASH_COMMAND]).map(
         (command) => ({ command, kind: "command" as const })
@@ -325,6 +345,7 @@ export function filterComposerSlashSuggestions(
   );
 
   return [
+    ...newCommands,
     ...btwCommands,
     ...addCommands,
     ...learnCommands,

@@ -19,7 +19,7 @@ function profilesStub(initial: { id: string; name: string }[] = []) {
 
       profiles.push(profile);
 
-      return profile;
+      return { profile };
     },
     listProfiles: async () => ({ profiles }),
     updateProfile: async (
@@ -53,7 +53,7 @@ describe("AgentMarketplaceService", () => {
 
     const listed = await service.list("org_1");
 
-    expect(listed.agents).toHaveLength(8);
+    expect(listed.agents).toHaveLength(10);
     expect(listed.agents.find((agent) => agent.id === "sales")?.installed).toBe(
       true
     );

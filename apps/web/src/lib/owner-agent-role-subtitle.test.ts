@@ -1,6 +1,8 @@
 import { describe, expect, test } from "bun:test";
 import {
+  agentRailHoverLabel,
   laundryAgentRoleMessageKey,
+  marketplaceAgentRoleMessageKey,
   ownerAgentSubtitleMessageKey,
 } from "./owner-agent-role-subtitle";
 
@@ -32,6 +34,23 @@ describe("ownerAgentSubtitleMessageKey", () => {
     ).toBe("owner.role.laundrySocial");
   });
 
+  test("maps marketplace agents to role keys", () => {
+    expect(
+      marketplaceAgentRoleMessageKey({
+        id: "hr-indonesia",
+        isSuper: false,
+        name: "Alya",
+      })
+    ).toBe("owner.role.hr");
+    expect(
+      ownerAgentSubtitleMessageKey({
+        id: "custom-alya",
+        isSuper: false,
+        name: "Alya",
+      })
+    ).toBe("owner.role.hr");
+  });
+
   test("uses orchestrator label for super agents", () => {
     expect(
       ownerAgentSubtitleMessageKey({
@@ -42,6 +61,16 @@ describe("ownerAgentSubtitleMessageKey", () => {
     ).toBe("owner.orchestrator");
   });
 
+  test("maps Default Bot to assistant instead of generic agent", () => {
+    expect(
+      ownerAgentSubtitleMessageKey({
+        id: "hz2lOuDwXX5BodkrxAY7G",
+        isSuper: false,
+        name: "Default Bot",
+      })
+    ).toBe("owner.role.assistant");
+  });
+
   test("falls back to generic agent label", () => {
     expect(
       ownerAgentSubtitleMessageKey({
@@ -50,5 +79,14 @@ describe("ownerAgentSubtitleMessageKey", () => {
         name: "Helper",
       })
     ).toBe("owner.agent");
+  });
+
+  test("formats advanced rail hover with role", () => {
+    expect(
+      agentRailHoverLabel(
+        { id: "hr-indonesia", isSuper: false, name: "Alya" },
+        "HR"
+      )
+    ).toBe("Alya · HR");
   });
 });

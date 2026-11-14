@@ -12,6 +12,7 @@ import {
   getReservedCommandTokenRanges,
   getSkillTokenRanges,
   matchComposerBtwCommand,
+  matchComposerNewCommand,
   matchComposerOpenCommand,
   replaceSlashRangeWithReservedCommand,
 } from "./chat-composer-skills";
@@ -160,6 +161,23 @@ describe("/btw side chat command", () => {
     );
     expect(matchComposerBtwCommand("/btwx")).toBeNull();
     expect(matchComposerBtwCommand("please /btw")).toBeNull();
+  });
+});
+
+describe("/new chat command", () => {
+  test("matches a bare /new and lists it when enabled", () => {
+    expect(matchComposerNewCommand("/new")).toBe(true);
+    expect(matchComposerNewCommand("  /new  ")).toBe(true);
+    expect(matchComposerNewCommand("/new please")).toBe(false);
+    expect(matchComposerNewCommand("/news")).toBe(false);
+    expect(
+      filterComposerSlashSuggestions([], "ne", { enableNewChat: true }).map(
+        suggestionName
+      )
+    ).toEqual(["new"]);
+    expect(
+      filterComposerSlashSuggestions([], "ne", { enableNewChat: false })
+    ).toEqual([]);
   });
 });
 

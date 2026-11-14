@@ -15,7 +15,7 @@
     grid-template-columns: 1fr;
     gap: 3rem;
     min-height: auto;
-    padding-block: 3.5rem 5.5rem;
+    padding-block: 2rem 4rem;
   }
   .landing-intro {
     text-align: center;

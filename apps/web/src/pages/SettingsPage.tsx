@@ -11,6 +11,7 @@ import {
 } from "@airin/ui/dialog";
 import { Spinner } from "@airin/ui/spinner";
 import { Switch } from "@airin/ui/switch";
+import { ArrowRight01Icon, DashboardSquare01Icon } from "hugeicons-react";
 import {
   type ReactNode,
   useCallback,
@@ -38,15 +39,18 @@ import { WebSearchSettingsCard } from "@/components/settings/WebSearchSettingsCa
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TimezoneSelect } from "@/components/TimezoneSelect";
 import { UserContextSettings } from "@/components/UserContextCard";
+import { useOwnerSimpleUi } from "@/context/owner-simple-ui-context";
 import { useAppContext } from "@/context/use-app-context";
 import { useAuth } from "@/context/use-auth";
 import { useLocale } from "@/context/use-locale";
+import { useUiMode } from "@/context/use-ui-mode";
 import { useChatUsageVisible } from "@/hooks/use-chat-usage-visible";
 import { useSaveUserLanguage, useUserLanguage } from "@/hooks/use-language";
 import { useSaveUserTimezone, useUserTimezone } from "@/hooks/use-timezones";
 import { formatError } from "@/lib/client";
 import type { AppLocale } from "@/lib/locale";
 import { needsMfaEnrollment } from "@/lib/mfa";
+import { PAGE_PATHS } from "@/lib/navigation";
 import { getBrowserTimezone } from "@/lib/timezones";
 
 function isDemoLoginHost(
@@ -62,6 +66,8 @@ export function SettingsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { health } = useAppContext();
+  const ownerSimple = useOwnerSimpleUi();
+  const { setUiMode } = useUiMode();
   const isDemo = isDemoLoginHost();
   const isPlatformAdmin = user?.isPlatformAdmin === true;
 
@@ -73,6 +79,11 @@ export function SettingsPage() {
   const version = health?.version?.trim();
   const { t } = useLocale();
   const mfaPending = needsMfaEnrollment(user);
+
+  function openAdvancedSettings() {
+    setUiMode("advanced");
+    navigate(PAGE_PATHS.customize);
+  }
 
   return (
     <>
@@ -177,6 +188,26 @@ export function SettingsPage() {
             updateCheckEnabled={health?.updateCheckEnabled === true}
             version={version}
           />
+        ) : null}
+
+        {ownerSimple ? (
+          <div className="border-border border-t pt-6">
+            <Button
+              className="h-12 w-full justify-between gap-3 px-4"
+              onClick={openAdvancedSettings}
+              type="button"
+              variant="outline"
+            >
+              <span className="flex items-center gap-2.5">
+                <DashboardSquare01Icon
+                  aria-hidden
+                  className="size-4 shrink-0"
+                />
+                {t("settings.advancedSettings")}
+              </span>
+              <ArrowRight01Icon aria-hidden className="size-4 shrink-0" />
+            </Button>
+          </div>
         ) : null}
       </div>
     </>

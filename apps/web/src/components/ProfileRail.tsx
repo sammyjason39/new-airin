@@ -2,27 +2,18 @@ import type { ProfileSummary } from "@airin/core";
 import type { AgentGroup } from "@airin/core/agent-groups";
 import type { AcpAgentPresetSummary, ToolSummary } from "@airin/core/contract";
 import { ConfirmDialog } from "@airin/ui/dialog";
-import { DropdownMenuItem } from "@airin/ui/dropdown-menu";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@airin/ui/tooltip";
-import { cn } from "@airin/ui/utils";
-import { ContextMenu } from "@base-ui/react/context-menu";
-import {
-  Delete02Icon,
-  PencilEdit02Icon,
-  PinIcon,
-  PinOffIcon,
-  PlusSignSquareIcon,
-} from "hugeicons-react";
 import { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import { GroupAvatar } from "@/components/agent-groups/GroupAvatar";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { GroupDialog } from "@/components/agent-groups/group-dialog";
 import { ProfileAdminPlusButton } from "@/components/ProfileAdminPlusButton";
-import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { ProfileCreateDialog } from "@/components/ProfileCreateDialog";
+import {
+  ProfileRailItem,
+  type ProfileRailItemData,
+} from "@/components/profile-rail-item";
 import { useActiveChatProfile } from "@/context/use-active-chat-profile";
 import { useAuth } from "@/context/use-auth";
-import { useTheme } from "@/context/use-theme";
+import { useLocale } from "@/context/use-locale";
 import {
   useAgentGroupsQuery,
   useDeleteGroup,
@@ -44,9 +35,7 @@ const NO_PRESETS: AcpAgentPresetSummary[] = [];
 
 const NO_TOOLS: ToolSummary[] = [];
 
-type RailItem =
-  | { id: string; kind: "agent"; profile: ProfileSummary }
-  | { id: string; kind: "group"; group: AgentGroup };
+type RailItem = ProfileRailItemData;
 
 function RailDivider() {
   return (
@@ -59,8 +48,8 @@ export function ProfileRail({ onNavigate }: { onNavigate?: () => void } = {}) {
     useSelectProfile();
 
   const { user, activeOrg } = useAuth();
-  const { resolvedTheme } = useTheme();
   const { syncForOrg } = useActiveChatProfile();
+  const { t } = useLocale();
   const navigate = useNavigate();
   const location = useLocation();
   const [createOpen, setCreateOpen] = useState(false);
@@ -84,7 +73,7 @@ export function ProfileRail({ onNavigate }: { onNavigate?: () => void } = {}) {
     syncForOrg({ orgId: activeOrg?.id ?? null, profiles });
   }, [activeOrg?.id, profiles, syncForOrg]);
 
-  const logoSrc = markLogoSrc(resolvedTheme);
+  const logoSrc = markLogoSrc();
 
   const orderedProfiles = profiles.toSorted(
     (left, right) => Number(right.isSuper) - Number(left.isSuper)
@@ -133,166 +122,60 @@ export function ProfileRail({ onNavigate }: { onNavigate?: () => void } = {}) {
     (item) => item.kind === "group" && !pinnedIds.has(item.id)
   );
 
-  function renderItem(item: RailItem) {
-    const name = item.kind === "agent" ? item.profile.name : item.group.name;
-    const pinned = pinnedIds.has(item.id);
-
-    // An open group takes the highlight from the chat agent.
-    const active =
-      item.kind === "agent"
-        ? !openGroupId && item.id === activeProfileId
-        : item.id === openGroupId;
-
-    const avatarClass = cn(
-      "size-7 rounded-md outline-none transition-all duration-150",
-      // Avatar colors identify agents, so inactive ones stay in color.
-      active ? "opacity-100" : "opacity-80 group-hover:opacity-100"
-    );
-
-    const trigger = (
-      <button
-        aria-current={active ? "true" : undefined}
-        aria-label={name}
-        className={cn(
-          "group relative flex size-7 shrink-0 items-center justify-center rounded-md transition-all duration-150",
-          !active && "hover:bg-muted/40"
-        )}
-        onClick={() => {
-          if (Date.now() - menuOpenedAt.current < 700) {
-            return;
-          }
-
-          if (item.kind === "agent") {
-            handleSelectProfile(item.id);
-
-            return;
-          }
-
-          // Like an agent: picking the open group keeps its current chat.
-          if (item.id !== openGroupId) {
-            openGroup(item.id);
-          }
-        }}
-        title={name}
-        type="button"
-      >
-        {active ? (
-          <span
-            aria-hidden="true"
-            className="absolute top-1/2 -left-2 h-5 w-1 -translate-y-1/2 rounded-full bg-primary"
-          />
-        ) : null}
-        {item.kind === "agent" ? (
-          <ProfileAvatar
-            active={
-              active &&
-              (location.pathname === PAGE_PATHS.chat ||
-                location.pathname.startsWith(`${PAGE_PATHS.chat}/`))
-            }
-            className={avatarClass}
-            profile={item.profile}
-            size="sm"
-          />
-        ) : (
-          <GroupAvatar
-            className={avatarClass}
-            group={item.group}
-            profiles={profiles}
-          />
-        )}
-      </button>
-    );
-
-    // Right-click, or a long press on touch, opens the item's menu.
-    return (
-      <ContextMenu.Root
-        key={item.id}
-        onOpenChange={(open) => {
-          if (open) {
-            menuOpenedAt.current = Date.now();
-            setMenuItemId(item.id);
-          } else if (Date.now() - menuOpenedAt.current > 700) {
-            setMenuItemId(null);
-          }
-        }}
-        open={menuItemId === item.id}
-      >
-        <ContextMenu.Trigger className="flex shrink-0">
-          <Tooltip>
-            <TooltipTrigger render={trigger} />
-            <TooltipContent side="right" sideOffset={8}>
-              {name}
-            </TooltipContent>
-          </Tooltip>
-        </ContextMenu.Trigger>
-        <ContextMenu.Portal>
-          <ContextMenu.Positioner className="isolate z-50 outline-none">
-            <ContextMenu.Popup className="z-50 min-w-36 rounded-lg bg-popover p-1 text-popover-foreground shadow-md outline-none ring-1 ring-foreground/10">
-              <DropdownMenuItem
-                onClick={() => togglePin({ itemId: item.id, pinned: !pinned })}
-              >
-                {pinned ? <PinOffIcon /> : <PinIcon />}
-                {pinned ? "Unpin" : "Pin to top"}
-              </DropdownMenuItem>
-              {item.kind === "group" ? (
-                <>
-                  <DropdownMenuItem onClick={() => openGroup(item.id)}>
-                    <PlusSignSquareIcon />
-                    New chat
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setEditingGroup(item.group)}>
-                    <PencilEdit02Icon />
-                    Edit group
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => setDeletingGroup(item.group)}
-                    variant="destructive"
-                  >
-                    <Delete02Icon />
-                    Delete group
-                  </DropdownMenuItem>
-                </>
-              ) : canEditAgent(item.profile) ? (
-                <DropdownMenuItem
-                  onClick={() => {
-                    onNavigate?.();
-                    navigate(profilePath(item.id));
-                  }}
-                >
-                  <PencilEdit02Icon />
-                  Edit agent
-                </DropdownMenuItem>
-              ) : null}
-            </ContextMenu.Popup>
-          </ContextMenu.Positioner>
-        </ContextMenu.Portal>
-      </ContextMenu.Root>
-    );
-  }
+  const railItemProps = {
+    activeProfileId,
+    canEditAgent,
+    handleSelectProfile,
+    menuItemId,
+    menuOpenedAt,
+    navigate,
+    onNavigate,
+    openGroup,
+    openGroupId,
+    pinnedIds,
+    profiles,
+    setDeletingGroup,
+    setEditingGroup,
+    setMenuItemId,
+    t,
+    togglePin,
+  };
 
   return (
     <div
       aria-label="Profiles"
       className="flex h-full w-14 shrink-0 flex-col items-center gap-2 border-border/50 border-r bg-sidebar/60 py-3"
     >
-      <div className="flex size-7 shrink-0 items-center justify-center">
+      <Link
+        aria-label="Airin"
+        className="flex size-7 shrink-0 items-center justify-center"
+        to={PAGE_PATHS.chat}
+      >
         <img
-          alt="Airin"
-          className="size-6 rounded-lg object-contain"
+          alt=""
+          className="size-6 object-contain"
+          height={24}
           src={logoSrc}
+          width={24}
         />
-      </div>
+      </Link>
 
       <div className="no-scrollbar flex min-h-0 flex-1 flex-col items-center gap-1.5 overflow-y-auto px-2 py-1">
-        {pinnedItems.map(renderItem)}
+        {pinnedItems.map((item) => (
+          <ProfileRailItem item={item} key={item.id} {...railItemProps} />
+        ))}
         {pinnedItems.length > 0 && agentItems.length + groupItems.length > 0 ? (
           <RailDivider />
         ) : null}
-        {agentItems.map(renderItem)}
+        {agentItems.map((item) => (
+          <ProfileRailItem item={item} key={item.id} {...railItemProps} />
+        ))}
         {groupItems.length > 0 && agentItems.length > 0 ? (
           <RailDivider />
         ) : null}
-        {groupItems.map(renderItem)}
+        {groupItems.map((item) => (
+          <ProfileRailItem item={item} key={item.id} {...railItemProps} />
+        ))}
 
         <ProfileRailCreateButton
           isPlatformAdmin={user?.isPlatformAdmin === true}

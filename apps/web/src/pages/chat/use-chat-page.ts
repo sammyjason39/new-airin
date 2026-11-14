@@ -31,6 +31,7 @@ import { useRunningTurnsStore } from "@/context/running-turns-store";
 import { useActiveChatProfile } from "@/context/use-active-chat-profile";
 import { useAppContext } from "@/context/use-app-context";
 import { useAuth } from "@/context/use-auth";
+import { useUiMode } from "@/context/use-ui-mode";
 import {
   buildThinkingSettingsPayload,
   useProfileQuery,
@@ -64,6 +65,7 @@ import {
   readRequestedDraftFromNewChatSearch,
   readRequestedDraftKeyFromNewChatSearch,
   readRequestedProfileFromNewChatSearch,
+  readStoredSessionId,
   sessionStorageKey,
   storeComposerDraft,
   storeFailedChatTurn,
@@ -225,6 +227,7 @@ export function useChatPage() {
   const routeSession = useMemo(() => parseChatRouteParams(params), [params]);
   const { health, models } = useAppContext();
   const { user, activeOrg, isLoading: authLoading } = useAuth();
+  const { uiMode } = useUiMode();
   const canManageInstallSettings = user?.isPlatformAdmin === true;
 
   const {
@@ -1065,9 +1068,22 @@ export function useChatPage() {
       }
 
       setProfileId(nextProfileId);
+
+      if (uiMode === "owner") {
+        const storedSessionId = readStoredSessionId(nextProfileId);
+
+        if (storedSessionId) {
+          navigate(buildChatPath(nextProfileId, storedSessionId), {
+            replace: true,
+          });
+
+          return;
+        }
+      }
+
       enterDraftChat(nextProfileId);
     },
-    [enterDraftChat, setProfileId]
+    [enterDraftChat, navigate, setProfileId, uiMode]
   );
 
   // Layout effect so session is cleared before the syncChatUrl effect can

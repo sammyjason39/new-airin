@@ -1,5 +1,6 @@
 import {
   buildChatBasePath,
+  buildChatPath,
   buildNewChatPath,
   isChatSessionPath,
   isProfilesPath,
@@ -15,14 +16,24 @@ export type ProfileSwitch =
 /**
  * Picking an agent is page-aware: Profiles, Files, Automations and the draft
  * chat swap the agent in place, every other page opens a fresh chat with it.
+ * Owner mode resumes the agent's last stored session when one exists.
  */
 export function resolveProfileSwitch(input: {
   activeProfileId: string | null;
   pathname: string;
   profileId: string;
   search: string;
+  storedSessionId?: string | null;
+  uiMode?: "advanced" | "owner";
 }): ProfileSwitch {
-  const { activeProfileId, pathname, profileId, search } = input;
+  const {
+    activeProfileId,
+    pathname,
+    profileId,
+    search,
+    storedSessionId = null,
+    uiMode = "advanced",
+  } = input;
   const onProfilesPage = isProfilesPath(pathname, PAGE_PATHS.profiles);
 
   // Files / Automations swap the agent in place. Draft /chat and session
@@ -65,6 +76,29 @@ export function resolveProfileSwitch(input: {
 
   if (swapsInPlace) {
     return { kind: "select" };
+  }
+
+  // Owner: keep the last chat for this agent; /new starts a blank one.
+  if (uiMode === "owner") {
+    if (storedSessionId) {
+      return {
+        kind: "navigate",
+        replace: onChat,
+        to: buildChatPath(profileId, storedSessionId),
+      };
+    }
+
+    if (onChat && pathname === buildChatBasePath()) {
+      return { kind: "select" };
+    }
+
+    if (onChat) {
+      return {
+        kind: "navigate",
+        replace: true,
+        to: buildChatBasePath(),
+      };
+    }
   }
 
   // Carry the agent in ?new=1 so ChatPage clears the previous transcript.

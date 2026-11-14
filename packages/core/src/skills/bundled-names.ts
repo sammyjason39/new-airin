@@ -31,6 +31,7 @@ export const OPT_IN_BUNDLED_SKILL_NAMES = [
   "agent-browser",
   "google-meet",
   "knowledge-base-wiki",
+  "hr-uu-ketenagakerjaan",
 ] as const;
 
 /** Laundry Innovation Summit pack — assigned on pack install only. */

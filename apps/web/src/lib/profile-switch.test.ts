@@ -1,12 +1,22 @@
 import { describe, expect, test } from "bun:test";
 import { resolveProfileSwitch } from "./profile-switch";
 
-function pick(pathname: string, search = "", activeProfileId = "alpha") {
+function pick(
+  pathname: string,
+  search = "",
+  activeProfileId = "alpha",
+  extras: {
+    storedSessionId?: string | null;
+    uiMode?: "advanced" | "owner";
+  } = {}
+) {
   return resolveProfileSwitch({
     activeProfileId,
     pathname,
     profileId: "beta",
     search,
+    storedSessionId: extras.storedSessionId,
+    uiMode: extras.uiMode,
   });
 }
 
@@ -55,5 +65,51 @@ describe("resolveProfileSwitch", () => {
 
   test("Files still swaps the agent in place", () => {
     expect(pick("/files")).toEqual({ kind: "select" });
+  });
+
+  test("Owner resumes the stored session for the picked agent", () => {
+    expect(
+      pick("/chat/alpha/session-1", "", "alpha", {
+        storedSessionId: "beta-last",
+        uiMode: "owner",
+      })
+    ).toEqual({
+      kind: "navigate",
+      replace: true,
+      to: "/chat/beta/beta-last",
+    });
+  });
+
+  test("Owner on draft chat swaps the agent without wiping another session URL", () => {
+    expect(
+      pick("/chat", "", "alpha", {
+        uiMode: "owner",
+      })
+    ).toEqual({ kind: "select" });
+  });
+
+  test("Owner leaves a session for a draft when the agent has no stored chat", () => {
+    expect(
+      pick("/chat/alpha/session-1", "", "alpha", {
+        uiMode: "owner",
+      })
+    ).toEqual({
+      kind: "navigate",
+      replace: true,
+      to: "/chat",
+    });
+  });
+
+  test("Owner outside chat opens the stored session when one exists", () => {
+    expect(
+      pick("/settings", "", "alpha", {
+        storedSessionId: "beta-last",
+        uiMode: "owner",
+      })
+    ).toEqual({
+      kind: "navigate",
+      replace: false,
+      to: "/chat/beta/beta-last",
+    });
   });
 });

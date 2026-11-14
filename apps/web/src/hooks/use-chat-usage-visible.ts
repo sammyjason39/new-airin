@@ -1,14 +1,10 @@
 import { useLocalStorageFlag } from "@/hooks/use-sidebar-collapsed";
-import {
-  CHAT_USAGE_VISIBLE_KEY,
-  getInitialChatUsageVisible,
-} from "@/lib/chat-usage";
+import { CHAT_USAGE_VISIBLE_KEY } from "@/lib/chat-usage";
 
 /** Settings toggle: show tokens and cost under each assistant reply. Off by default. */
 export function useChatUsageVisible() {
   const { collapsed: visible, toggle } = useLocalStorageFlag(
-    CHAT_USAGE_VISIBLE_KEY,
-    getInitialChatUsageVisible
+    CHAT_USAGE_VISIBLE_KEY
   );
 
   return { toggle, visible };

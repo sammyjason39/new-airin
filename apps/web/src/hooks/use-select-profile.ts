@@ -1,8 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useActiveChatProfile } from "@/context/use-active-chat-profile";
+import { useUiMode } from "@/context/use-ui-mode";
 import { useProfilesQuery } from "@/hooks/use-app-queries";
 import {
   isProfilesPath,
+  readStoredSessionId,
   resolveActiveProfileIdFromLocation,
 } from "@/lib/chat-history";
 import { PAGE_PATHS } from "@/lib/navigation";
@@ -11,6 +13,7 @@ import { resolveProfileSwitch } from "@/lib/profile-switch";
 /** One agent switch for every picker, so the rail and Cmd+K agree per page. */
 export function useSelectProfile() {
   const { data: profiles = [] } = useProfilesQuery();
+  const { uiMode } = useUiMode();
 
   const { profileId: liveChatProfileId, setProfileId: setLiveChatProfileId } =
     useActiveChatProfile();
@@ -32,6 +35,9 @@ export function useSelectProfile() {
       pathname,
       profileId,
       search,
+      storedSessionId:
+        uiMode === "owner" ? readStoredSessionId(profileId) : null,
+      uiMode,
     });
 
     if (next.kind === "stay") {

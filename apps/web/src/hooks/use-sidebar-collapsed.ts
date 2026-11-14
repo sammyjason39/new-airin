@@ -1,38 +1,34 @@
-import { useCallback, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useSyncExternalStore } from "react";
 import { useAuth } from "@/context/use-auth";
 import {
-  getInitialOwnerSidebarHidden,
-  getInitialSidebarCollapsed,
   OWNER_SIDEBAR_HIDDEN_KEY,
   pinnedPluginsStorageKey,
+  readLocalStorageFlag,
   readPinnedPluginIds,
   SIDEBAR_COLLAPSED_KEY,
+  subscribeLocalStorageFlag,
   subscribePinnedPlugins,
+  toggleLocalStorageFlag,
   togglePinnedPlugin,
 } from "@/lib/sidebar";
 
-export function useLocalStorageFlag(key: string, getInitial: () => boolean) {
-  const [collapsed, setCollapsed] = useState(getInitial);
+export function useLocalStorageFlag(key: string) {
+  const collapsed = useSyncExternalStore(
+    (listener) => subscribeLocalStorageFlag(key, listener),
+    () => readLocalStorageFlag(key),
+    () => false
+  );
 
-  useEffect(() => {
-    try {
-      localStorage.setItem(key, String(collapsed));
-    } catch {
-      // Ignore storage failures (private browsing, etc.)
-    }
-  }, [collapsed, key]);
-
-  const toggle = useCallback(() => setCollapsed((current) => !current), []);
+  const toggle = useCallback(() => {
+    toggleLocalStorageFlag(key);
+  }, [key]);
 
   return { collapsed, toggle };
 }
 
 /** With `shortcut`, Ctrl+B / Cmd+B toggles the sidebar. */
 export function useSidebarCollapsed({ shortcut = false } = {}) {
-  const flag = useLocalStorageFlag(
-    SIDEBAR_COLLAPSED_KEY,
-    getInitialSidebarCollapsed
-  );
+  const flag = useLocalStorageFlag(SIDEBAR_COLLAPSED_KEY);
 
   const { toggle } = flag;
 
@@ -63,12 +59,9 @@ export function useSidebarCollapsed({ shortcut = false } = {}) {
   return flag;
 }
 
-/** Hides the Owner team sidebar below `lg` (tablet and phone). */
+/** Hides the Owner team sidebar until the user shows it again. */
 export function useOwnerSidebarHidden() {
-  return useLocalStorageFlag(
-    OWNER_SIDEBAR_HIDDEN_KEY,
-    getInitialOwnerSidebarHidden
-  );
+  return useLocalStorageFlag(OWNER_SIDEBAR_HIDDEN_KEY);
 }
 
 export function usePinnedPlugins() {

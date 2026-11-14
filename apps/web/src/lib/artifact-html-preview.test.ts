@@ -15,6 +15,20 @@ describe("htmlForArtifactPreview", () => {
     expect(htmlForArtifactPreview(`${html}x`)).toContain('role="alert"');
     expect(ARTIFACT_HTML_IFRAME_SANDBOX.split(" ")).toEqual(["allow-scripts"]);
   });
+
+  test("stamps the app theme on the html root for preview", () => {
+    const dark = htmlForArtifactPreview(
+      "<!doctype html><html lang='en' data-theme='light'><head></head><body>hi</body></html>",
+      "dark"
+    );
+    expect(dark).toContain('data-theme="dark"');
+    expect(dark).toContain("color-scheme:dark");
+    expect(dark).not.toContain('data-theme="light"');
+
+    const light = htmlForArtifactPreview("<div>hi</div>", "light");
+    expect(light).toContain('<html data-theme="light"');
+    expect(light).toContain("color-scheme:light");
+  });
 });
 
 // Parse real HTML without loading its subresources in the test process.

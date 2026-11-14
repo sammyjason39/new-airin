@@ -63,13 +63,11 @@ import {
 } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  type AttachmentsContext,
   PromptInput,
   PromptInputBody,
   PromptInputFooter,
   PromptInputHeader,
   PromptInputSubmit,
-  PromptInputTextarea,
   usePromptInputAttachments,
   usePromptInputController,
 } from "@/components/ai-elements/prompt-input";
@@ -80,8 +78,6 @@ import {
 } from "@/components/chat/ChatMessageQueuePanel";
 import { ChatAddCapabilitiesDialogs } from "@/components/chat/chat-add-capabilities-dialogs";
 import { ChatContextUsageRing } from "@/components/chat/chat-context-usage";
-import { ChatSkillPicker } from "@/components/chat/chat-skill-picker";
-import { ChatSkillTokenOverlay } from "@/components/chat/chat-skill-token-overlay";
 import { ImageAttachmentPreview } from "@/components/chat/image-attachment-preview";
 import { OwnerEffortPicker } from "@/components/chat/owner-effort-picker";
 import { TextAttachmentPreview } from "@/components/chat/text-attachment-preview";
@@ -103,18 +99,12 @@ import type { ChatStatus, FileUIPart } from "@/lib/ai-ui-types";
 import {
   type ComposerAddCommandAction,
   type ComposerOpenPlugin,
-  type ComposerSuggestion,
-  filterComposerMentionSuggestions,
-  filterComposerSlashSuggestions,
-  findActiveSkillSlashRange,
   getLeadingCommand,
   matchComposerAddCommand,
   matchComposerBtwCommand,
   matchComposerLearningLoopCommand,
+  matchComposerNewCommand,
   matchComposerOpenCommand,
-  replaceSlashRangeWithReservedCommand,
-  replaceSlashRangeWithSkillInvocation,
-  type SkillSlashRange,
 } from "@/lib/chat-composer-skills";
 import type { ChatContextUsage } from "@/lib/chat-context-usage";
 import { storeComposerDraft } from "@/lib/chat-history";
@@ -144,6 +134,15 @@ import { queryKeys } from "@/lib/query-keys";
 import { THINKING_EFFORT_OPTIONS } from "@/lib/thinking-settings";
 import { PluginView } from "@/pages/PluginPage";
 import { composerActions } from "./chat-composer.shared";
+import {
+  BtwCommandContext,
+  ChatComposerTextarea,
+  CommandPrefixContext,
+  NewChatCommandContext,
+  OpenPluginContext,
+  openAttachmentPicker,
+  PromptHistoryContext,
+} from "./chat-composer-textarea";
 import { ChatDictationButton } from "./chat-dictation-button";
 import { ChatComposerError, ChatTips } from "./chat-tips";
 
@@ -159,6 +158,8 @@ interface ChatComposerBaseProps {
   /** Lets a failed turn's "Switch model" button open the model picker. */
   modelPickerTriggerRef?: RefObject<HTMLButtonElement | null>;
   onEditQueuedMessage?: (id: string, text: string) => void;
+  /** `/new` clears the thread and opens a blank chat with this agent. */
+  onNewChat?: () => void;
   onRemoveQueuedMessage?: (id: string) => void;
   onSendQueuedMessageNow?: (id: string) => void;
   onStop?: () => void;
@@ -684,14 +685,6 @@ function PluginPanelExpandButton({ panelId }: { panelId: string }) {
   );
 }
 
-/** Plugin pages `/open` lists for the active agent, and how to show one. */
-const OpenPluginContext = createContext<{
-  /** Opens the add-plugin dialog. Null when the user cannot assign tools. */
-  onAdd: (() => void) | null;
-  open: (plugin: ComposerOpenPlugin) => void;
-  plugins: ComposerOpenPlugin[];
-}>({ onAdd: null, open: () => undefined, plugins: NO_OPEN_PLUGINS });
-
 function composerBtwHandler(props: ChatComposerProps) {
   return isFullComposer(props) ? props.onBtw : undefined;
 }
@@ -712,29 +705,25 @@ function runBtwCommand(
   return true;
 }
 
+/** Starts a blank chat for a sent `/new`. True when it did. */
+function runNewChatCommand(
+  text: string,
+  onNewChat: (() => void) | undefined
+): boolean {
+  if (!(onNewChat && matchComposerNewCommand(text))) {
+    return false;
+  }
+
+  onNewChat();
+
+  return true;
+}
+
 /** Agent whose MCP servers the + menu can switch, and how to add one. Null hides Connectors. */
 const ConnectorsContext = createContext<{
   onAdd: (() => void) | null;
   profileId: string;
 } | null>(null);
-
-/** True when `/btw` is offered: only the composer that can open a side chat. */
-const BtwCommandContext = createContext(false);
-
-const PromptHistoryContext = createContext<{
-  promptHistoryRef: RefObject<string[]>;
-  historyPointer: number | null;
-  setHistoryPointer: (pointer: number | null) => void;
-}>({
-  historyPointer: null,
-  promptHistoryRef: { current: [] },
-  setHistoryPointer: () => undefined,
-});
-
-const CommandPrefixContext = createContext<{
-  prefix: string | null;
-  setPrefix: (prefix: string | null) => void;
-}>({ prefix: null, setPrefix: () => undefined });
 
 /** Strip above the input showing the selected leading command; its text lives outside the textarea. */
 function ChatComposerCommandBanner({
@@ -852,6 +841,7 @@ export function ChatComposer(props: ChatComposerProps) {
   const openPluginContext = useOpenPluginContext(profileId);
 
   const onBtw = composerBtwHandler(props);
+  const onNewChat = props.onNewChat;
 
   const canAddCapabilities =
     Boolean(profileId) &&
@@ -866,6 +856,12 @@ export function ChatComposer(props: ChatComposerProps) {
         : typedText;
 
       setCommandPrefix(null);
+
+      if (runNewChatCommand(text, onNewChat)) {
+        clearDraft();
+
+        return;
+      }
 
       if (runBtwCommand(text, onBtw)) {
         clearDraft();
@@ -954,348 +950,52 @@ export function ChatComposer(props: ChatComposerProps) {
 
   return (
     <CommandPrefixContext.Provider value={commandContext}>
-      <BtwCommandContext.Provider value={Boolean(onBtw)}>
-        <OpenPluginContext.Provider value={pluginsMenuContext}>
-          <ConnectorsContext.Provider value={connectorsContext}>
-            <PromptHistoryContext.Provider value={promptHistoryContext}>
-              <div className={cn("w-full shrink-0", props.className)}>
-                {layout.showOfflineHint && isFullComposer(props) ? (
-                  <ChatComposerOfflineHint
-                    onConnectProvider={props.onConnectProvider}
+      <NewChatCommandContext.Provider value={onNewChat ?? null}>
+        <BtwCommandContext.Provider value={Boolean(onBtw)}>
+          <OpenPluginContext.Provider value={pluginsMenuContext}>
+            <ConnectorsContext.Provider value={connectorsContext}>
+              <PromptHistoryContext.Provider value={promptHistoryContext}>
+                <div className={cn("w-full shrink-0", props.className)}>
+                  {layout.showOfflineHint && isFullComposer(props) ? (
+                    <ChatComposerOfflineHint
+                      onConnectProvider={props.onConnectProvider}
+                    />
+                  ) : null}
+                  <ChatComposerMain
+                    displayError={displayError}
+                    layout={layout}
+                    onAddCommand={openAddCommand}
+                    props={composerProps}
+                    setAttachmentError={setAttachmentError}
                   />
-                ) : null}
-                <ChatComposerMain
-                  displayError={displayError}
-                  layout={layout}
-                  onAddCommand={openAddCommand}
-                  props={composerProps}
-                  setAttachmentError={setAttachmentError}
-                />
-                {addProfileId ? (
-                  <ChatAddCapabilitiesDialogs
-                    mcpOpen={addDialog === "add-mcp"}
-                    onMcpOpenChange={(open) => {
-                      setAddDialog(open ? "add-mcp" : null);
-                    }}
-                    onPluginOpenChange={(open) =>
-                      setAddDialog(open ? "add-plugin" : null)
-                    }
-                    onSkillOpenChange={(open) => {
-                      setAddDialog(open ? "add-skill" : null);
-                    }}
-                    onToolOpenChange={(open) => {
-                      setAddDialog(open ? "add-tool" : null);
-                    }}
-                    pluginOpen={addDialog === "add-plugin"}
-                    profileId={addProfileId}
-                    skillOpen={addDialog === "add-skill"}
-                    toolOpen={addDialog === "add-tool"}
-                  />
-                ) : null}
-              </div>
-            </PromptHistoryContext.Provider>
-          </ConnectorsContext.Provider>
-        </OpenPluginContext.Provider>
-      </BtwCommandContext.Provider>
+                  {addProfileId ? (
+                    <ChatAddCapabilitiesDialogs
+                      mcpOpen={addDialog === "add-mcp"}
+                      onMcpOpenChange={(open) => {
+                        setAddDialog(open ? "add-mcp" : null);
+                      }}
+                      onPluginOpenChange={(open) =>
+                        setAddDialog(open ? "add-plugin" : null)
+                      }
+                      onSkillOpenChange={(open) => {
+                        setAddDialog(open ? "add-skill" : null);
+                      }}
+                      onToolOpenChange={(open) => {
+                        setAddDialog(open ? "add-tool" : null);
+                      }}
+                      pluginOpen={addDialog === "add-plugin"}
+                      profileId={addProfileId}
+                      skillOpen={addDialog === "add-skill"}
+                      toolOpen={addDialog === "add-tool"}
+                    />
+                  ) : null}
+                </div>
+              </PromptHistoryContext.Provider>
+            </ConnectorsContext.Provider>
+          </OpenPluginContext.Provider>
+        </BtwCommandContext.Provider>
+      </NewChatCommandContext.Provider>
     </CommandPrefixContext.Provider>
-  );
-}
-
-function ChatComposerTextarea({
-  availableSkills,
-  disabled,
-  className,
-  onAddCommand,
-  placeholder,
-  longPasteWordThreshold,
-}: {
-  availableSkills: SkillSummary[];
-  disabled: boolean;
-  className: string;
-  onAddCommand?: (action: ComposerAddCommandAction) => void;
-  placeholder: string;
-  longPasteWordThreshold?: number;
-}) {
-  const controller = usePromptInputController();
-  const attachments = usePromptInputAttachments();
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
-  const [slashRange, setSlashRange] = useState<SkillSlashRange | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [scrollTop, setScrollTop] = useState(0);
-  const openPlugin = useContext(OpenPluginContext);
-  const enableBtw = useContext(BtwCommandContext);
-
-  const mentionOpen =
-    slashRange !== null && controller.textInput.value[slashRange.start] === "@";
-
-  const suggestions = useMemo(() => {
-    if (!slashRange) {
-      return [];
-    }
-
-    return mentionOpen
-      ? filterComposerMentionSuggestions(slashRange.query)
-      : filterComposerSlashSuggestions(availableSkills, slashRange.query, {
-          enableAddCommands: onAddCommand != null,
-          enableBtw,
-          openPlugins: openPlugin.plugins,
-        });
-  }, [
-    availableSkills,
-    enableBtw,
-    mentionOpen,
-    onAddCommand,
-    openPlugin.plugins,
-    slashRange,
-  ]);
-
-  const pickerOpen = Boolean(slashRange && !disabled && suggestions.length > 0);
-
-  const safeActiveIndex =
-    suggestions.length === 0
-      ? 0
-      : Math.min(activeIndex, suggestions.length - 1);
-
-  const updateSlashRange = useCallback((value: string, cursorIndex: number) => {
-    setSlashRange(
-      findActiveSkillSlashRange(value, cursorIndex) ??
-        findActiveSkillSlashRange(value, cursorIndex, "@")
-    );
-    setActiveIndex(0);
-  }, []);
-
-  const selectSuggestion = useCallback(
-    (suggestion: ComposerSuggestion) => {
-      const textarea = textareaRef.current;
-      const value = controller.textInput.value;
-      const cursorIndex = textarea?.selectionStart ?? value.length;
-
-      const activeRange =
-        slashRange ??
-        findActiveSkillSlashRange(
-          value,
-          cursorIndex,
-          suggestion.kind === "mention" ? "@" : "/"
-        );
-
-      if (!activeRange) {
-        return;
-      }
-
-      if (suggestion.kind === "plugin") {
-        controller.textInput.setInput(
-          `${value.slice(0, activeRange.start)}${value.slice(activeRange.end)}`
-        );
-        setSlashRange(null);
-        setActiveIndex(0);
-        openPlugin.open(suggestion.plugin);
-
-        return;
-      }
-
-      const addAction =
-        suggestion.kind === "command" ? suggestion.command.action : undefined;
-
-      if (
-        onAddCommand &&
-        (addAction === "add-tool" ||
-          addAction === "add-mcp" ||
-          addAction === "add-plugin" ||
-          addAction === "add-skill")
-      ) {
-        controller.textInput.setInput(
-          `${value.slice(0, activeRange.start)}${value.slice(activeRange.end)}`
-        );
-        setSlashRange(null);
-        setActiveIndex(0);
-        onAddCommand(addAction);
-
-        return;
-      }
-
-      const next =
-        suggestion.kind === "skill"
-          ? replaceSlashRangeWithSkillInvocation(
-              value,
-              activeRange,
-              suggestion.skill
-            )
-          : suggestion.kind === "mention"
-            ? replaceSlashRangeWithReservedCommand(
-                value,
-                activeRange,
-                suggestion.mention,
-                "@"
-              )
-            : replaceSlashRangeWithReservedCommand(
-                value,
-                activeRange,
-                suggestion.command
-              );
-
-      controller.textInput.setInput(next.value);
-      setSlashRange(null);
-      setActiveIndex(0);
-
-      requestAnimationFrame(() => {
-        textareaRef.current?.setSelectionRange(
-          next.cursorIndex,
-          next.cursorIndex
-        );
-        textareaRef.current?.focus();
-      });
-    },
-    [controller.textInput, onAddCommand, openPlugin, slashRange]
-  );
-
-  const { prefix, setPrefix } = useContext(CommandPrefixContext);
-
-  const { promptHistoryRef, historyPointer, setHistoryPointer } =
-    useContext(PromptHistoryContext);
-
-  const value = controller.textInput.value;
-  const setInput = controller.textInput.setInput;
-
-  // Move a finished leading command (`/learn `, `/skill name `) out of the text.
-  useEffect(() => {
-    const command = getLeadingCommand(value, availableSkills);
-    const next = command ? value[command.range.end] : undefined;
-
-    if (!(command && next && /\s/.test(next))) {
-      return;
-    }
-
-    setPrefix(value.slice(command.range.start, command.range.end));
-    setInput(value.slice(command.range.end).replace(/^[ \t]/, ""));
-  }, [availableSkills, setInput, setPrefix, value]);
-
-  return (
-    <div className="relative min-w-0 flex-1">
-      <ChatSkillTokenOverlay
-        className={className}
-        scrollTop={scrollTop}
-        value={controller.textInput.value}
-      />
-      {pickerOpen ? (
-        <ChatSkillPicker
-          activeIndex={safeActiveIndex}
-          onSelect={selectSuggestion}
-          suggestions={suggestions}
-        />
-      ) : null}
-      <PromptInputTextarea
-        className={className}
-        disabled={disabled}
-        longPasteWordThreshold={longPasteWordThreshold}
-        onChange={(event) => {
-          if (historyPointer !== null) {
-            setHistoryPointer(null);
-          }
-
-          updateSlashRange(
-            event.currentTarget.value,
-            event.currentTarget.selectionStart
-          );
-        }}
-        onKeyDown={(event) => {
-          if (
-            !disabled &&
-            (event.ctrlKey || event.metaKey) &&
-            event.key.toLowerCase() === "u"
-          ) {
-            event.preventDefault();
-            openAttachmentPicker(attachments, ALL_ATTACHMENT_ACCEPT);
-
-            return;
-          }
-
-          if (!pickerOpen) {
-            if (event.key === "Escape" && prefix) {
-              event.preventDefault();
-              setPrefix(null);
-            }
-
-            if (
-              event.currentTarget.selectionStart === 0 &&
-              event.currentTarget.selectionEnd === 0
-            ) {
-              if (event.key === "ArrowUp") {
-                if (promptHistoryRef.current.length === 0) {
-                  return;
-                }
-
-                const nextPointer =
-                  historyPointer === null
-                    ? promptHistoryRef.current.length - 1
-                    : Math.max(historyPointer - 1, 0);
-
-                event.preventDefault();
-                setHistoryPointer(nextPointer);
-                setInput(promptHistoryRef.current[nextPointer]);
-              }
-
-              if (event.key === "ArrowDown" && historyPointer !== null) {
-                event.preventDefault();
-
-                if (historyPointer >= promptHistoryRef.current.length - 1) {
-                  setHistoryPointer(null);
-                  setInput("");
-                } else {
-                  const nextPointer = historyPointer + 1;
-                  setHistoryPointer(nextPointer);
-                  setInput(promptHistoryRef.current[nextPointer]);
-                }
-              }
-            }
-
-            return;
-          }
-
-          if (event.key === "ArrowDown") {
-            event.preventDefault();
-            setActiveIndex((current) =>
-              suggestions.length === 0 ? 0 : (current + 1) % suggestions.length
-            );
-
-            return;
-          }
-
-          if (event.key === "ArrowUp") {
-            event.preventDefault();
-            setActiveIndex((current) =>
-              suggestions.length === 0
-                ? 0
-                : (current - 1 + suggestions.length) % suggestions.length
-            );
-
-            return;
-          }
-
-          if (event.key === "Escape") {
-            event.preventDefault();
-            setSlashRange(null);
-            setActiveIndex(0);
-
-            return;
-          }
-
-          if (
-            (event.key === "Enter" || event.key === "Tab") &&
-            !event.shiftKey
-          ) {
-            event.preventDefault();
-            const suggestion = suggestions[safeActiveIndex];
-
-            if (suggestion) {
-              selectSuggestion(suggestion);
-            }
-          }
-        }}
-        onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
-        placeholder={placeholder}
-        ref={textareaRef}
-      />
-    </div>
   );
 }
 
@@ -1972,20 +1672,6 @@ function typeSlashCommand(textarea: HTMLTextAreaElement) {
   setValue?.call(textarea, `${before}${slash}${value.slice(selectionEnd)}`);
   textarea.setSelectionRange(cursor, cursor);
   textarea.dispatchEvent(new window.Event("input", { bubbles: true }));
-}
-
-/** Shared by the + menu item and the Ctrl+U/Cmd+U composer shortcut. */
-function openAttachmentPicker(attachments: AttachmentsContext, accept: string) {
-  const input = attachments.fileInputRef.current;
-
-  if (!input) {
-    attachments.openFileDialog();
-
-    return;
-  }
-
-  input.accept = accept;
-  input.click();
 }
 
 function addFilesShortcutLabel(): string {

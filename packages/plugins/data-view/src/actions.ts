@@ -290,16 +290,33 @@ async function spreadsheetInfo(
   };
 }
 
-async function fetchPublic(spreadsheetId: string, gid: string) {
+async function fetchPublicCsv(spreadsheetId: string, gid: string | null) {
+  const query =
+    gid === null ? "format=csv" : `format=csv&gid=${encodeURIComponent(gid)}`;
   const response = await fetch(
-    `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?format=csv&gid=${gid}`
+    `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?${query}`
   );
 
   if (!(response.ok && response.headers.get("content-type")?.includes("csv"))) {
     return null;
   }
 
-  const grid = parseCsv(await response.text());
+  return parseCsv(await response.text());
+}
+
+async function fetchPublic(spreadsheetId: string, gid: string) {
+  // Links without #gid= default to "0". Many workbooks use another first-tab id,
+  // so fall back to Google's default export (active/first sheet) when gid=0 fails.
+  let grid = await fetchPublicCsv(spreadsheetId, gid);
+
+  if (!grid && gid === "0") {
+    grid = await fetchPublicCsv(spreadsheetId, null);
+  }
+
+  if (!grid) {
+    return null;
+  }
+
   let title = "Untitled sheet";
 
   try {

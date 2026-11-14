@@ -41,7 +41,7 @@ function WaitlistForm() {
     return (
       <p className="landing-success" role="status">
         <CheckmarkCircle02Icon aria-hidden />
-        Pendaftaran kamu sudah masuk daftar tunggu.
+        Form kamu sudah masuk. Kami akan hubungi secepatnya.
       </p>
     );
   }
@@ -105,7 +105,7 @@ function WaitlistForm() {
         disabled={status === "pending"}
         type="submit"
       >
-        {status === "pending" ? "Mengirim…" : "Masuk daftar tunggu"}
+        {status === "pending" ? "Mengirim…" : "Kirim form"}
         <ArrowRight01Icon aria-hidden />
       </button>
       {status === "error" && (

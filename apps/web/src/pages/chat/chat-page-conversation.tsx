@@ -166,6 +166,7 @@ export function ChatConversation({
   composer,
   onSwitchModel,
   ownerAgentSettingsButton,
+  ownerHistoryButton,
   ownerMode,
   showSessionBar,
   showUsage,
@@ -175,6 +176,7 @@ export function ChatConversation({
   cognitoControl: ReactNode;
   cognitoSurface: boolean;
   ownerAgentSettingsButton?: ReactNode;
+  ownerHistoryButton?: ReactNode;
   ownerMode: boolean;
   cognitoToggle: ReactNode;
   composer: ReactNode;
@@ -270,6 +272,7 @@ export function ChatConversation({
             <ChatSessionBar
               actions={
                 <>
+                  {ownerHistoryButton}
                   {ownerAgentSettingsButton}
                   {cognitoToggle}
                   <ChatStatusButton />
@@ -413,7 +416,7 @@ export function NewChatTopBar({
 }) {
   return (
     <div className="flex h-12 shrink-0 items-center gap-1 border-border border-b bg-background px-4 max-sm:hidden">
-      <OwnerSidebarReopen />
+      <OwnerSidebarReopen className="size-7" />
       <h1 className="truncate px-2 font-semibold text-[15px] tracking-tight">
         New chat
       </h1>

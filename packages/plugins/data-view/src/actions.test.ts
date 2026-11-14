@@ -167,6 +167,47 @@ test("a private sheet reads once through the connected account", async () => {
   expect(hostCalls[1]).toMatchObject({ range: "'Q1 ''final'''" });
 });
 
+test("gid 0 falls back to the default public export", async () => {
+  const urls: string[] = [];
+  globalThis.fetch = Object.assign(
+    async (url: string | URL | Request) => {
+      const href = String(url);
+      urls.push(href);
+
+      if (href.includes("export?format=csv&gid=0")) {
+        return new Response("<html>", {
+          headers: { "content-type": "text/html" },
+          status: 400,
+        });
+      }
+
+      if (href.includes("export?format=csv") && !href.includes("gid=")) {
+        return new Response("Name,Score\nAda,1\n", {
+          headers: { "content-type": "text/csv" },
+        });
+      }
+
+      return new Response('<meta property="og:title" content="Default tab">', {
+        headers: { "content-type": "text/html" },
+      });
+    },
+    { preconnect: originalFetch.preconnect }
+  );
+
+  const added = await invoke("add_sheet", {
+    url: "https://docs.google.com/spreadsheets/d/abc123/edit",
+  });
+
+  expect(added).toMatchObject({ rows: 1, title: "Default tab" });
+  expect(urls.some((url) => url.includes("gid=0"))).toBe(true);
+  expect(
+    urls.some(
+      (url) => url.includes("export?format=csv") && !url.includes("gid=")
+    )
+  ).toBe(true);
+  expect(hostCalls).toEqual([]);
+});
+
 test("rows past the end and unknown columns are refused", async () => {
   const { id } = await invoke("add_sheet", { url: SHEET });
   const sheetId = String(id);

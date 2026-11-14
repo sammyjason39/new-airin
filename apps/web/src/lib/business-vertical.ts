@@ -1,4 +1,4 @@
-import type { UserOrgSummary } from "@nakama/core/contract";
+import type { UserOrgSummary } from "@airin/core/contract";
 
 export type BusinessVerticalId = "generic" | "laundry";
 

@@ -73,12 +73,13 @@ export function Layout() {
         <DesktopTitleBar ownerMode={ownerMode} />
         <div className="flex min-h-0 flex-1 overflow-hidden pl-[env(safe-area-inset-left)]">
           {/* The rail and sidebar cost a fixed 296px, so on a phone they live
-            in MobileNavDrawer instead of the layout. Below lg, Owner can hide
-            the tablet sidebar and reopen it from the chat bar. */}
+            in MobileNavDrawer instead of the layout. Owner can hide the team
+            sidebar and reopen it from the chat bar. Do not combine `sm:flex`
+            with `max-lg:hidden` — those conflict and the sidebar stays visible. */}
           <div
             className={cn(
-              "hidden h-full sm:flex",
-              ownerMode && ownerSidebarHidden && "max-lg:hidden"
+              "h-full",
+              ownerMode && ownerSidebarHidden ? "hidden" : "hidden sm:flex"
             )}
           >
             {ownerMode ? (
@@ -94,6 +95,14 @@ export function Layout() {
             className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden pr-[env(safe-area-inset-right)]"
             data-app-shell-content=""
           >
+            {ownerMode &&
+            ownerSidebarHidden &&
+            shell.page !== "chat" &&
+            groupRouteFromPath(shell.pathname) === null ? (
+              <div className="absolute top-3 left-3 z-20 max-sm:hidden">
+                <OwnerSidebarReopen className="rounded-full border border-border bg-background shadow-sm" />
+              </div>
+            ) : null}
             <AppShellHeader
               hideDesktop={
                 ownerMode ||

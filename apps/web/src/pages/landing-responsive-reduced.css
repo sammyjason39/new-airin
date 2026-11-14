@@ -31,7 +31,7 @@
     justify-content: center;
     width: 100%;
     min-width: 0;
-    padding: 0.8rem;
+    padding: 0.55rem 0.7rem;
   }
   .landing-marquee-track li > svg {
     display: none;

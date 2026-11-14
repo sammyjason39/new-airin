@@ -31,10 +31,7 @@ import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { RecentChatContextMenu } from "@/components/SidebarRecentChatRow";
 import { useLocalStorageFlag } from "@/hooks/use-sidebar-collapsed";
-import {
-  getInitialPinnedCollapsed,
-  SIDEBAR_PINNED_COLLAPSED_KEY,
-} from "@/lib/sidebar";
+import { SIDEBAR_PINNED_COLLAPSED_KEY } from "@/lib/sidebar";
 
 /**
  * The Recents building blocks the sidebar shares between an agent's chats and
@@ -284,10 +281,7 @@ export function PinnedChats<T>({
   renderRow: (row: T) => ReactNode;
 }) {
   const { collapsed: pinnedCollapsed, toggle: togglePinned } =
-    useLocalStorageFlag(
-      SIDEBAR_PINNED_COLLAPSED_KEY,
-      getInitialPinnedCollapsed
-    );
+    useLocalStorageFlag(SIDEBAR_PINNED_COLLAPSED_KEY);
 
   return rows.length > 0 ? (
     <div className="mb-3">

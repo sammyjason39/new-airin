@@ -118,7 +118,7 @@
 }
 .landing-schedule {
   padding: 1rem;
-  margin: 0.5rem 2rem 2rem;
+  margin: 0.5rem 1.5rem 1.5rem;
   background: #f7f5fb;
   border-radius: 12px;
 }
@@ -145,19 +145,39 @@
   background: var(--violet);
   border-radius: 9px;
 }
-.landing-schedule p {
+.landing-schedule-list {
+  display: grid;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  list-style: none;
+}
+.landing-schedule-list li {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.55rem;
   align-items: center;
-  padding: 0.65rem 0.75rem;
-  margin-top: 0.7rem;
-  font-size: 0.65rem;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.62rem;
+  line-height: 1.35;
   color: var(--ink);
-  background: #eaf6d9;
+  background: #fff;
+  border: 1px solid #ebe6f3;
   border-radius: 8px;
 }
-.landing-schedule p span:last-child {
+.landing-schedule-list li:first-child {
+  background: #eaf6d9;
+  border-color: #d7ebc0;
+}
+.landing-schedule-list strong {
+  min-width: 0;
+  font-weight: 650;
+  text-align: left;
+}
+.landing-schedule-list span:last-child {
   margin-left: auto;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted);
+  white-space: nowrap;
 }
 .landing-access-list {
   display: grid;

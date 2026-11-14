@@ -17,10 +17,7 @@ import {
 } from "@/hooks/use-agent-groups";
 import { useLocalStorageFlag } from "@/hooks/use-sidebar-collapsed";
 import { groupPath } from "@/lib/navigation";
-import {
-  getInitialRecentsCollapsed,
-  SIDEBAR_RECENTS_COLLAPSED_KEY,
-} from "@/lib/sidebar";
+import { SIDEBAR_RECENTS_COLLAPSED_KEY } from "@/lib/sidebar";
 
 /** The sidebar's Recents while a group is open: that group's sessions. */
 export function GroupRecents({ groupId }: { groupId: string }) {
@@ -40,8 +37,7 @@ export function GroupRecents({ groupId }: { groupId: string }) {
   const [renameTarget, setRenameTarget] = useState<SessionTarget | null>(null);
 
   const { collapsed, toggle } = useLocalStorageFlag(
-    SIDEBAR_RECENTS_COLLAPSED_KEY,
-    getInitialRecentsCollapsed
+    SIDEBAR_RECENTS_COLLAPSED_KEY
   );
 
   // A group holds few sessions, so titles are searched on the page.

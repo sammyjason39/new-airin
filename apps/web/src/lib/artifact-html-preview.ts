@@ -50,7 +50,8 @@ export function printArtifactHtml(html: string): void {
     if (event.data === ARTIFACT_FRAME_READY) {
       frame.contentWindow?.postMessage(
         {
-          airinArtifactHtml: `${htmlForArtifactPreview(html)}${PRINT_SCRIPT}`,
+          // PDF print stays on the light theme (white background).
+          airinArtifactHtml: `${htmlForArtifactPreview(html, "light")}${PRINT_SCRIPT}`,
         },
         "*"
       );
@@ -65,26 +66,56 @@ export function printArtifactHtml(html: string): void {
   window.setTimeout(cleanup, 10 * 60_000);
 }
 
-export function htmlForArtifactPreview(html: string): string {
+/**
+ * Prepares HTML for the sandboxed preview frame. When `theme` is set, stamps
+ * `data-theme` on `<html>` so artifact CSS follows the app theme (white light
+ * background by default; dark tokens when the app is dark).
+ */
+export function htmlForArtifactPreview(
+  html: string,
+  theme?: "dark" | "light"
+): string {
   if (new TextEncoder().encode(html).byteLength > MAX_HTML_ARTIFACT_BYTES) {
     return `<p role="alert">HTML artifacts cannot exceed ${MAX_HTML_ARTIFACT_BYTES} bytes.</p>`;
   }
 
-  if (/<head[\s>]/i.test(html)) {
-    return html.replace(
+  const themed = theme ? applyArtifactPreviewTheme(html, theme) : html;
+
+  if (/<head[\s>]/i.test(themed)) {
+    return themed.replace(
       /<head(\s[^>]*)?>/i,
       (match) => `${match}${HIDDEN_SCROLLBAR_STYLE}`
     );
   }
 
-  if (/<html[\s>]/i.test(html)) {
-    return html.replace(
+  if (/<html[\s>]/i.test(themed)) {
+    return themed.replace(
       /<html(\s[^>]*)?>/i,
       (match) => `${match}<head>${HIDDEN_SCROLLBAR_STYLE}</head>`
     );
   }
 
-  return `${HIDDEN_SCROLLBAR_STYLE}${html}`;
+  return `${HIDDEN_SCROLLBAR_STYLE}${themed}`;
+}
+
+function applyArtifactPreviewTheme(
+  html: string,
+  theme: "dark" | "light"
+): string {
+  if (/<html\b[^>]*>/i.test(html)) {
+    return html.replace(/<html\b([^>]*)>/i, (_match, attrs: string) => {
+      const cleaned = attrs
+        .replace(/\sdata-theme\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/i, "")
+        .replace(/\scolor-scheme\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/i, "")
+        .trim();
+
+      return cleaned
+        ? `<html ${cleaned} data-theme="${theme}" style="color-scheme:${theme}">`
+        : `<html data-theme="${theme}" style="color-scheme:${theme}">`;
+    });
+  }
+
+  return `<html data-theme="${theme}" style="color-scheme:${theme}"><head></head><body>${html}</body></html>`;
 }
 
 const ABSOLUTE_ASSET_URL = /^(?:[a-z][a-z\d+.-]*:|\/\/|#)/i;

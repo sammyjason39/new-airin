@@ -4,39 +4,81 @@ export const SIDEBAR_RECENTS_COLLAPSED_KEY = "airin-sidebar-recents-collapsed";
 
 export const SIDEBAR_PINNED_COLLAPSED_KEY = "airin-sidebar-pinned-collapsed";
 
-/** Owner team sidebar hidden on tablet and phone (lg+ always shows it). */
+/** Owner team sidebar hidden on this browser until the user shows it again. */
 export const OWNER_SIDEBAR_HIDDEN_KEY = "airin-owner-sidebar-hidden";
 
 export function getInitialSidebarCollapsed(): boolean {
-  try {
-    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
-  } catch {
-    return false;
-  }
+  return readLocalStorageFlag(SIDEBAR_COLLAPSED_KEY);
 }
 
 export function getInitialOwnerSidebarHidden(): boolean {
+  return readLocalStorageFlag(OWNER_SIDEBAR_HIDDEN_KEY);
+}
+
+/** Boolean flags shared across hook instances on this page. */
+const localStorageFlagListeners = new Map<string, Set<() => void>>();
+
+export function readLocalStorageFlag(key: string): boolean {
   try {
-    return localStorage.getItem(OWNER_SIDEBAR_HIDDEN_KEY) === "true";
+    return localStorage.getItem(key) === "true";
   } catch {
     return false;
   }
+}
+
+export function writeLocalStorageFlag(key: string, value: boolean): void {
+  try {
+    localStorage.setItem(key, String(value));
+  } catch {
+    // Ignore storage failures (private browsing, etc.)
+  }
+
+  const listeners = localStorageFlagListeners.get(key);
+
+  if (!listeners) {
+    return;
+  }
+
+  for (const listener of listeners) {
+    listener();
+  }
+}
+
+export function toggleLocalStorageFlag(key: string): boolean {
+  const next = !readLocalStorageFlag(key);
+  writeLocalStorageFlag(key, next);
+
+  return next;
+}
+
+export function subscribeLocalStorageFlag(
+  key: string,
+  listener: () => void
+): () => void {
+  let listeners = localStorageFlagListeners.get(key);
+
+  if (!listeners) {
+    listeners = new Set();
+    localStorageFlagListeners.set(key, listeners);
+  }
+
+  listeners.add(listener);
+
+  return () => {
+    listeners.delete(listener);
+
+    if (listeners.size === 0) {
+      localStorageFlagListeners.delete(key);
+    }
+  };
 }
 
 export function getInitialRecentsCollapsed(): boolean {
-  try {
-    return localStorage.getItem(SIDEBAR_RECENTS_COLLAPSED_KEY) === "true";
-  } catch {
-    return false;
-  }
+  return readLocalStorageFlag(SIDEBAR_RECENTS_COLLAPSED_KEY);
 }
 
 export function getInitialPinnedCollapsed(): boolean {
-  try {
-    return localStorage.getItem(SIDEBAR_PINNED_COLLAPSED_KEY) === "true";
-  } catch {
-    return false;
-  }
+  return readLocalStorageFlag(SIDEBAR_PINNED_COLLAPSED_KEY);
 }
 
 const PINNED_PLUGINS_KEY = "airin-sidebar-pinned-plugins";

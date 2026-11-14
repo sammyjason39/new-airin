@@ -22,6 +22,8 @@ const IGNORED_PATHS = [
   /^packages\/plugins\/[^/]+\/(actions\/[^/]+\.js|ui\/app\.js|workers\/[^/]+\.js)$/,
   // Vendored upstream source, kept verbatim; not written by hand here.
   /^apps\/web\/src\/components\/moodstone\/(core\/|svg\.ts$)/,
+  // Bundled skill reference corpora (laws, long source excerpts), not hand-edited.
+  /^packages\/core\/src\/skills\/bundled\/[^/]+\/references\//,
 ];
 
 const git = (args: string[]) =>

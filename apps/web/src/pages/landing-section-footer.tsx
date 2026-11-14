@@ -1,33 +1,54 @@
-import { ArrowRight01Icon } from "hugeicons-react";
-import { Link } from "react-router-dom";
-import { industries } from "./landing-content";
-
 function LandingFooter() {
   return (
-    <footer className="landing-footer landing-wrap">
-      <div>
-        <a aria-label="Airin, beranda" href="/">
-          <img
-            alt="Airin"
-            height={40}
-            src="/airin-wordmark-light.png"
-            width={414}
-          />
-        </a>
-        <span>Kerja nyata. Tim lebih kuat.</span>
-      </div>
-      <div>
-        <p>
-          Foto industri:{" "}
-          {industries.map((item) => (
-            <a href={item.photo} key={item.id}>
-              {item.credit}
+    <footer className="landing-footer">
+      <div className="landing-wrap landing-footer-inner">
+        <div className="landing-footer-brand">
+          <p className="landing-footer-created">Created by Conextlab.ai</p>
+          <div className="landing-footer-logos">
+            <a
+              aria-label="Conextlab.ai"
+              href="https://conextlab.net"
+              rel="noreferrer"
+              target="_blank"
+            >
+              <img
+                alt="Conextlab"
+                height={40}
+                src="/icons/conextlab.png"
+                width={40}
+              />
             </a>
-          ))}
-        </p>
-        <Link to="/login">
-          Masuk ke Airin <ArrowRight01Icon aria-hidden />
-        </Link>
+            <a
+              aria-label="Ralali Group"
+              href="https://ralaligroup.com"
+              rel="noreferrer"
+              target="_blank"
+            >
+              <img
+                alt="Ralali Group"
+                height={36}
+                src="/icons/ralali-group.svg"
+                width={67}
+              />
+            </a>
+          </div>
+          <p className="landing-footer-note">A Ralali Group company</p>
+        </div>
+        <div className="landing-footer-contact">
+          <p>
+            Capital Cove Business Loft, BSD City
+            <br />
+            Jl. BSD Grand Boulevard No.26, Cilenggang
+            <br />
+            Kec. Serpong, Kota Tangerang Selatan
+            <br />
+            Banten 15310
+          </p>
+          <p>
+            <a href="mailto:hello@conextlab.ai">hello@conextlab.ai</a>
+            <span> — partnership atau pertanyaan lain</span>
+          </p>
+        </div>
       </div>
     </footer>
   );

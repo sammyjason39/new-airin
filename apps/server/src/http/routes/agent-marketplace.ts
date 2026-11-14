@@ -13,7 +13,10 @@ export function registerAgentMarketplaceRoutes(
   app: HonoApp,
   options: ServerOptions
 ): void {
-  const marketplace = new AgentMarketplaceService(options.agent.profiles);
+  const marketplace = new AgentMarketplaceService(
+    options.agent.profiles,
+    options.databaseAdapter
+  );
 
   app.get("/v1/agent-marketplace", async (c) => {
     const auth = requireOrgMemberFromContext(c);

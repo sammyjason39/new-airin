@@ -1,103 +1,11 @@
-import type {
-  AgentChannel,
-  AutomationDeliveryChannel,
-  ToolDefinition,
-} from "@airin/core";
+import type { AutomationDeliveryChannel, ToolDefinition } from "@airin/core";
 import { UNTRUSTED_DOCUMENT_GUIDANCE } from "@airin/core";
 import type { AgentRequest } from "./chat";
-
-type MessagingChannelPromptConfig = {
-  label: string;
-  supportsGroupAudience: boolean;
-  /** How the channel renders text. Also applied to automation reports. */
-  format: readonly string[];
-  /** Live-chat behavior only; skipped for automation reports. */
-  chat?: readonly string[];
-};
-
-const MESSAGING_CHANNEL_PROMPT = {
-  automation: null,
-  cli: null,
-  discord: {
-    chat: [
-      "For work that needs tools, send a brief status line first (what you are about to do), then use tools, then send a short outcome when finished.",
-    ],
-    format: [
-      "Discord supports a Markdown subset: **bold**, *italic*, __underline__, ~~strikethrough~~, inline code, fenced code blocks, and headings.",
-      "Avoid tables and very long code blocks; keep messages compact for chat.",
-    ],
-    label: "Discord",
-    supportsGroupAudience: true,
-  },
-  slack: {
-    format: [
-      "Write in normal Markdown; Slack renders **bold**, *italic*, ~~strikethrough~~, links, lists, inline code, and fenced code blocks.",
-      "Avoid tables and very long code blocks; keep messages compact for chat.",
-    ],
-    label: "Slack",
-    supportsGroupAudience: true,
-  },
-  subagent: null,
-  task: null,
-  teams: {
-    format: [
-      "Use simple Markdown and keep responses suitable for a personal Teams chat. File delivery is not available on this connection.",
-    ],
-    label: "Microsoft Teams",
-    supportsGroupAudience: false,
-  },
-  telegram: {
-    chat: [
-      "When you save an artifact, Airin posts a share link after your reply. When the user asks to send or attach the file (or uses /attach), Airin sends a Telegram document — do not say you cannot attach or send files, and do not redirect them only to the Artifacts tab for that request.",
-    ],
-    format: [
-      "Write in normal Markdown when formatting helps; Telegram delivery will render a safe rich subset.",
-      "Use simple Markdown: **bold**, *italic*, __underline__, inline code, fenced code blocks, headings, links, and short lists.",
-      "Avoid raw HTML, Markdown tables, deeply nested lists, and very long code blocks because Telegram is best for compact chat messages.",
-    ],
-    label: "Telegram",
-    supportsGroupAudience: true,
-  },
-  web: null,
-  whatsapp: {
-    chat: [
-      "WhatsApp /attach resends the most recent saved artifact without an agent turn. Saving a file alone does not upload it.",
-    ],
-    format: [
-      "WhatsApp only supports simple *bold* and _italic_ formatting.",
-      "Do not use markdown headings, bullet lists, numbered lists, tables, or ``` code fences.",
-    ],
-    label: "WhatsApp",
-    supportsGroupAudience: true,
-  },
-} as const satisfies Record<AgentChannel, MessagingChannelPromptConfig | null>;
-
-/**
- * The channels that get a messaging style, read back off the map above instead
- * of hand-written beside it. The map is total over `AgentChannel`, so a new
- * channel fails the typecheck there and has to say whether it is one of these.
- */
-type MessagingChannel = {
-  [K in AgentChannel]: (typeof MESSAGING_CHANNEL_PROMPT)[K] extends null
-    ? never
-    : K;
-}[AgentChannel];
-
-const SHARED_MESSAGING_STYLE = [
-  "Write like texting a friend: short paragraphs and a conversational tone.",
-  "Prefer one to three brief paragraphs unless the user asks for detail.",
-  "If you must share code or commands, put them on their own line as plain text without backticks.",
-  "Do not mention tools, JSON, or internal steps in the user-visible reply.",
-] as const;
-
-const AUTOMATION_REPORT_STYLE =
-  'Your final reply is read as a message from a person. Write plainly, lead with the result, and skip openers like "Here is your report" or "Task completed".';
-
-function isMessagingChannel(
-  channel: AgentRequest["channel"] | undefined
-): channel is MessagingChannel {
-  return channel !== undefined && MESSAGING_CHANNEL_PROMPT[channel] !== null;
-}
+import {
+  appendAutomationDeliveryPrompt,
+  appendMessagingChannelPrompt,
+  isMessagingChannel,
+} from "./chat-prompt-messaging";
 
 export { UNTRUSTED_DOCUMENT_GUIDANCE };
 
@@ -197,6 +105,7 @@ export function buildChatSystemPrompt(
     "# Interactive HTML widgets",
     "When a calculator, form, chart, table with inputs, or other interactive result helps more than plain text, reply with a fenced ```html block that includes self-contained HTML, CSS, and JavaScript.",
     "The dashboard renders that block inline in a sandboxed iframe. Prefer one compact widget plus a short plain-language note.",
+    "Use a white light background by default, follow prefers-color-scheme / data-theme for dark, keep panels rounded and colorful, put a short Executive summary above charts when the widget is a report, and draw a chart when numbers exist.",
     "Do not rely on external scripts or network calls from the widget. Keep widgets under ~50 KB."
   );
 
@@ -273,7 +182,7 @@ export function buildChatSystemPrompt(
     if (tools.some((tool) => tool.name === saveTool)) {
       sections.push(
         "Skills are workflow instructions, not callable tools — never invoke the artifact-design skill (or other skills) as a tool.",
-        `When the user wants output kept or mentions artifacts, use ${saveTool} to save under artifacts/ (follow the artifact-design or slide-deck-design skill when active for layout and styling). Durable deliverables such as reports, slide decks, and exports belong under artifacts/, not the profile workspace root. Save only the deliverable; Airin derives the file type, size, and timestamp automatically, so do not create metadata files.`,
+        `When the user wants output kept or mentions artifacts, use ${saveTool} to save under artifacts/ (follow the artifact-design or slide-deck-design skill when active for layout and styling). For HTML dashboards and metric reports, load artifact-design and use its locked report template: Executive summary first, colorful rounded KPIs, chart when numbers exist, then detail; white light background, theme via prefers-color-scheme and data-theme. Durable deliverables such as reports, slide decks, and exports belong under artifacts/, not the profile workspace root. Save only the deliverable; Airin derives the file type, size, and timestamp automatically, so do not create metadata files.`,
         "Use a short filename such as artifacts/project-atlas.html; use subdirectories to group related files. Existing names receive a date suffix automatically; use the returned path.",
         saveTool === "save_artifact"
           ? "save_artifact writes UTF-8 text, except a .pdf path: give it full HTML and the server prints it to PDF with headless Chrome. In web chat, the user can also select Download as PDF on an HTML artifact. If save_artifact reports that the server has no Chrome, tell the user that the server admin must install Chrome or Chromium or set AIRIN_CHROME_PATH. Use a suitable tool or skill for other binary formats; changing an extension does not create an image."
@@ -340,40 +249,8 @@ export function buildChatSystemPrompt(
       options.chatKind ?? "private"
     );
   } else if (options.channel === "automation") {
-    sections.push("", AUTOMATION_REPORT_STYLE);
-
-    if (options.deliveryChannel && options.deliveryChannel !== "email") {
-      const config: MessagingChannelPromptConfig =
-        MESSAGING_CHANNEL_PROMPT[options.deliveryChannel];
-
-      sections.push(
-        `Your final reply is sent to ${config.label} as the run report.`,
-        ...config.format
-      );
-    }
+    appendAutomationDeliveryPrompt(sections, options.deliveryChannel);
   }
 
   return sections.join("\n");
-}
-
-function appendMessagingChannelPrompt(
-  sections: string[],
-  channel: MessagingChannel,
-  chatKind: "private" | "group"
-): void {
-  const config: MessagingChannelPromptConfig =
-    MESSAGING_CHANNEL_PROMPT[channel];
-
-  const audienceLine =
-    chatKind === "group" && config.supportsGroupAudience
-      ? `You are replying in a ${config.label} channel. Everyone in the channel can see your messages.`
-      : `You are replying in a private ${config.label} chat.`;
-
-  sections.push(
-    "",
-    audienceLine,
-    ...config.format,
-    ...(config.chat ?? []),
-    ...SHARED_MESSAGING_STYLE
-  );
 }

@@ -47,7 +47,7 @@ function RosterSection() {
           ))}
         </ul>
         <div className="landing-roster-more">
-          <span lang="en">+ 20 more</span>
+          <span>Marketplace · Simple &amp; Advanced</span>
           <a className="landing-text-link" href="#daftar-tunggu">
             Temukan tim untuk bisnismu <ArrowRight01Icon aria-hidden />
           </a>

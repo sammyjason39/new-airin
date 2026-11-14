@@ -4,7 +4,7 @@ import {
   CheckmarkCircle02Icon,
   Shield01Icon,
 } from "hugeicons-react";
-import { industries, integrations, team } from "./landing-content";
+import { industries, team } from "./landing-content";
 import { CampaignPoster } from "./landing-poster";
 
 function FeatureSection() {
@@ -64,8 +64,7 @@ function FeatureSection() {
               <Calendar03Icon aria-hidden />
               <h3>Rutinitas punya jadwal.</h3>
               <p>
-                Ringkasan penjualan Senin pagi. Pengingat stok Jumat sore. Atur
-                sesuai ritme bisnis.
+                Briefing pagi sampai closing malam. Atur sesuai ritme bisnis.
               </p>
             </div>
             <div className="landing-schedule">
@@ -83,11 +82,33 @@ function FeatureSection() {
                 <span>13</span>
                 <span>14</span>
               </div>
-              <p>
-                <span className="landing-status-dot" />
-                <strong>Ringkasan penjualan</strong>
-                <span>09.00</span>
-              </p>
+              <ul className="landing-schedule-list">
+                <li>
+                  <span className="landing-status-dot" />
+                  <strong>Briefing tim</strong>
+                  <span>08.00</span>
+                </li>
+                <li>
+                  <span className="landing-status-dot" />
+                  <strong>Cek absensi &amp; keterlambatan</strong>
+                  <span>09.30</span>
+                </li>
+                <li>
+                  <span className="landing-status-dot" />
+                  <strong>Rekap shift pagi · brief shift sore</strong>
+                  <span>15.00</span>
+                </li>
+                <li>
+                  <span className="landing-status-dot" />
+                  <strong>Catat invoice masuk</strong>
+                  <span>17.00</span>
+                </li>
+                <li>
+                  <span className="landing-status-dot" />
+                  <strong>Report closing order harian</strong>
+                  <span>22.00</span>
+                </li>
+              </ul>
             </div>
           </article>
           <article className="landing-feature-access" data-reveal="rise">
@@ -100,17 +121,23 @@ function FeatureSection() {
               </p>
             </div>
             <div className="landing-access-list">
-              {integrations.slice(0, 3).map((app, index) => (
-                <div key={app.name}>
+              {(
+                [
+                  ["whatsapp.svg", "WhatsApp", team[0].name],
+                  ["google-sheets.svg", "Google Sheets", team[1].name],
+                  ["gmail.svg", "Gmail", team[2].name],
+                ] as const
+              ).map(([icon, name, agent]) => (
+                <div key={name}>
                   <img
                     alt=""
                     height={26}
                     loading="lazy"
-                    src={`/icons/${app.icon}`}
+                    src={`/icons/${icon}`}
                     width={26}
                   />
-                  <span>{app.name}</span>
-                  <span>{team[index].name}</span>
+                  <span>{name}</span>
+                  <span>{agent}</span>
                   <CheckmarkCircle02Icon aria-hidden />
                 </div>
               ))}

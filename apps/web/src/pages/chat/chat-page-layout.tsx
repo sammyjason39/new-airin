@@ -19,7 +19,10 @@ import { type ReactNode, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChatProfileSwitcher } from "@/components/chat/chat-profile-switcher";
 import type { AgentActivity } from "@/components/moodstone";
-import { OwnerSidebarReopen } from "@/components/OwnerSidebarReopen";
+import {
+  OwnerSidebarAvatarTrigger,
+  OwnerSidebarReopen,
+} from "@/components/OwnerSidebarReopen";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import {
   RecentChatsDialogs,
@@ -381,12 +384,14 @@ export function ChatWelcome({
         key={welcomeAnimationKey(false)}
       >
         {profile ? (
-          <ProfileAvatar
-            active
-            className="size-16"
-            profile={profile}
-            size="lg"
-          />
+          <OwnerSidebarAvatarTrigger>
+            <ProfileAvatar
+              active
+              className="size-16"
+              profile={profile}
+              size="lg"
+            />
+          </OwnerSidebarAvatarTrigger>
         ) : null}
         <div className="flex flex-col gap-1">
           <h2 className="font-semibold text-2xl text-foreground tracking-tight sm:text-3xl">
@@ -466,16 +471,18 @@ export function ChatSessionBar({
 
   return (
     <div className="-mx-6 flex h-12 shrink-0 items-center gap-2 border-border border-b px-4 max-sm:hidden">
-      <OwnerSidebarReopen />
       <div className="flex h-7 min-w-0 flex-1 items-center gap-2">
+        <OwnerSidebarReopen className="size-7" />
         {profile ? (
-          <ProfileAvatar
-            active
-            activity={activity}
-            className="outline-none"
-            profile={profile}
-            size="sm"
-          />
+          <OwnerSidebarAvatarTrigger>
+            <ProfileAvatar
+              active
+              activity={activity}
+              className="outline-none"
+              profile={profile}
+              size="sm"
+            />
+          </OwnerSidebarAvatarTrigger>
         ) : null}
         {cognito ? (
           <h1 className="truncate px-2.5 font-medium text-sm">Cognito chat</h1>

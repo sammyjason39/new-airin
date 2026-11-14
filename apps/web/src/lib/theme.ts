@@ -49,7 +49,7 @@ export function applyTheme(theme: Theme): void {
   document.documentElement.style.colorScheme = resolved;
 }
 
-/** The app icon is one design in both themes, so the brand mark no longer swaps. */
+/** Letter-A mark for Advanced rail / auth screens (not the robot app icon). */
 export function markLogoSrc(_resolvedTheme?: ResolvedTheme): string {
-  return "/icons/icon-192-v3.png";
+  return "/airin-mark-v2.png";
 }

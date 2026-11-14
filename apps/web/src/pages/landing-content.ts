@@ -6,11 +6,19 @@ const integrations = [
   { icon: "whatsapp.svg", name: "WhatsApp" },
   { icon: "gmail.svg", name: "Gmail" },
   { icon: "google-drive.svg", name: "Google Drive" },
+  { icon: "google-sheets.svg", name: "Google Sheets" },
   { icon: "slack.svg", name: "Slack" },
   { icon: "telegram.svg", name: "Telegram" },
   { icon: "google-meet.png", name: "Google Meet" },
   { icon: "discord.svg", name: "Discord" },
   { icon: "teams.svg", name: "Microsoft Teams" },
+  { icon: "n8n.png", name: "n8n" },
+  { icon: "odoo.svg", name: "Odoo" },
+  { icon: "wordpress.png", name: "WordPress" },
+  { icon: "accurate.png", name: "Accurate" },
+  { icon: "qontak.svg", name: "Qontak" },
+  { icon: "cekat-ai.svg", name: "Cekat.AI" },
+  { icon: "pos.svg", name: "POS" },
 ];
 
 const team = [
@@ -26,15 +34,15 @@ const team = [
     task: "Bantu kabari pelanggan yang cuciannya sudah siap diambil.",
   },
   {
-    app: "gmail.svg",
+    app: "google-sheets.svg",
     avatar: "dimas",
-    file: "Ringkasan penjualan & piutang",
+    file: "Dashboard keuangan & stok",
     kind: "finance",
     name: "Dimas",
     reply:
-      "Penjualan minggu ini Rp18,45 juta. Ada 3 invoice jatuh tempo. Ini daftar yang perlu tim tindak lanjuti.",
+      "Dari Google Sheets: penjualan minggu ini Rp18,45 juta. Stok pelembut menipis. Ini ringkasan yang perlu ditindaklanjuti.",
     role: "Finance",
-    task: "Sebelum tutup toko, cek penjualan dan tagihan yang belum lunas.",
+    task: "Sebelum tutup toko, cek penjualan, stok, dan tagihan dari sheet bisnis.",
   },
   {
     app: "google-drive.svg",
@@ -60,7 +68,19 @@ const featuredAgents = [
     avatar: "alya",
     name: "Alya",
     role: "Human Resources",
-    task: "Rekrutmen, onboarding, dan panduan tim.",
+    task: "Kebijakan tim, onboarding, dan panduan kerja.",
+  },
+  {
+    avatar: "maya",
+    name: "Maya",
+    role: "Recruiting",
+    task: "Lowongan, screening, dan scorecard wawancara.",
+  },
+  {
+    avatar: "rani",
+    name: "Rani",
+    role: "Payroll",
+    task: "Slip gaji, THR, dan catatan absensi.",
   },
   {
     avatar: "dimas",

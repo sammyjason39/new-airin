@@ -30,8 +30,6 @@ import {
 import { navHrefForPage } from "@/lib/navigation";
 import { sessionSearchQuery } from "@/lib/session-list";
 import {
-  getInitialPinnedCollapsed,
-  getInitialRecentsCollapsed,
   SIDEBAR_PINNED_COLLAPSED_KEY,
   SIDEBAR_RECENTS_COLLAPSED_KEY,
 } from "@/lib/sidebar";
@@ -107,10 +105,7 @@ function PinnedChats({
   ) => React.ReactNode;
 }) {
   const { collapsed: pinnedCollapsed, toggle: togglePinned } =
-    useLocalStorageFlag(
-      SIDEBAR_PINNED_COLLAPSED_KEY,
-      getInitialPinnedCollapsed
-    );
+    useLocalStorageFlag(SIDEBAR_PINNED_COLLAPSED_KEY);
 
   return sessions.length > 0 ? (
     <div className="mb-3">
@@ -217,8 +212,7 @@ export function RecentChats() {
   const [renameTarget, setRenameTarget] = useState<SessionTarget | null>(null);
 
   const { collapsed, toggle } = useLocalStorageFlag(
-    SIDEBAR_RECENTS_COLLAPSED_KEY,
-    getInitialRecentsCollapsed
+    SIDEBAR_RECENTS_COLLAPSED_KEY
   );
 
   const pinnedSessions = sessions.filter((session) => session.pinned);
