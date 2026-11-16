@@ -1,3 +1,4 @@
+import ch00 from "./00-peta-halaman.md?raw";
 import ch01 from "./01-mulai.md?raw";
 import ch02 from "./02-akun-dan-keamanan.md?raw";
 import ch03 from "./03-organisasi-dan-pengguna.md?raw";
@@ -65,6 +66,7 @@ function chapter(
 
 export const USER_GUIDE_CHAPTERS: readonly UserGuideChapter[] = [
   chapter("index", readme, "Panduan Pengguna"),
+  chapter("00-peta-halaman", ch00, "Peta halaman"),
   chapter("01-mulai", ch01, "Mulai memakai Airin"),
   chapter("02-akun-dan-keamanan", ch02, "Akun dan keamanan"),
   chapter("03-organisasi-dan-pengguna", ch03, "Organisasi dan pengguna"),

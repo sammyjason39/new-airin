@@ -206,3 +206,13 @@ Lihat [10. Otomasi dan workflow](./10-otomasi-dan-workflow.md).
 - [13. Admin platform](./13-admin-platform.md)
 - [14. Batas, FAQ, dan istilah](./14-batas-faq-dan-istilah.md)
 - [07. Memori dan pengetahuan](./07-memori-dan-pengetahuan.md)
+
+## Halaman terkait
+
+- [Connections / Composio](/connectors)
+- [Tools](/settings/tools)
+- [MCP](/settings/mcp) (platform admin)
+- [Plugins](/settings/plugins)
+- [Google Meet](/google-meet)
+- [AI Providers](/settings/providers) (platform admin)
+- [00. Peta halaman](./00-peta-halaman.md)

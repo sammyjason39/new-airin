@@ -244,7 +244,7 @@
 - Setelan: **Pemakaian token di chat** (Token usage in chat).
 
 **Cara pakai:**
-1. Mode **Advanced**. Nyalakan **Pemakaian token di chat** di **Pengaturan** (Settings) bila perlu.
+1. Mode **Advanced**. Nyalakan **Pemakaian token di chat** di **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)) bila perlu.
 2. Setelah balasan, buka badge **Usage**.
 3. Lihat cincin konteks di composer atau panel status **Context**.
 
@@ -291,3 +291,10 @@
 - [08. Skills](./08-skills.md)
 - [09. File dan artifacts](./09-file-dan-artifacts.md)
 - [14. Batas, FAQ, dan istilah](./14-batas-faq-dan-istilah.md)
+
+## Halaman terkait
+
+- [Chat](/chat)
+- [Groups](/groups)
+- [Panduan](/guide)
+- [00. Peta halaman](./00-peta-halaman.md)

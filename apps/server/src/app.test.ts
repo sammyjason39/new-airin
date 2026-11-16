@@ -15,6 +15,9 @@ describe("static web serving before auth", () => {
     mkdirSync(TEST_DIST_DIR, { recursive: true });
     writeFileSync(join(TEST_DIST_DIR, "index.html"), "<html>SPA</html>");
     writeFileSync(join(TEST_DIST_DIR, "app.js"), "console.log('app')");
+    // Assets under public/chat/ land in dist/chat/; must not steal SPA /chat.
+    mkdirSync(join(TEST_DIST_DIR, "chat"), { recursive: true });
+    writeFileSync(join(TEST_DIST_DIR, "chat", "doodle.png"), "png");
   });
 
   afterAll(() => {
@@ -49,6 +52,26 @@ describe("static web serving before auth", () => {
 
     expect(response.status).toBe(200);
     expect(await response.text()).toBe("console.log('app')");
+  });
+
+  test("GET /chat serves SPA when dist/chat is a directory", async () => {
+    const { app } = createMinimalHonoApp({ webDistDir: TEST_DIST_DIR });
+
+    const response = await app.fetch(new Request("http://localhost:4310/chat"));
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("<html>SPA</html>");
+  });
+
+  test("GET /chat/doodle.png serves the asset file", async () => {
+    const { app } = createMinimalHonoApp({ webDistDir: TEST_DIST_DIR });
+
+    const response = await app.fetch(
+      new Request("http://localhost:4310/chat/doodle.png")
+    );
+
+    expect(response.status).toBe(200);
+    expect(await response.text()).toBe("png");
   });
 
   test("GET /v1/sessions without token returns 401", async () => {

@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { join, normalize, sep } from "node:path";
 
 const API_PREFIXES = [
@@ -113,6 +113,15 @@ function resolveDistFile(distDir: string, relativePath: string): string | null {
   }
 
   if (!existsSync(filePath)) {
+    return null;
+  }
+
+  // public/chat/ (assets) must not steal the SPA route /chat — only files.
+  try {
+    if (!statSync(filePath).isFile()) {
+      return null;
+    }
+  } catch {
     return null;
   }
 

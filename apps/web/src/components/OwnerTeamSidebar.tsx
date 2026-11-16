@@ -88,9 +88,9 @@ export function OwnerTeamSidebar({
     return Number(right.isSuper) - Number(left.isSuper);
   });
 
-  const rosterProfiles = ownerSimple
-    ? orderedProfiles.filter((profile) => !profile.isSuper)
-    : orderedProfiles;
+  // Keep Airin (super) visible in Simple so owners have one place for
+  // settings, platform help, and setup QnA with clickable deep links.
+  const rosterProfiles = orderedProfiles;
 
   return (
     <aside

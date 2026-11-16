@@ -118,9 +118,13 @@ export function marketplaceAgentRoleMessageKey(
 
 export function ownerAgentSubtitleMessageKey(
   profile: Pick<ProfileSummary, "id" | "name" | "isSuper">
-): OwnerAgentRoleMessageKey | "owner.orchestrator" | "owner.agent" {
+):
+  | OwnerAgentRoleMessageKey
+  | "owner.orchestrator"
+  | "owner.platformHelper"
+  | "owner.agent" {
   if (profile.isSuper) {
-    return "owner.orchestrator";
+    return "owner.platformHelper";
   }
 
   const laundryRole = laundryAgentRoleMessageKey(profile);
@@ -157,7 +161,11 @@ export function agentRailHoverLabel(
 export function agentNameWithRoleLabel(
   profile: Pick<ProfileSummary, "id" | "name" | "isSuper">,
   t: (
-    key: OwnerAgentRoleMessageKey | "owner.orchestrator" | "owner.agent"
+    key:
+      | OwnerAgentRoleMessageKey
+      | "owner.orchestrator"
+      | "owner.platformHelper"
+      | "owner.agent"
   ) => string
 ): string {
   const roleKey = ownerAgentSubtitleMessageKey(profile);

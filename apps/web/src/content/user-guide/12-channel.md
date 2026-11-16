@@ -160,3 +160,9 @@
 - [11. Integrasi dan tools](./11-integrasi-dan-tools.md)
 - [13. Admin platform](./13-admin-platform.md)
 - [14. Batas, FAQ, dan istilah](./14-batas-faq-dan-istilah.md)
+
+## Halaman terkait
+
+- [Profiles](/profiles) → pilih agen → Channels
+- [Workers](/workers)
+- [00. Peta halaman](./00-peta-halaman.md)

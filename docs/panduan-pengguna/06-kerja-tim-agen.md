@@ -62,7 +62,7 @@
 - Jovan merangkum satu jawaban dan menyebut siapa yang memberi tiap fakta.
 
 **Cara pakai:**
-1. Admin install **Jovan** dari **Marketplace** (lihat [04. Agen](./04-agen.md)).
+1. Admin install **Jovan** dari **Marketplace** ([/marketplace](/marketplace)) (lihat [04. Agen](./04-agen.md)).
 2. Chat dengan **Jovan**. Tanyakan seperti biasa (contoh: “bandingkan omzet minggu ini dan risiko kontrak supplier”).
 3. Jovan memanggil `send_to_bot` ke spesialis (Dimas, Nisa, dll.) — Anda tidak perlu membuka agen itu dulu.
 4. Baca jawaban gabungan. Cek nama rekan yang disebut.
@@ -172,3 +172,9 @@ Ringkas:
 - [07. Memori dan pengetahuan](./07-memori-dan-pengetahuan.md)
 - [09. File dan artifacts](./09-file-dan-artifacts.md)
 - [10. Otomasi dan workflow](./10-otomasi-dan-workflow.md)
+
+## Halaman terkait
+
+- [Groups](/groups)
+- [Marketplace](/marketplace) (Jovan / orkestrator)
+- [00. Peta halaman](./00-peta-halaman.md)

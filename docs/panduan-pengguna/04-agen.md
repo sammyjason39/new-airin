@@ -35,7 +35,7 @@
 - Pack laundry siap untuk demo toko laundry.
 
 **Cara pakai:**
-1. Mode **Simple**: buka **Marketplace** di sidebar. Mode **Advanced**: buka halaman **Marketplace**.
+1. Mode **Simple**: buka **Marketplace** ([/marketplace](/marketplace)) di sidebar. Mode **Advanced**: buka halaman **Marketplace** ([/marketplace](/marketplace)).
 2. Pilih agen. Baca deskripsi. Pilih foto bila diminta.
 3. Admin organisasi: tekan **Install**. Member: tampilan meminta Anda minta admin meng-install.
 4. Setelah install, agen muncul di **Tim Anda** / rail profil. Buka chat.
@@ -279,3 +279,12 @@ Install pack laundry (demo toko). Enam agen:
 - [08. Skills](./08-skills.md)
 - [09. File dan artifacts](./09-file-dan-artifacts.md)
 - [11. Integrasi dan tools](./11-integrasi-dan-tools.md)
+
+## Halaman terkait
+
+- [Marketplace](/marketplace)
+- [Profiles](/profiles)
+- [Skills](/settings/skills)
+- [Tools](/settings/tools)
+- Tanya **Airin** di [chat](/chat) untuk buat agen baru
+- [00. Peta halaman](./00-peta-halaman.md)

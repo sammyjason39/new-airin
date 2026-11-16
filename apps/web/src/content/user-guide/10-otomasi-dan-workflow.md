@@ -158,3 +158,10 @@ Ada juga pemicu `runAt` (waktu ISO sekali jalan). Di editor UI, tombol cepat men
 - [14. Batas, FAQ, dan istilah](./14-batas-faq-dan-istilah.md)
 - [08. Skills](./08-skills.md)
 - [09. File dan artifacts](./09-file-dan-artifacts.md)
+
+## Halaman terkait
+
+- [Automations](/automations)
+- [Workers](/workers) — status worker
+- [00. Peta halaman](./00-peta-halaman.md)
+- Atau minta **Airin** membuat otomasi dari chat

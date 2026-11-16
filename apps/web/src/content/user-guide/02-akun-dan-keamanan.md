@@ -14,7 +14,7 @@
 - Opsional tampilkan pemakaian token di chat (lebih relevan di Advanced).
 
 **Cara pakai:**
-1. Buka **Pengaturan** (Settings) dari footer sidebar, atau jalur preferensi di Advanced.
+1. Buka **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)) dari footer sidebar, atau jalur preferensi di Advanced.
 2. Di bagian **Umum** (General):
    - **Tampilan** (Appearance) — tema.
    - **Bahasa** (Language) — **ID** / **EN**.
@@ -84,7 +84,7 @@
 - Platform bisa mewajibkan MFA untuk peran tertentu.
 
 **Cara pakai (aktifkan di akun Anda):**
-1. Buka **Pengaturan** → bagian keamanan / kartu **Multi-factor authentication**.
+1. Buka **Pengaturan** ([/settings/preferences](/settings/preferences)) → bagian keamanan / kartu **Multi-factor authentication**.
 2. Di baris **Authenticator app**, klik **Add authenticator**.
 3. Pindai QR di aplikasi autentikator (atau masukkan rahasia manual jika UI menampilkannya).
 4. Masukkan kode verifikasi, lalu konfirmasi.
@@ -98,7 +98,7 @@
 3. Status MFA akun kembali ke belum terdaftar kecuali passkey masih aktif.
 
 **Cara pakai (kebijakan platform — Platform admin):**
-1. Buka **Pengaturan** → **Instans** (Instance).
+1. Buka **Pengaturan** ([/settings/preferences](/settings/preferences)) → **Instans** (Instance).
 2. Atur kartu kebijakan MFA platform:
    - **Off** — tidak diminta kode kedua.
    - **Optional** — pengguna boleh menambah sendiri.
@@ -120,7 +120,7 @@
 - Bisa digabung dengan alur MFA akun.
 
 **Cara pakai:**
-1. Buka **Pengaturan** → **Multi-factor authentication**.
+1. Buka **Pengaturan** ([/settings/preferences](/settings/preferences)) → **Multi-factor authentication**.
 2. Di baris **Passkey**, klik **Add passkey**.
 3. Selesaikan prompt browser/OS.
 4. Simpan backup codes jika ditampilkan.
@@ -140,7 +140,7 @@
 - Keluarkan sesi lain tanpa mengubah sandi (kecuali Anda juga ingin rotasi kredensial).
 
 **Cara pakai:**
-1. Buka **Pengaturan** → kartu **Active sessions**.
+1. Buka **Pengaturan** ([/settings/preferences](/settings/preferences)) → kartu **Active sessions**.
 2. Tiap baris menampilkan perkiraan perangkat, waktu pakai/masuk, dan kedaluwarsa.
 3. Sesi saat ini bertanda **This browser** — tidak ada tombol keluar di baris itu (pakai **Log out** di menu akun).
 4. Di sesi lain, klik **Sign out** untuk mencabut sesi itu.
@@ -158,7 +158,7 @@
 - Bisa diisi di wizard setup atau kapan saja kemudian.
 
 **Cara pakai:**
-1. Dari menu akun, klik **Personalisation**, atau di **Pengaturan** buka baris **Personalisation**.
+1. Dari menu akun, klik **Personalisation**, atau di **Pengaturan** ([/settings/preferences](/settings/preferences)) buka baris **Personalisation**.
 2. Dialog **About you** menampilkan editor konteks (isi Markdown yang disimpan untuk Anda).
 3. Sunting teks sesuai peran, proyek, bahasa balasan, aturan Always/Never, dan zona waktu bila ditampilkan di formulir.
 4. Simpan perubahan di dialog.
@@ -195,7 +195,7 @@
 
 **Cara pakai:**
 1. Masuk sebagai **Platform admin**.
-2. Buka **Pengaturan** → **Instans** (Instance) → bagian **Local API token**.
+2. Buka **Pengaturan** ([/settings/preferences](/settings/preferences)) → **Instans** (Instance) → bagian **Local API token**.
 3. Klik **Rotate token**.
 4. Konfirmasi dialog **Rotate the local API token?** dengan **Rotate**.
 5. Salin token yang muncul (**Copy**). Token tidak ditampilkan lagi setelah Anda meninggalkan layar.
@@ -212,10 +212,10 @@
 | Tujuan | Jalur UI |
 |---|---|
 | Ubah nama/email/sandi | Menu akun → **Profile** |
-| Bahasa, tema, notifikasi, MFA, sesi | **Pengaturan** (Settings) |
+| Bahasa, tema, notifikasi, MFA, sesi | **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)) |
 | Konteks pribadi agen | Menu akun → **Personalisation** |
 | Reset sandi (lupa) | Login → **Forgot password?** |
-| Wajibkan MFA di instalasi | Platform admin → **Pengaturan** → **Instans** |
+| Wajibkan MFA di instalasi | Platform admin → **Pengaturan** ([/settings/preferences](/settings/preferences)) → **Instans** |
 | Token CLI/worker | Platform admin → **Local API token** → **Rotate token** |
 | Keluar | Menu akun → **Log out** |
 
@@ -236,3 +236,8 @@
 
 - [01. Mulai](./01-mulai.md)
 - [03. Organisasi dan pengguna](./03-organisasi-dan-pengguna.md)
+
+## Halaman terkait
+
+- [Preferences](/settings/preferences) — MFA, sesi, keamanan
+- [00. Peta halaman](./00-peta-halaman.md)

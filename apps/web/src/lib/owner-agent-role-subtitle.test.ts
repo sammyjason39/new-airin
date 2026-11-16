@@ -52,14 +52,14 @@ describe("ownerAgentSubtitleMessageKey", () => {
     ).toBe("owner.role.hr");
   });
 
-  test("uses orchestrator label for super agents", () => {
+  test("uses platform helper label for super agents", () => {
     expect(
       ownerAgentSubtitleMessageKey({
         id: "super",
         isSuper: true,
         name: "Boss",
       })
-    ).toBe("owner.orchestrator");
+    ).toBe("owner.platformHelper");
   });
 
   test("maps Default Bot to assistant instead of generic agent", () => {

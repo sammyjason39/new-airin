@@ -259,6 +259,7 @@ import {
   type StoredSessionRecord,
   type StoredSessionSummaryRecord,
   type StoredToolRecord,
+  SUPER_AIRIN_PLATFORM_GUIDE_RULES,
   SUPER_AIRIN_TEAM_RULES,
   SUPER_AIRIN_TOOL_AUTHORING_RULES,
 } from "@airin/db";
@@ -6773,7 +6774,7 @@ export class AgentService {
     );
 
     const basePrompt = profile.isSuper
-      ? `${systemPrompt.trim()}\n\n${SUPER_AIRIN_TOOL_AUTHORING_RULES}\n\n${SUPER_AIRIN_TEAM_RULES}`
+      ? `${systemPrompt.trim()}\n\n${SUPER_AIRIN_PLATFORM_GUIDE_RULES}\n\n${SUPER_AIRIN_TOOL_AUTHORING_RULES}\n\n${SUPER_AIRIN_TEAM_RULES}`
       : systemPrompt;
 
     const resolvedSystemPrompt = withTurnInstructions(

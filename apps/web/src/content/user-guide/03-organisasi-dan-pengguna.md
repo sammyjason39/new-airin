@@ -278,3 +278,10 @@
 
 - [01. Mulai](./01-mulai.md)
 - [02. Akun dan keamanan](./02-akun-dan-keamanan.md)
+
+## Halaman terkait
+
+- [Organization](/organization) — undang member, team, org memory
+- [Preferences](/settings/preferences) — preferensi pribadi
+- [00. Peta halaman](./00-peta-halaman.md) — screenshot klik di mana
+- Tanya **Airin** di [chat](/chat) untuk dibantu langkah demi langkah

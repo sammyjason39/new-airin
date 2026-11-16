@@ -1,83 +1,109 @@
 ---
 name: airin-guide
-description: Map of the Airin web app — each page, its path, what it controls, and who can open it. Use when the user asks where or how to find, set, or change something in Airin itself (models, providers, image generation, tools, skills, members, channels, settings).
+description: >-
+  Map of the Airin web app — each page path, who can open it, and how to answer
+  "where / how do I…" questions with clickable Markdown links. Use for settings,
+  providers, tools, skills, members, channels, Marketplace, Panduan, Simple vs
+  Advanced, and any question about finding or changing something in Airin itself
+  (Indonesian or English).
 ---
 
 # Airin guide
 
-Use this map when the user asks where something is in Airin. Do not guess from other web apps.
+Use this map when the user asks where something is in Airin. Do not guess from other products.
 
-## How to answer
+For longer FAQ examples, read `references/qna.md` in this skill folder after you load the skill.
 
-1. Name the real path, for example **Settings → AI Providers**, and give the page link. In web chat, write a Markdown link with the path, for example [AI Providers](/settings/providers). It opens the page in the same tab. To point to one card on AI Providers, add its anchor: `#image-parsing`, `#transcription`, `#image-generation`, `#web-search`, or `#browser-runtime`, for example [Image generation](/settings/providers#image-generation). In Telegram, Discord, or WhatsApp, write the path as plain text.
-2. Say who can change it. If the page needs a platform admin, say that a platform admin must make the change.
-3. Give one or two steps, not a generic walkthrough.
-4. If the setting is not on this map, read the docs with `web_fetch` on `https://ahmadrosid.github.io/airin/llms.txt` before you answer.
+## How to answer (mandatory)
+
+1. **Always give a clickable link in web/desktop chat.** Use Markdown with the real path, for example [Pengaturan](/settings/preferences) or [AI Providers](/settings/providers). Paths open in the same tab. Never invent URLs.
+2. Name the UI path in words too: **Sidebar → Panduan**, or **Settings → AI Providers**.
+3. Say **who** can change it (everyone / org admin / platform admin).
+4. Give **one or two steps**, then the link. Prefer short answers.
+5. Point to the in-app user guide when helpful: [Panduan](/guide) or a chapter such as [Mulai](/guide/01-mulai).
+6. On Telegram, Discord, or WhatsApp, write the path as plain text (no Markdown link required).
+7. If the setting is not on this map, `web_fetch` `https://ahmadrosid.github.io/airin/llms.txt` before you answer.
+
+## One-point help (Airin / Super Airin)
+
+When you are **Airin** (the super / platform helper agent):
+
+- You are the **default place** for "how do I set up…", "manage the platform", invite people, add agents, connect channels, fix providers, and similar.
+- Prefer **doing the work with your tools** when the user wants a change and you can (create profile, assign tools/skills, automation, etc.). Always also give the UI link so they can open the same page.
+- For read-only "where is…" questions, answer with links; offer to make the change if you can.
+- If the user is in **Simple** mode, tell them the Indonesian labels (**Tim Anda**, **Panduan**, **Pengaturan**, **Marketplace**). Advanced uses mostly English sidebar labels.
 
 ## Layout
 
-- **Left rail** (far left): profile avatars to switch agent. At the bottom: the notifications bell and the account avatar.
-- **Account avatar menu** (bottom left): Profile, Personalisation, Organization, Theme, Log out. It has no Settings item.
-- **Sidebar**: organization switcher at the top, then New chat, Agent, Groups, Connections, Automations, Settings, then Recents.
-- **Settings** (`/settings`) is the hub for configuration. It groups pages into Workspace, Agent tools, Integrations, and Installed plugins.
+### Simple mode (default for owners)
+
+- Left: **Tim Anda** (agents). **Airin** is the platform helper at the top of the list when present.
+- Footer links: **Marketplace** → `/marketplace`, **Panduan** → `/guide`, **Pengaturan** → `/settings/preferences`.
+- Account avatar (bottom): Personalisation, Organization, Theme, Log out.
+
+### Advanced mode
+
+- Left rail: agent avatars. Sidebar: New chat, Agent (`/profiles`), Groups, Connections, Automations, Settings hub (`/settings`), Recents.
+- Account avatar (bottom left): Profile, Personalisation, Organization, Theme, Log out (no Settings item).
+
+**Settings hub** (`/settings`) groups Workspace, Agent tools, Integrations, and Installed plugins.
 
 ## Roles
 
-- **Platform admin**: runs the Airin install. Only role that can open AI Providers, Skills, and MCP.
+- **Platform admin**: runs the install. Only role for AI Providers, Skills catalog, MCP.
 - **Org admin**: manages one organization.
-- **Member** and **viewer**: org roles with less access. Viewers cannot use Groups, Google Meet, Organization, or Browse Files.
+- **Member**: uses agents and most workspace pages; less admin edit rights.
+- Role **viewer** was removed.
 
-## Pages
+## Pages (use these paths in links)
 
-| Page | Where | Path | What it controls | Who |
-|---|---|---|---|---|
-| New chat | Sidebar | `/chat` | Start a chat; pick agent, model, and effort in the composer | Everyone |
-| Agent | Sidebar | `/profiles` | Agents (profiles): model, instructions, soul, assigned tools, skills, MCP servers, channels (Telegram, Discord, WhatsApp) | Everyone; editing depends on role |
-| Groups | Sidebar | `/groups` | Group chats where agents talk to each other | Org admin, member |
-| Connections | Sidebar | `/connectors` | Composio apps and per-user OAuth connections | Platform admin, org admin, member |
-| Automations | Sidebar | `/automations` | Scheduled automations and their runs | Everyone |
-| Settings | Sidebar | `/settings` | Hub for every page below | Everyone (shows only allowed pages) |
-| Notifications | Bell, bottom left | `/notifications` | Automation runs and org memory proposals | Everyone |
+| Page | Path | Who |
+|---|---|---|
+| Chat | `/chat` | Everyone |
+| Panduan (user guide) | `/guide` | Everyone (login) |
+| Guide chapter | `/guide/01-mulai` … `/guide/14-batas-faq-dan-istilah` | Everyone (login) |
+| Marketplace | `/marketplace` | Org admin, member |
+| Agent / Profiles | `/profiles` | Everyone; edit by role |
+| Groups | `/groups` | Org admin, member |
+| Connections (Composio) | `/connectors` | Platform admin, org admin, member |
+| Automations | `/automations` | Everyone |
+| Settings hub | `/settings` | Everyone (shows allowed pages) |
+| Preferences | `/settings/preferences` | Everyone (sections by role) |
+| Organization | `/organization` | Platform admin, org admin, member |
+| Browse Files | `/files` | Platform admin, org admin, member |
+| Usage | `/settings/usage` | Platform admin, org admin |
+| Workers | `/workers` | Platform admin, org admin |
+| Google Meet | `/google-meet` | Org admin, member |
+| Notifications inbox | `/notifications` | Everyone |
+| AI Providers | `/settings/providers` | Platform admin |
+| Tools | `/settings/tools` | Platform admin, org admin |
+| Skills | `/settings/skills` | Platform admin |
+| MCP | `/settings/mcp` | Platform admin |
+| Plugins | `/settings/plugins` | Platform admin, org admin |
+| Notification delivery | `/settings/connections/notifications` | Platform admin, org admin |
+| Coding agents | `/settings/connections/coding-agents` | Platform admin, org admin |
+| Error tracking | `/settings/connections/error-tracking` | Platform admin |
 
-### Settings → Workspace
+### AI Providers anchors
 
-| Page | Path | What it controls | Who |
-|---|---|---|---|
-| Organization | `/organization` | Members, invites, teams, org memory, org settings | Platform admin, org admin, member |
-| Browse Files | `/files` | Agent artifacts and workspace files | Platform admin, org admin, member |
-| Usage | `/settings/usage` | Token usage and cost | Platform admin, org admin |
-| Workers | `/workers` | Automation and channel workers, worker logs | Platform admin, org admin |
-| Google Meet | `/google-meet` | Meeting capture and transcripts | Org admin, member |
-| Preferences | `/settings/preferences` | Appearance, user context, token usage in chat, version, browser sessions, MFA. Org admin: local API token. Platform admin: Web public URL, Composio, data export | Everyone (sections by role) |
+Append to `/settings/providers`: `#image-parsing`, `#transcription`, `#image-generation`, `#web-search`, `#browser-runtime`.
 
-### Settings → Agent tools
+## Common questions (short)
 
-| Page | Path | What it controls | Who |
-|---|---|---|---|
-| AI Providers | `/settings/providers` | Provider API keys and models. Cards: **Image parsing model**, **Audio transcription model**, **Image generation**, web search, browser runtime | Platform admin only |
-| Tools | `/settings/tools` | Built-in and custom tools, tool playground, email mailbox setup | Platform admin, org admin |
-| Skills | `/settings/skills` | Organization skill catalog | Platform admin only |
-| MCP | `/settings/mcp` | MCP servers | Platform admin only |
-| Plugins | `/settings/plugins` | Install and manage plugins | Platform admin, org admin |
-
-### Settings → Integrations
-
-| Page | Path | What it controls | Who |
-|---|---|---|---|
-| Notifications | `/settings/connections/notifications` | Notification delivery | Platform admin, org admin |
-| Composio | `/connectors` | Composio toolkits | Platform admin, org admin, member |
-| Coding agents | `/settings/connections/coding-agents` | Codex, Claude Code, OpenCode, pi, Cursor Agent setup | Platform admin, org admin |
-| Error tracking | `/settings/connections/error-tracking` | Error tracking | Platform admin only |
-
-## Common questions
-
-| User asks | Answer |
+| User asks | Link / action |
 |---|---|
-| Set the image generation model | Settings → AI Providers (`/settings/providers`), card **Image generation**. Platform admin only. With ChatGPT signed in, no model is needed; **Off** turns images off. The agent also needs the `generate_image` tool (Agent → Tools); new agents have it |
-| Set voice message transcription | Settings → AI Providers, card **Audio transcription model**. Platform admin only |
-| Let a text-only model read images | Settings → AI Providers, card **Image parsing model**. Platform admin only |
-| Add or fix an API key, reconnect ChatGPT or Grok | Settings → AI Providers. Platform admin only |
-| Change an agent's model, tools, or skills | Agent (`/profiles`), pick the agent |
-| Connect Telegram, Discord, or WhatsApp | Agent (`/profiles`), pick the agent, open its channels |
-| Invite a teammate | Settings → Organization (`/organization`) |
-| Change the theme | Account avatar menu → Theme, or Settings → Preferences (`/settings/preferences`) |
+| Open the user guide | [Panduan](/guide) |
+| Theme, language, MFA, sessions | [Preferences](/settings/preferences) |
+| Invite teammate / org | [Organization](/organization) |
+| Install ready-made agents | [Marketplace](/marketplace) |
+| Create / edit an agent | [Profiles](/profiles) — or ask Airin to create one |
+| Image generation model | [Image generation](/settings/providers#image-generation) (platform admin) |
+| API keys / ChatGPT / Grok | [AI Providers](/settings/providers) (platform admin) |
+| Telegram / WhatsApp / Discord | [Profiles](/profiles) → pick agent → channels |
+| Composio / SaaS apps | [Connections](/connectors) |
+| Automations | [Automations](/automations) |
+| Files / HTML reports | [Files](/files) |
+| Workers / channel health | [Workers](/workers) |
+| Plugins | [Plugins](/settings/plugins) |
+
+More examples: `references/qna.md`.

@@ -207,3 +207,9 @@
 - [08. Skills](./08-skills.md)
 - [11. Integrasi dan tools](./11-integrasi-dan-tools.md)
 - [12. Channel](./12-channel.md)
+
+## Halaman terkait
+
+- [Files](/files) — browse artifacts
+- [Chat](/chat) — minta agen buat laporan HTML
+- [00. Peta halaman](./00-peta-halaman.md)

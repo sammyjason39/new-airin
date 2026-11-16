@@ -38,7 +38,7 @@
 - Riwayat perubahan bisa dibatalkan atau dipulihkan.
 
 **Cara pakai:**
-1. Admin organisasi buka **Pengaturan** (Settings) → **Workspace → Organization → Org Memory** (halaman Organization).
+1. Admin organisasi buka **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)) → **Workspace → Organization → Org Memory** (halaman Organization).
 2. Tab **Live memory**: lihat fakta pinned + log terbaru. Pilih **Edit** untuk mengubah Markdown mentah. Pertahankan struktur `## Org Memory`, `## Pinned`, lalu bagian tanggal `## YYYY-MM-DD`.
 3. Tab **Proposals**: tinjau usulan agen. **Approve** atau **Reject**. Centang **Pin on approve** bila fakta harus selalu masuk ringkasan prompt.
 4. Tab **History**: lihat snapshot perubahan. **Undo latest** mengembalikan ke revisi sebelumnya. **Restore** pada baris lama memuat ulang snapshot itu sebagai memori hidup (dan mencatat restore sebagai entri baru).
@@ -119,7 +119,7 @@
 - Bisa kembali ke salinan lokal bila plugin dimatikan.
 
 **Cara pakai:**
-1. Admin organisasi: **Pengaturan** (Settings) → **Agent tools → Plugins → Official plugins → Supermemory → Install**, lalu enable.
+1. Admin organisasi: **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)) → **Agent tools → Plugins → Official plugins → Supermemory → Install**, lalu enable.
 2. Airin memakai provider OpenAI default (atau OpenAI tersimpan pertama). ChatGPT subscription tidak didukung worker ini. Tambah provider OpenAI di **Settings → Agent tools → AI Providers** bila belum ada.
 3. Server terkelola sendiri: buka **Supermemory → Settings**, simpan URL + token API, lalu **Check saved connection**.
 4. Setelah ganti provider, restart Supermemory di **Settings → Workspace → Workers**.
@@ -198,3 +198,10 @@ Skills menyimpan **prosedur** (cara kerja). Memori menyimpan **fakta**. Jangan c
 - [08. Skills](./08-skills.md)
 - [09. File dan artifacts](./09-file-dan-artifacts.md)
 - [11. Integrasi dan tools](./11-integrasi-dan-tools.md)
+
+## Halaman terkait
+
+- [Profiles](/profiles) → Memory
+- [Organization](/organization) → org memory
+- [Notifications](/notifications)
+- [00. Peta halaman](./00-peta-halaman.md)

@@ -103,3 +103,14 @@ Panduan lebih dalam: docs *Docker*, *Deployment hardening*, *Secret managers*, *
 - [11. Integrasi dan tools](./11-integrasi-dan-tools.md)
 - [12. Channel](./12-channel.md)
 - [14. Batas, FAQ, dan istilah](./14-batas-faq-dan-istilah.md)
+
+## Halaman terkait
+
+- [AI Providers](/settings/providers)
+- [Usage](/settings/usage)
+- [Workers](/workers)
+- [Skills](/settings/skills)
+- [MCP](/settings/mcp)
+- [Plugins](/settings/plugins)
+- [Preferences](/settings/preferences) (backup / instance)
+- [00. Peta halaman](./00-peta-halaman.md)

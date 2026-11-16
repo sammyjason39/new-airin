@@ -17,12 +17,24 @@
 **Cara pakai:**
 1. Pikir Airin sebagai empat bagian: **organisasi** (batas data), **profil/agen** (bot yang diajak bicara), **akses alat** (apa yang boleh dilakukan agen), dan **channel** (web, CLI, Telegram, WhatsApp, Discord, Slack, Microsoft Teams).
 2. Organisasi baru biasanya sudah punya **Default Bot** (di mode Simple sering berlabel **Asisten**) dan **Airin** (agen bantu admin).
-3. Tambah agen spesialis lewat **Marketplace**, atau minta **Airin** membantu menyiapkan profil.
+3. Tambah agen spesialis lewat **Marketplace** ([/marketplace](/marketplace)), atau minta **Airin** membantu menyiapkan profil.
 
 **Batas / catatan:**
 - Airin adalah platform agen, bukan satu chat asisten tunggal.
 - Data antar organisasi tidak dicampur.
 - Demo publik dipakai untuk eksplorasi, bukan data nyata atau kunci API.
+
+
+
+## Tanya Airin (one-point)
+
+**Kenapa:** Satu chat untuk setup, settings, dan “klik di mana?”.
+
+**Cara pakai:**
+1. Di [Tim Anda](/chat), buka agen **Airin**.
+2. Tanyakan contoh: “Di mana API key?”, “Undang member”, “Pasang agen dari Marketplace”.
+3. Airin membalas dengan tautan yang bisa diklik (contoh [Pengaturan](/settings/preferences), [Organization](/organization), [Marketplace](/marketplace)) dan bisa ikut mengubah konfigurasi dengan tools-nya.
+4. Untuk peta lengkap + screenshot, buka [00. Peta halaman](./00-peta-halaman.md).
 
 ## Landing dan waitlist
 
@@ -63,7 +75,7 @@
    1. **Pilih tugas pertama.** (Pick the first job.)
    2. **Kenalkan bisnismu.** (Introduce your business.) — SOP, file, aplikasi.
    3. **Kerja bareng, makin cocok.** (Work together, get sharper.) — tinjau hasil, lalu tambah tugas.
-3. Setelah punya akses dashboard, lanjut isi preferensi lewat menu akun **Personalisation** atau **Pengaturan** (Settings).
+3. Setelah punya akses dashboard, lanjut isi preferensi lewat menu akun **Personalisation** atau **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)).
 
 **Batas / catatan:**
 - Bagian ini adalah panduan produk di landing, bukan wizard setup server.
@@ -85,7 +97,7 @@
    - Passkey: ikuti prompt browser (**Sign in with a passkey** atau alur verifikasi).
    - Kode autentikator: isi **Authentication code**, lalu **Verify**.
    - Atau pilih **Use a backup code instead** dan isi **Backup code**.
-5. Setelah berhasil, Anda biasanya masuk ke chat (`/chat`).
+5. Setelah berhasil, Anda biasanya masuk ke chat ([`/chat`](/chat)).
 6. Lupa sandi: klik **Forgot password?** — lihat bab [02. Akun dan keamanan](./02-akun-dan-keamanan.md).
 
 **Batas / catatan:**
@@ -122,7 +134,7 @@
 
 **Batas / catatan:**
 - Orang pertama yang menyelesaikan wizard menjadi admin platform pada install itu.
-- Beberapa install Docker/managed bisa melewati wizard lewat seed admin di environment — setelah itu, lengkapi preferensi di **Pengaturan**.
+- Beberapa install Docker/managed bisa melewati wizard lewat seed admin di environment — setelah itu, lengkapi preferensi di **Pengaturan** ([/settings/preferences](/settings/preferences)).
 - Tanpa penyedia model yang valid, chat bisa gagal atau terbatas; periksa kembali pengaturan penyedia.
 
 ## Terima undangan (accept invite)
@@ -159,7 +171,7 @@
 
 | Mode | Untuk siapa | Yang terlihat |
 |---|---|---|
-| **Simple** (kode internal `owner`; default install baru) | Pemilik usaha | **Tim Anda** (agen + peran di bawah nama), **Grup** (Groups), **Marketplace**, **Pengaturan** (Settings). Detail tool dilipat. Membuka chat mengembalikan percakapan terakhir agen itu (disimpan per browser). |
+| **Simple** (kode internal `owner`; default install baru) | Pemilik usaha | **Tim Anda** (agen + peran di bawah nama), **Grup** (Groups), **Marketplace** ([/marketplace](/marketplace)), **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)). Detail tool dilipat. Membuka chat mengembalikan percakapan terakhir agen itu (disimpan per browser). |
 | **Advanced** | Admin / operator | Rail profil penuh, **Settings**, Tools, MCP, Skills, **Usage**, switcher organisasi |
 
 **Batas / catatan:**
@@ -179,7 +191,7 @@
 1. Di kiri, lihat **Tim Anda** — daftar agen dengan peran di bawah nama.
 2. Klik agen untuk membuka chat terakhir dengan agen itu.
 3. Di bawah daftar agen, buka **Grup** bila ada grup agen.
-4. Footer: **Marketplace**, **Pengaturan**, nama organisasi, dan menu akun.
+4. Footer: **Marketplace** ([/marketplace](/marketplace)), **Pengaturan** ([/settings/preferences](/settings/preferences)), nama organisasi, dan menu akun.
 5. Sembunyikan/tampilkan sidebar lewat kontrol sidebar jika tersedia (**Sembunyikan sidebar** / **Tampilkan sidebar**).
 
 **Cara pakai (Advanced):**
@@ -218,13 +230,13 @@
 - Bahasa juga menjadi default balasan agen (kecuali Anda minta lain).
 
 **Cara pakai:**
-1. Buka **Pengaturan** (Settings) → bagian **Umum** (General).
+1. Buka **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)) → bagian **Umum** (General).
 2. Di baris **Bahasa** (Language), pilih **ID** atau **EN**.
 3. Perubahan disimpan ke preferensi akun Anda.
 
 **Batas / catatan:**
 - Banyak label tombol tetap bahasa Inggris (misalnya **Sign in**, **Profile**, **Organization**).
-- Mode Simple punya beberapa label Indonesia (**Pengaturan**, **Grup**, **Chat baru**, **Tim Anda**, dan lain-lain).
+- Mode Simple punya beberapa label Indonesia (**Pengaturan** ([/settings/preferences](/settings/preferences)), **Grup**, **Chat baru**, **Tim Anda**, dan lain-lain).
 - Landing memakai salinan ID/EN sendiri; default produk landing cenderung Indonesia.
 
 ## Tema tampilan
@@ -237,7 +249,7 @@
 **Cara pakai:**
 1. Buka menu akun di bawah sidebar.
 2. Di baris **Theme**, pilih **Light**, **Dark**, atau **System**.
-3. Atau di **Pengaturan** → **Tampilan** (Appearance), pakai sakelar tema yang sama.
+3. Atau di **Pengaturan** ([/settings/preferences](/settings/preferences)) → **Tampilan** (Appearance), pakai sakelar tema yang sama.
 
 **Batas / catatan:**
 - Preferensi tema disimpan di browser/akun sesuai implementasi tampilan setempat.
@@ -251,7 +263,7 @@
 - Uji notifikasi di perangkat ini.
 
 **Cara pakai:**
-1. Buka **Pengaturan** (Settings) → **Notifikasi** (Notifications).
+1. Buka **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)) → **Notifikasi** (Notifications).
 2. Aktifkan sakelar dengan teks petunjuk: beri tahu saat balasan siap saat Anda tidak di depan layar.
 3. Izinkan notifikasi di dialog browser jika diminta.
 4. Opsional: klik **Uji notifikasi** (Test notification).
@@ -269,8 +281,8 @@
 - Urutan kerja yang aman untuk pemilik usaha.
 
 **Cara pakai:**
-1. Kirim pesan uji ke **Default Bot** atau agen di **Marketplace**.
-2. Buka **Marketplace** → **Install** pada agen yang dibutuhkan (contoh: Jovan sebagai orkestrator).
+1. Kirim pesan uji ke **Default Bot** atau agen di **Marketplace** ([/marketplace](/marketplace)).
+2. Buka **Marketplace** ([/marketplace](/marketplace)) → **Install** pada agen yang dibutuhkan (contoh: Jovan sebagai orkestrator).
 3. Undang anggota tim (bab organisasi) jika Anda Admin.
 4. Isi **Personalisation** / **About you** agar agen mengenal konteks Anda.
 5. Hubungkan channel (WhatsApp/Telegram/dll.) bila perlu — lihat panduan channel terpisah.

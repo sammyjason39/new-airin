@@ -165,7 +165,7 @@ Skill paket Laundry Innovation Summit terpasang saat pack laundry diinstal (buka
 
 ### Preset organisasi: Off / Ask me first / Automatic
 
-Admin organisasi: **Pengaturan** (Settings) → **Workspace → Organization → How bots learn skills**.
+Admin organisasi: **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)) → **Workspace → Organization → How bots learn skills**.
 
 | Preset | Label UI | Arti praktis |
 |--------|----------|--------------|
@@ -239,3 +239,9 @@ Skill vs Org Memory: skill = cara kerja satu bot; Org Memory = fakta bersama org
 - [09. File dan artifacts](./09-file-dan-artifacts.md)
 - [10. Otomasi dan workflow](./10-otomasi-dan-workflow.md)
 - [11. Integrasi dan tools](./11-integrasi-dan-tools.md)
+
+## Halaman terkait
+
+- [Skills](/settings/skills) (katalog org, platform admin)
+- [Profiles](/profiles) → Skills per agen
+- [00. Peta halaman](./00-peta-halaman.md)

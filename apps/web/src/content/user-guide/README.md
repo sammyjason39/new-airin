@@ -1,20 +1,24 @@
 # Panduan Pengguna Airin
 
 > Panduan lengkap untuk pemilik usaha, admin organisasi, dan anggota tim.
-> Bahasa: Indonesia. Versi produk: 0.4.74 (`f986c3ba`). Produksi contoh: https://useairin.id
+> Bahasa: Indonesia. Versi produk: 0.4.74. Produksi contoh: [useairin.id](https://useairin.id)
+
+**Mulai cepat:** buka [Peta halaman](/guide/00-peta-halaman) (klik di mana) · tanya **Airin** di chat · atau buka [Pengaturan](/settings/preferences).
 
 ## Cara baca
 
-1. Mulai dari [01. Mulai memakai Airin](./01-mulai.md) jika Anda baru.
-2. Pilih bab sesuai pekerjaan Anda (lihat tabel di bawah).
-3. Istilah teknis ada di [14. Batas, FAQ, dan istilah](./14-batas-faq-dan-istilah.md).
+1. Lihat screenshot dan tautan di [00. Peta halaman](./00-peta-halaman.md).
+2. Mulai dari [01. Mulai memakai Airin](./01-mulai.md) jika Anda baru.
+3. Pilih bab sesuai pekerjaan Anda (tabel di bawah).
+4. Istilah teknis ada di [14. Batas, FAQ, dan istilah](./14-batas-faq-dan-istilah.md).
 
-Setiap bab berisi: **siapa yang bisa**, **cara pakai** (langkah UI), **batas**, **masalah umum**, dan **lihat juga**.
+Setiap bab berisi: **siapa yang bisa**, **cara pakai** (langkah UI + tautan), **batas**, **masalah umum**, dan **lihat juga**.
 
 ## Daftar isi
 
 | Bab | Isi | Untuk |
 |---|---|---|
+| [00. Peta halaman](./00-peta-halaman.md) | Hyperlink + screenshot menu krusial | Semua |
 | [01. Mulai](./01-mulai.md) | Login, setup, mode Simple/Advanced, navigasi, bahasa, notifikasi, landing | Semua |
 | [02. Akun dan keamanan](./02-akun-dan-keamanan.md) | Password, MFA, passkey, sesi browser, logout | Semua |
 | [03. Organisasi dan pengguna](./03-organisasi-dan-pengguna.md) | Undang member, peran, team, shared resources | Admin |
@@ -36,11 +40,12 @@ Setiap bab berisi: **siapa yang bisa**, **cara pakai** (langkah UI), **batas**, 
 
 | Mode UI | Untuk | Yang terlihat |
 |---|---|---|
-| **Simple** | Pemilik usaha (default) | Tim Anda, Grup, Marketplace, Pengaturan. Chat terakhir dibuka otomatis |
-| **Advanced** | Admin / operator | Semua menu: Profiles, Tools, MCP, Skills, Usage |
+| **Simple** | Pemilik usaha (default) | [Tim Anda](/chat) (termasuk **Airin**), Grup, [Marketplace](/marketplace), [Panduan](/guide), [Pengaturan](/settings/preferences). Chat terakhir dibuka otomatis |
+| **Advanced** | Admin / operator | Semua menu: [Profiles](/profiles), [Tools](/settings/tools), [MCP](/settings/mcp), [Skills](/settings/skills), [Usage](/settings/usage) |
 
 | Cara kerja sama agen | Kapan |
 |---|---|
+| Tanya **Airin** (bantu kelola platform) | Setup, settings, undang member, buat agen, “klik di mana?” — jawaban berisi hyperlink |
 | Tanya **Jovan** (orkestrator) | Satu pertanyaan, beberapa spesialis; Jovan memakai `send_to_bot` |
 | Buka **Grup** | Diskusi bersama 2–12 agen dengan brief yang sama |
 | `sub_agent` | Satu agen mendelegasikan tugas ke “dirinya sendiri” (harus di-assign) |
@@ -57,9 +62,9 @@ Setiap bab berisi: **siapa yang bisa**, **cara pakai** (langkah UI), **batas**, 
 - Role **viewer** sudah dihapus. Hanya **admin** dan **member**.
 - Panduan ini untuk pengguna, bukan developer. Path kode dan tabel API tidak disertakan.
 - **Cmd+K** / **Ctrl+K** (command palette) hanya di mode **Advanced**. Di Simple, pakai menu sidebar.
-- Preferensi pribadi: menu akun → **Personalisation** / dialog **About you** (bukan “Workspace → Preferences”).
+- Preferensi pribadi: menu akun → **Personalisation** / dialog **About you**, atau [Preferences](/settings/preferences).
 - Salin agen: tombol UI **Duplicate**, dialog **Clone profile?** → **Clone**.
 - Grup: ubah anggota lewat **Edit group**; hentikan hand-off dengan **Stop after this reply**.
 - Backup dashboard: **Download backup** (bukan “Export ZIP”).
-- Kunci API **Composio**: platform admin. Tiap user menghubungkan akun SaaS sendiri.
+- Kunci API **Composio**: platform admin. Tiap user menghubungkan akun SaaS sendiri di [Connections](/connectors).
 - Audit: API platform saja; belum ada menu Audit di sidebar.

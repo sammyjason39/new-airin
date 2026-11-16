@@ -151,7 +151,7 @@ Disimpan per browser. Di perangkat baru, buka dari riwayat atau lanjutkan manual
 | **Brief** | Instruksi bersama di agent group |
 | **Knowledge base** | Dokumen untuk pencarian agen |
 | **Org memory** | Fakta bersama organisasi |
-| **Marketplace** | Katalog agen siap install |
+| **Marketplace** ([/marketplace](/marketplace)) | Katalog agen siap install |
 | **Pairing** | Menghubungkan akun messaging ke profil |
 | **Worker** | Proses bridge channel / automation |
 
@@ -160,3 +160,9 @@ Disimpan per browser. Di perangkat baru, buka dari riwayat atau lanjutkan manual
 - [README](./README.md) — daftar isi
 - [`../airin-product-overview.html`](../airin-product-overview.html) — ringkasan BRD/PRD visual
 - [`../current-state-brd-prd-gaps.md`](../current-state-brd-prd-gaps.md) — gap produk
+
+## Halaman terkait
+
+- [Panduan index](/guide)
+- [00. Peta halaman](./00-peta-halaman.md)
+- Tanya **Airin** di [chat](/chat)
