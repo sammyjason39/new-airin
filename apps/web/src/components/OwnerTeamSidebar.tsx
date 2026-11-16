@@ -6,6 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@airin/ui/tooltip";
 import { cn } from "@airin/ui/utils";
 import { ContextMenu } from "@base-ui/react/context-menu";
 import {
+  BookOpen01Icon,
   Calendar03Icon,
   Delete02Icon,
   NotificationOff01Icon,
@@ -259,6 +260,14 @@ export function OwnerTeamSidebar({
             onNavigate={onNavigate}
           />
         )}
+        <OwnerFooterLink
+          active={location.pathname.startsWith(PAGE_PATHS.guide)}
+          href={pathForPage("guide")}
+          icon={BookOpen01Icon}
+          label={t("owner.guide")}
+          largeType={ownerSimple}
+          onNavigate={onNavigate}
+        />
         <OwnerFooterLink
           active={location.pathname.startsWith(PAGE_PATHS.settings)}
           href={pathForPage("settings")}

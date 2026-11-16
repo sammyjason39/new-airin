@@ -1,4 +1,5 @@
 import {
+  BookOpen01Icon,
   BrainIcon,
   Bug01Icon,
   Building03Icon,
@@ -25,6 +26,7 @@ type NavIcon = typeof SharedWifiIcon;
 export type PageId =
   | "google-meet"
   | "groups"
+  | "guide"
   | "chat"
   | "composio"
   | "customize"
@@ -194,6 +196,7 @@ export function sidebarPageId(page: PageId): PageId {
 }
 
 export const STANDALONE_PAGES: Partial<Record<PageId, NavItem>> = {
+  guide: navItem("guide", "Guide", "How to use Airin", BookOpen01Icon),
   marketplace: navItem(
     "marketplace",
     "Marketplace",
@@ -505,6 +508,7 @@ export const PAGE_PATHS: Record<PageId, string> = {
   files: "/files",
   "google-meet": "/google-meet",
   groups: "/groups",
+  guide: "/guide",
   marketplace: "/marketplace",
   mcp: "/settings/mcp",
   notifications: "/notifications",
@@ -527,6 +531,7 @@ const PREFIX_PAGE_IDS: readonly [string, PageId][] = [
   [PAGE_PATHS["plugin-management"], "plugin-management"],
   [PAGE_PATHS.chat, "chat"],
   [PAGE_PATHS.groups, "groups"],
+  [PAGE_PATHS.guide, "guide"],
   [PAGE_PATHS.marketplace, "marketplace"],
   [PAGE_PATHS.organization, "organization"],
   [PAGE_PATHS.soul, "soul"],

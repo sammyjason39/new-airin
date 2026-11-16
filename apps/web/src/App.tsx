@@ -109,6 +109,11 @@ const SettingsPage = lazyPage(
   "SettingsPage"
 );
 
+const UserGuidePage = lazyPage(
+  () => import("@/pages/UserGuidePage"),
+  "UserGuidePage"
+);
+
 const SetupWizardPage = lazyPage(
   () => import("@/pages/SetupWizardPage"),
   "SetupWizardPage"
@@ -385,6 +390,11 @@ function AppShell() {
                   <Route
                     element={<SettingsPage />}
                     path={PAGE_PATHS.settings}
+                  />
+                  <Route element={<UserGuidePage />} path={PAGE_PATHS.guide} />
+                  <Route
+                    element={<UserGuidePage />}
+                    path={`${PAGE_PATHS.guide}/:slug`}
                   />
                   <Route element={<Navigate replace to="/chat" />} path="*" />
                 </Route>

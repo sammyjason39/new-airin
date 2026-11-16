@@ -238,6 +238,7 @@ function isFlushContentPage(page: PageId, pathname: string): boolean {
     page === "chat" ||
     page === "automations" ||
     page === "files" ||
+    page === "guide" ||
     page === "plugins" ||
     pathname.startsWith(`${PAGE_PATHS.groups}/`) ||
     pathname.startsWith(`${PAGE_PATHS.profiles}/skills/`) ||
@@ -272,7 +273,9 @@ function AppShellHeader({
   const hideTitle = page === "soul";
 
   const showCustomizeBack =
-    page !== "notifications" && !SIDEBAR_PAGE_IDS.includes(sidebarPageId(page));
+    page !== "notifications" &&
+    page !== "guide" &&
+    !SIDEBAR_PAGE_IDS.includes(sidebarPageId(page));
 
   // SAFETY: PageId is a string union; the lookup falls back when the key is absent.
   const backLabel =
@@ -295,9 +298,9 @@ function AppShellHeader({
         // Standalone on iOS the shell owns the status bar, so the bar grows by
         // the top inset and paints its own background under the notch.
         "h-[calc(3rem+env(safe-area-inset-top))] pt-[env(safe-area-inset-top)]",
-        // Chat uses the full desktop column; phones still need the header
-        // to reach navigation.
-        (page === "chat" || hideDesktop) && "sm:hidden"
+        // Chat and the in-app guide use the full desktop column; phones still
+        // need the header to reach navigation.
+        (page === "chat" || page === "guide" || hideDesktop) && "sm:hidden"
       )}
     >
       <MobileNavDrawer className="sm:hidden" />

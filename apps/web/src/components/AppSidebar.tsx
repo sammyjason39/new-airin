@@ -4,6 +4,7 @@ import { cn } from "@airin/ui/utils";
 import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
+  BookOpen01Icon,
   Home01Icon,
   Settings01Icon,
 } from "hugeicons-react";
@@ -25,6 +26,7 @@ import {
   useSidebarCollapsed,
 } from "@/hooks/use-sidebar-collapsed";
 import { chatProfileIdFromPath } from "@/lib/chat-history";
+import type { MessageKey } from "@/lib/i18n";
 import {
   enabledPluginNavEntries,
   groupPath,
@@ -40,6 +42,7 @@ import {
   sidebarPageId,
   visibleNavGroups,
 } from "@/lib/navigation";
+import type { UiMode } from "@/lib/ui-mode";
 
 export function AppSidebar({
   variant = "shell",
@@ -159,86 +162,134 @@ export function AppSidebar({
         )}
       </nav>
       <SidebarNotifications collapsed={collapsed} />
-      <div
-        className={cn(
-          "shrink-0 border-border/50 border-t",
-          collapsed
-            ? "flex flex-col items-center gap-1 px-1 py-2"
-            : "px-2 pt-2 pb-3"
-        )}
-      >
-        {collapsed ? (
-          <>
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <Link
-                    aria-label="Settings"
-                    className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background/70 hover:text-foreground"
-                    to={pathForPage("settings")}
-                  />
-                }
-              >
-                <Settings01Icon aria-hidden="true" className="size-4" />
-              </TooltipTrigger>
-              <TooltipContent side="right">
-                {t("owner.settings")}
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip>
-              <TooltipTrigger
-                render={
-                  <button
-                    aria-label={t("mode.owner")}
-                    className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background/70 hover:text-foreground"
-                    onClick={() => setUiMode("owner")}
-                    type="button"
-                  />
-                }
-              >
-                <Home01Icon aria-hidden="true" className="size-4" />
-              </TooltipTrigger>
-              <TooltipContent side="right">{t("mode.owner")}</TooltipContent>
-            </Tooltip>
-            <SidebarUserMenu />
-          </>
-        ) : (
-          <>
-            <Link
-              aria-current={
-                location.pathname.startsWith(PAGE_PATHS.settings)
-                  ? "page"
-                  : undefined
-              }
-              className={cn(
-                "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-                location.pathname.startsWith("/settings")
-                  ? "bg-background font-medium text-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
-              )}
-              to={pathForPage("settings")}
-            >
-              <Settings01Icon aria-hidden="true" className="size-4 shrink-0" />
-              {t("owner.settings")}
-            </Link>
-            <button
-              className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-muted-foreground text-sm transition-colors hover:bg-background/70 hover:text-foreground"
-              onClick={() => setUiMode("owner")}
-              type="button"
-            >
-              <Home01Icon aria-hidden="true" className="size-4 shrink-0" />
-              {t("mode.owner")}
-            </button>
-            <div className="mt-2 flex items-center justify-between gap-2 px-2">
-              <p className="truncate text-muted-foreground text-xs">
-                {activeOrg?.name ?? "Organization"}
-              </p>
-              <SidebarUserMenu />
-            </div>
-          </>
-        )}
-      </div>
+      <AppSidebarFooter
+        collapsed={collapsed}
+        orgName={activeOrg?.name}
+        pathname={location.pathname}
+        setUiMode={setUiMode}
+        t={t}
+      />
     </aside>
+  );
+}
+
+function AppSidebarFooter({
+  collapsed,
+  orgName,
+  pathname,
+  setUiMode,
+  t,
+}: {
+  collapsed: boolean;
+  orgName: string | undefined;
+  pathname: string;
+  setUiMode: (mode: UiMode) => void;
+  t: (key: MessageKey) => string;
+}) {
+  const guideActive = pathname.startsWith(PAGE_PATHS.guide);
+  const settingsActive = pathname.startsWith("/settings");
+
+  return (
+    <div
+      className={cn(
+        "shrink-0 border-border/50 border-t",
+        collapsed
+          ? "flex flex-col items-center gap-1 px-1 py-2"
+          : "px-2 pt-2 pb-3"
+      )}
+    >
+      {collapsed ? (
+        <>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Link
+                  aria-label={t("owner.guide")}
+                  className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background/70 hover:text-foreground"
+                  to={pathForPage("guide")}
+                />
+              }
+            >
+              <BookOpen01Icon aria-hidden="true" className="size-4" />
+            </TooltipTrigger>
+            <TooltipContent side="right">{t("owner.guide")}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <Link
+                  aria-label="Settings"
+                  className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background/70 hover:text-foreground"
+                  to={pathForPage("settings")}
+                />
+              }
+            >
+              <Settings01Icon aria-hidden="true" className="size-4" />
+            </TooltipTrigger>
+            <TooltipContent side="right">{t("owner.settings")}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger
+              render={
+                <button
+                  aria-label={t("mode.owner")}
+                  className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background/70 hover:text-foreground"
+                  onClick={() => setUiMode("owner")}
+                  type="button"
+                />
+              }
+            >
+              <Home01Icon aria-hidden="true" className="size-4" />
+            </TooltipTrigger>
+            <TooltipContent side="right">{t("mode.owner")}</TooltipContent>
+          </Tooltip>
+          <SidebarUserMenu />
+        </>
+      ) : (
+        <>
+          <Link
+            aria-current={guideActive ? "page" : undefined}
+            className={cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              guideActive
+                ? "bg-background font-medium text-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+            )}
+            to={pathForPage("guide")}
+          >
+            <BookOpen01Icon aria-hidden="true" className="size-4 shrink-0" />
+            {t("owner.guide")}
+          </Link>
+          <Link
+            aria-current={settingsActive ? "page" : undefined}
+            className={cn(
+              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+              settingsActive
+                ? "bg-background font-medium text-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+            )}
+            to={pathForPage("settings")}
+          >
+            <Settings01Icon aria-hidden="true" className="size-4 shrink-0" />
+            {t("owner.settings")}
+          </Link>
+          <button
+            className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-muted-foreground text-sm transition-colors hover:bg-background/70 hover:text-foreground"
+            onClick={() => setUiMode("owner")}
+            type="button"
+          >
+            <Home01Icon aria-hidden="true" className="size-4 shrink-0" />
+            {t("mode.owner")}
+          </button>
+          <div className="mt-2 flex items-center justify-between gap-2 px-2">
+            <p className="truncate text-muted-foreground text-xs">
+              {orgName ?? "Organization"}
+            </p>
+            <SidebarUserMenu />
+          </div>
+        </>
+      )}
+    </div>
   );
 }
 
