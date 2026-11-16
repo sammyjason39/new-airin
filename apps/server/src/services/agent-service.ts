@@ -679,7 +679,11 @@ export class AgentService {
         createGroup: (orgId, userId, name, memberIds, brief) =>
           this.groups.create(orgId, userId, name, memberIds, brief),
         getModels: () => this.getModels(),
+        getUserLanguage: () => this.getUserLanguage(),
+        getUserTimezone: () => this.getUserTimezone(),
         listSkills: (orgId) => this.listSkills(orgId),
+        setUserLanguage: (language) => this.setUserLanguage(language),
+        setUserTimezone: (timezone) => this.setUserTimezone(timezone),
       }
     );
     this.orgMemoryTools = createOrgMemoryTools(this.getOrgMemoryService());

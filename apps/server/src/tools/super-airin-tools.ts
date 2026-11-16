@@ -1,4 +1,5 @@
 import {
+  type AppLanguage,
   type AssignSkillRequest,
   emptyObjectSchema,
   getProfileSoulDir,
@@ -60,7 +61,11 @@ export function createSuperAirinTools(
       brief: string
     ) => Promise<AgentGroup>;
     getModels?: () => Promise<ModelsResponse>;
+    getUserLanguage?: () => Promise<AppLanguage>;
+    getUserTimezone?: () => Promise<string>;
     listSkills?: (orgId: string) => Promise<ListSkillsResponse>;
+    setUserLanguage?: (language: string) => Promise<AppLanguage>;
+    setUserTimezone?: (timezone: string) => Promise<string>;
   } = {}
 ): ToolDefinition[] {
   async function inheritModel(
@@ -457,6 +462,92 @@ export function createSuperAirinTools(
             name: tool.name,
           })),
         };
+      },
+    },
+    {
+      description:
+        "Read the install UI language and timezone (also used as the default AI reply language for every agent).",
+      name: "get_user_preferences",
+      parameters: emptyObjectSchema(),
+      async run() {
+        if (!(services.getUserLanguage && services.getUserTimezone)) {
+          throw new Error("User preferences are not available on this server.");
+        }
+
+        return {
+          language: await services.getUserLanguage(),
+          timezone: await services.getUserTimezone(),
+        };
+      },
+    },
+    {
+      description:
+        "Set the install UI language and default AI reply language for every agent. Use id or en. Prefer this over editing config files. After a change, tell the user to refresh the page if the UI language did not switch yet.",
+      name: "set_user_language",
+      parameters: {
+        additionalProperties: false,
+        properties: {
+          language: {
+            description:
+              'Language code: "id" (Bahasa Indonesia) or "en" (English).',
+            enum: ["id", "en"],
+            type: "string",
+          },
+        },
+        required: ["language"],
+        type: "object",
+      },
+      async run(input) {
+        if (!services.setUserLanguage) {
+          throw new Error(
+            "User language updates are not available on this server."
+          );
+        }
+
+        const { language } = z
+          .object({ language: z.enum(["id", "en"]) })
+          .strict()
+          .parse(input);
+
+        const saved = await services.setUserLanguage(language);
+
+        return {
+          language: saved,
+          note: "Applies to the UI and default AI replies. Refresh the page if the UI still shows the old language.",
+        };
+      },
+    },
+    {
+      description:
+        "Set the install timezone used for schedules and time-aware replies. Prefer this over editing config files.",
+      name: "set_user_timezone",
+      parameters: {
+        additionalProperties: false,
+        properties: {
+          timezone: {
+            description:
+              "IANA timezone, for example Asia/Jakarta or America/New_York.",
+            type: "string",
+          },
+        },
+        required: ["timezone"],
+        type: "object",
+      },
+      async run(input) {
+        if (!services.setUserTimezone) {
+          throw new Error(
+            "User timezone updates are not available on this server."
+          );
+        }
+
+        const { timezone } = z
+          .object({ timezone: z.string().trim().min(1).max(64) })
+          .strict()
+          .parse(input);
+
+        const saved = await services.setUserTimezone(timezone);
+
+        return { timezone: saved };
       },
     },
     ...createSuperAirinCustomTools(profileService, sessionState),

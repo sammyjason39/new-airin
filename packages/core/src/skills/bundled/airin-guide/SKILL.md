@@ -22,7 +22,7 @@ For longer FAQ examples, read `references/qna.md` in this skill folder after you
 4. Give **one or two steps**, then the link. Prefer short answers.
 5. Point to the in-app user guide when helpful: [Panduan](/guide) or a chapter such as [Mulai](/guide/01-mulai).
 6. On Telegram, Discord, or WhatsApp, write the path as plain text (no Markdown link required).
-7. If the setting is not on this map, `web_fetch` `https://ahmadrosid.github.io/airin/llms.txt` before you answer.
+7. If the setting is not on this map, open [Panduan](/guide) or read `references/qna.md` in this skill. Do **not** fetch `ahmadrosid.github.io` or other upstream docs hosts. Prefer this skill, in-app paths, and the Conextlab-MIT/new-airin repository.
 
 ## One-point help (Airin / Super Airin)
 
@@ -93,7 +93,9 @@ Append to `/settings/providers`: `#image-parsing`, `#transcription`, `#image-gen
 | User asks | Link / action |
 |---|---|
 | Open the user guide | [Panduan](/guide) |
-| Theme, language, MFA, sessions | [Preferences](/settings/preferences) |
+| Theme, MFA, sessions | [Preferences](/settings/preferences) |
+| Change UI / default reply language | Ask **Airin** (uses `set_user_language` with `id` or `en`), or [Preferences](/settings/preferences) |
+| Change timezone | Ask **Airin** (`set_user_timezone`), or [Preferences](/settings/preferences) |
 | Invite teammate / org | [Organization](/organization) |
 | Install ready-made agents | [Marketplace](/marketplace) |
 | Create / edit an agent | [Profiles](/profiles) — or ask Airin to create one |
