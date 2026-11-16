@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useChatAttachmentPanel } from "@/context/use-chat-attachment-panel";
 import { useLocale } from "@/context/use-locale";
+import { useUiMode } from "@/context/use-ui-mode";
 import { useAppNavigation } from "@/hooks/use-app-navigation";
 import { useHistorySessionsQuery } from "@/hooks/use-resource-mutations";
 import { buildChatPath } from "@/lib/chat-history";
@@ -51,6 +52,7 @@ export function ChatHistoryButton({ profileId }: { profileId: string }) {
 
 function ChatHistoryBody({ profileId }: { profileId: string }) {
   const { t } = useLocale();
+  const { uiMode } = useUiMode();
   const { navigateToNewChat } = useAppNavigation();
   const { hide } = useChatAttachmentPanel();
   const location = useLocation();
@@ -58,22 +60,25 @@ function ChatHistoryBody({ profileId }: { profileId: string }) {
   const sessions = list.data ?? [];
   const pinned = sessions.filter((session) => session.pinned);
   const recent = sessions.filter((session) => !session.pinned);
+  const continuousSimple = uiMode === "owner";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-3">
-      <Button
-        className="w-full justify-start gap-2"
-        onClick={() => {
-          hide(CHAT_HISTORY_PANEL_ID);
-          navigateToNewChat(profileId);
-        }}
-        size="sm"
-        type="button"
-        variant="outline"
-      >
-        <PencilEdit02Icon aria-hidden className="size-4" />
-        {t("owner.newChat")}
-      </Button>
+      {continuousSimple ? null : (
+        <Button
+          className="w-full justify-start gap-2"
+          onClick={() => {
+            hide(CHAT_HISTORY_PANEL_ID);
+            navigateToNewChat(profileId);
+          }}
+          size="sm"
+          type="button"
+          variant="outline"
+        >
+          <PencilEdit02Icon aria-hidden className="size-4" />
+          {t("owner.newChat")}
+        </Button>
+      )}
       <ChatHistorySection
         empty={t("owner.historyEmpty")}
         loading={list.isLoading}

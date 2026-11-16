@@ -146,7 +146,6 @@ export function ChatPageComposerSection({
         {readOnlyBanner}
         <ChatComposer
           {...composerShared}
-          onNewChat={onNewChat}
           profileId={profileId}
           variant="minimal"
         />

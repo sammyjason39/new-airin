@@ -10,7 +10,7 @@
 
 **Manfaat:**
 - Satu agen, satu ruang chat.
-- Mode Simple membuka chat terakhir agen itu (disimpan per browser).
+- Mode Simple = satu thread terus (seperti Grok): chat terakhir agen itu selalu dilanjutkan; tidak ada **Chat baru**.
 
 **Cara pakai:**
 1. Mode **Simple**: di **Tim Anda** pilih agen. Chat terakhir agen itu terbuka (bukan selalu kosong).
@@ -20,7 +20,7 @@
 
 **Batas / catatan:**
 - Chat milik pengguna yang membuatnya. Anggota lain tidak melihat riwayat pribadi Anda.
-- Mode Simple: membuka agen = lanjutkan percakapan terakhir di browser itu.
+- Mode Simple: membuka agen = lanjutkan thread yang sama (refresh / `/new` tidak membuat sesi kosong).
 
 ## Lampiran
 
@@ -158,29 +158,29 @@
 
 **Cara pakai:**
 1. Mode **Advanced**: di sidebar lihat **Recents**. Cari nama chat. Buka, **Rename chat**, atau **Delete chat?**.
-2. Mode **Simple**: buka riwayat dari UI agen → **Riwayat chat**. Tekan **Chat baru** untuk kosong.
+2. Mode **Simple**: buka riwayat dari UI agen → **Riwayat chat** (lanjutkan thread lama jika perlu). Tidak ada tombol **Chat baru**.
 3. Chat Cognito tidak masuk riwayat tersimpan (lihat Cognito).
 
 **Batas / catatan:**
 - Label **Recents** di Advanced tetap bahasa Inggris.
 - Hapus dari UI menghilangkan dari daftar aktif; deep link / pencarian bisa masih menemukan sesi tertutup tertentu (tutup lewat tool `close_session` tidak menghapus permanen).
 
-## Chat terakhir di Simple dan New chat
+## Chat terakhir di Simple (thread terus) dan New chat di Advanced
 
-**Kenapa:** Pemilik usaha sering lanjut topik kemarin; kadang butuh halaman kosong.
+**Kenapa:** Simple seperti Grok: satu session per agen, selalu lanjut. Advanced tetap butuh halaman kosong kadang.
 
 **Manfaat:**
-- Simple menghemat waktu: langsung ke chat terakhir.
-- **Chat baru** / `/new` = sesi kosong, brief agen sama.
+- Simple: satu thread terus — refresh / `/new` tidak membuat sesi kosong.
+- Advanced: **Chat baru** / `/new` = sesi kosong, brief agen sama.
 
 **Cara pakai:**
-1. Simple: pilih agen → chat terakhir terbuka.
-2. Tekan **Chat baru** (New chat) di riwayat / top bar, atau ketik `/new`.
-3. Advanced: **New chat** di sidebar atau empty state, atau `/new`.
+1. Simple: pilih agen → thread terakhir terbuka dan terus dipakai.
+2. Advanced: **Chat baru** di sidebar / empty state, atau `/new`.
+3. Simple: tidak ada tombol **Chat baru**; riwayat hanya untuk membuka thread lama bila perlu.
 
 **Batas / catatan:**
 - Chat terakhir disimpan per browser dan per agen.
-- `/new` harus tepat `/new` (tanpa teks lain).
+- Advanced: `/new` harus tepat `/new` (tanpa teks lain).
 
 ## Branch
 

@@ -152,9 +152,12 @@ export function ChatPageContent({
   const { navigateToNewChat } = useAppNavigation();
 
   const startNewChat = () => {
-    if (profileId) {
-      navigateToNewChat(profileId);
+    // Simple mode keeps one continuous session; do not wipe it from the composer.
+    if (ownerMode || !profileId) {
+      return;
     }
+
+    navigateToNewChat(profileId);
   };
 
   const ownerAgentSettingsButton =

@@ -1821,3 +1821,133 @@ test("Simple mode opens the last stored chat on /chat", async () => {
     }
   }
 });
+
+test("Simple mode ?new=1 resumes the continuous session instead of wiping it", async () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+
+  const previousProfile = useActiveChatProfileStore.getState();
+  const previousStorage = globalThis.localStorage;
+
+  const stored: Record<string, string> = {
+    [UI_MODE_STORAGE_KEY]: "owner",
+    "airin:active-chat-profile": "default",
+    "airin:session:default": "last-session",
+  };
+
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key: string) => stored[key] ?? null,
+      removeItem(key: string) {
+        delete stored[key];
+      },
+      setItem(key: string, value: string) {
+        stored[key] = value;
+      },
+    },
+  });
+
+  useActiveChatProfileStore.setState({
+    orgId: "org1",
+    profileId: "default",
+  });
+
+  const createSession = spyOn(client, "createSession");
+
+  const spies = [
+    createSession,
+    // SAFETY: Partial client stubs; only fields the chat bootstrap reads.
+    spyOn(client, "getMe").mockResolvedValue({
+      activeOrgId: "org1",
+      id: "u1",
+      isPlatformAdmin: false,
+      orgId: "org1",
+    } as never),
+    // SAFETY: Partial org list for auth bootstrap.
+    spyOn(client, "listUserOrgs").mockResolvedValue({
+      orgs: [{ id: "org1", name: "Org" }],
+    } as never),
+    // SAFETY: Partial profile list for the active org.
+    spyOn(client, "listProfiles").mockResolvedValue({
+      profiles: [{ id: "default", name: "Default" }],
+    } as never),
+    // SAFETY: Partial profile detail for skills.
+    spyOn(client, "getProfile").mockResolvedValue({
+      profile: { id: "default", skills: [] },
+    } as never),
+    // SAFETY: Empty thinking settings are enough for this path.
+    spyOn(client, "getThinkingSettings").mockResolvedValue({} as never),
+    // SAFETY: Minimal session payload for the stored last chat.
+    spyOn(client, "getSessionMessages").mockResolvedValue({
+      channel: "web",
+      messageMeta: [],
+      messages: [{ content: "hi", role: "user" }],
+      model: null,
+      questionnaire: null,
+      todos: [],
+    } as never),
+    // SAFETY: Idle session status for the reopen path.
+    spyOn(client, "getSessionStatus").mockResolvedValue({
+      active: false,
+    } as never),
+  ];
+
+  let pathname = "";
+
+  function Probe() {
+    useChatPage();
+    pathname = useLocation().pathname;
+
+    return null;
+  }
+
+  const container = document.createElement("div");
+  const root = createRoot(container);
+
+  try {
+    await act(async () =>
+      root.render(
+        <MemoryRouter initialEntries={["/chat?new=1&profile=default"]}>
+          <QueryClientProvider client={queryClient}>
+            <UiModeProvider>
+              <AuthProvider>
+                <AppProvider>
+                  <Routes>
+                    <Route
+                      element={<Probe />}
+                      path="/chat/:profileId?/:sessionId?"
+                    />
+                  </Routes>
+                </AppProvider>
+              </AuthProvider>
+            </UiModeProvider>
+          </QueryClientProvider>
+        </MemoryRouter>
+      )
+    );
+    await act(async () => {
+      await Bun.sleep(40);
+    });
+
+    expect(pathname).toBe("/chat/default/last-session");
+    expect(stored["airin:session:default"]).toBe("last-session");
+    expect(createSession).not.toHaveBeenCalled();
+  } finally {
+    await act(async () => root.unmount());
+    queryClient.clear();
+
+    for (const spy of spies) {
+      spy.mockRestore();
+    }
+
+    useActiveChatProfileStore.setState(previousProfile);
+
+    if (previousStorage) {
+      Object.defineProperty(globalThis, "localStorage", previousStorage);
+    } else {
+      Reflect.deleteProperty(globalThis, "localStorage");
+    }
+  }
+});

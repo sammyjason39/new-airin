@@ -590,17 +590,31 @@ export function useChatPage() {
   );
 
   const enterDraftChat = useCallback(
-    (nextProfileId: string) => {
+    (
+      nextProfileId: string,
+      options?: {
+        /**
+         * Simple mode keeps one continuous session like Grok. Only clear the
+         * stored id when starting Cognito or recovering from a deleted chat.
+         */
+        clearStoredSession?: boolean;
+      }
+    ) => {
       // oxlint-disable react-doctor/no-adjust-state-on-prop-change -- The ?new=1 layout effect calls this for a one-shot "New chat" link, then clears the URL; it is an event, not a prop change.
       sessionLoadRef.current += 1;
       releaseActiveStream();
       setBusy(false);
       setTurnStartedAt(null);
 
-      try {
-        localStorage.removeItem(sessionStorageKey(nextProfileId));
-      } catch {
-        // Starting a new chat must still work when browser storage is disabled.
+      const clearStoredSession =
+        options?.clearStoredSession ?? uiMode !== "owner";
+
+      if (clearStoredSession) {
+        try {
+          localStorage.removeItem(sessionStorageKey(nextProfileId));
+        } catch {
+          // Starting a new chat must still work when browser storage is disabled.
+        }
       }
 
       skipNextProfileSessionRef.current = true;
@@ -626,7 +640,13 @@ export function useChatPage() {
         navigate(buildNewChatPath(nextProfileId), { replace: true });
       }
     },
-    [location.pathname, navigate, releaseActiveStream, restoreLastChatModel]
+    [
+      location.pathname,
+      navigate,
+      releaseActiveStream,
+      restoreLastChatModel,
+      uiMode,
+    ]
   );
 
   useLayoutEffect(() => {
@@ -828,6 +848,7 @@ export function useChatPage() {
       setBusy(true);
       setTurnStartedAt(null);
       setError(null);
+      let recoverDeletedProfileId: string | null = null;
 
       try {
         localStorage.setItem(sessionStorageKey(nextProfileId), sessionId);
@@ -967,9 +988,10 @@ export function useChatPage() {
           return;
         }
 
-        // The chat was deleted: open a new chat instead of an error.
+        // The chat was deleted: drop the stale id and open a blank draft
+        // after finally (enterDraftChat clears busy itself).
         if (err instanceof AirinApiError && err.status === 404) {
-          navigate(buildNewChatPath(nextProfileId), { replace: true });
+          recoverDeletedProfileId = nextProfileId;
 
           return;
         }
@@ -984,9 +1006,13 @@ export function useChatPage() {
           setTurnStartedAt(null);
         }
       }
+
+      if (recoverDeletedProfileId && isCurrentLoad()) {
+        enterDraftChat(recoverDeletedProfileId, { clearStoredSession: true });
+      }
     },
     [
-      navigate,
+      enterDraftChat,
       notifyTurnDone,
       profileId,
       releaseActiveStream,
@@ -1052,7 +1078,7 @@ export function useChatPage() {
 
       cognitoRef.current = next;
       setCognito(next);
-      enterDraftChat(profileIdRef.current);
+      enterDraftChat(profileIdRef.current, { clearStoredSession: true });
     },
     [enterDraftChat]
   );
@@ -1115,9 +1141,6 @@ export function useChatPage() {
     const storedDraft = draftKey ? consumeStoredChatDraft(draftKey) : null;
     const requestedDraft = inlineDraft ?? storedDraft;
 
-    // ?new=1 is always on /chat, so enterDraftChat does not navigate here.
-    enterDraftChat(targetProfileId);
-
     if (requestedProfile && requestedProfile !== profileIdRef.current) {
       setProfileId(requestedProfile);
     }
@@ -1149,6 +1172,23 @@ export function useChatPage() {
       }));
     }
 
+    // Simple mode: keep one continuous thread. Resume the last chat instead of
+    // wiping it when something opens ?new=1 (composer slash, history, deep link).
+    if (uiMode === "owner" && !cognitoRef.current) {
+      const storedSessionId = readStoredSessionId(targetProfileId);
+
+      if (storedSessionId) {
+        navigate(buildChatPath(targetProfileId, storedSessionId), {
+          replace: true,
+        });
+
+        return;
+      }
+    }
+
+    // ?new=1 is always on /chat, so enterDraftChat does not navigate here.
+    enterDraftChat(targetProfileId);
+
     navigate(buildChatBasePath(), { replace: true });
   }, [
     searchParams,
@@ -1160,6 +1200,7 @@ export function useChatPage() {
     profileId,
     user?.id,
     activeOrg?.id,
+    uiMode,
   ]);
 
   useEffect(() => {
