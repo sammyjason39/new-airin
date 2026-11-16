@@ -3,8 +3,17 @@ import {
   CheckmarkCircle02Icon,
   UserGroupIcon,
 } from "hugeicons-react";
+import { useLandingCopy } from "./use-landing-copy";
 
 function GroupsOnboardingSections() {
+  const { m } = useLandingCopy();
+
+  const groupMessages = [
+    { avatar: "jovan", name: "Jovan", text: m.groupMsgJovan },
+    { avatar: "dimas", name: "Dimas", text: m.groupMsgDimas },
+    { avatar: "kezia", name: "Kezia", text: m.groupMsgKezia },
+  ];
+
   return (
     <>
       <section
@@ -15,21 +24,14 @@ function GroupsOnboardingSections() {
         <div className="landing-wrap landing-groups-layout">
           <div data-reveal="rise">
             <h2 id="landing-groups-title">
-              Satu grup.
+              {m.groupTitleLead}
               <br />
-              <em>Banyak kepala.</em>
+              <em>{m.groupTitleEm}</em>
             </h2>
-            <p>
-              Satukan beberapa AI agent dalam satu grup bersama timmu. Mereka
-              bisa saling ngobrol, berbagi konteks, dan meneruskan tugas sesuai
-              keahliannya.
-            </p>
-            <p>
-              Di mode Simple, buka Grup dari sidebar. Mulai dengan satu brief,
-              ikut diskusinya, lalu tinjau hasil bersama.
-            </p>
+            <p>{m.groupBody1}</p>
+            <p>{m.groupBody2}</p>
             <a className="landing-button" href="#daftar-tunggu">
-              Bangun AI superteam kamu <ArrowRight01Icon aria-hidden />
+              {m.groupCta} <ArrowRight01Icon aria-hidden />
             </a>
           </div>
           <div className="landing-group-demo" data-reveal="assemble">
@@ -47,33 +49,17 @@ function GroupsOnboardingSections() {
                 ))}
               </div>
               <div>
-                <strong>Tim Promo Mingguan</strong>
-                <span>Kamu, Jovan, Dimas, Kezia</span>
+                <strong>{m.groupName}</strong>
+                <span>{m.groupMembers}</span>
               </div>
               <UserGroupIcon aria-hidden />
             </div>
             <div className="landing-group-messages">
               <div className="landing-group-owner">
-                <span>Kamu</span>
-                <p>Tim, bantu siapkan promo untuk jam sepi minggu depan.</p>
+                <span>{m.groupOwnerLabel}</span>
+                <p>{m.groupOwnerText}</p>
               </div>
-              {[
-                {
-                  avatar: "jovan",
-                  name: "Jovan",
-                  text: "Dimas, cek laporan penjualannya. Kezia, kita siapkan konsep dari temuan Dimas.",
-                },
-                {
-                  avatar: "dimas",
-                  name: "Dimas",
-                  text: "Di laporan contoh ini, Selasa siang paling sepi. Kezia, paket makan siang bisa jadi bahan promonya.",
-                },
-                {
-                  avatar: "kezia",
-                  name: "Kezia",
-                  text: "Siap. Aku susun konsep visual dan caption. Tim bisa cek harga serta stok sebelum kita lanjut.",
-                },
-              ].map((message) => (
+              {groupMessages.map((message) => (
                 <div className="landing-group-message" key={message.avatar}>
                   <img
                     alt=""
@@ -91,11 +77,9 @@ function GroupsOnboardingSections() {
             </div>
             <div className="landing-group-summary">
               <CheckmarkCircle02Icon aria-hidden />
-              <span>Satu brief → diskusi tim → hasil untuk ditinjau</span>
+              <span>{m.groupSummary}</span>
             </div>
-            <p className="landing-group-disclaimer">
-              Contoh percakapan grup AIRIN.
-            </p>
+            <p className="landing-group-disclaimer">{m.groupDisclaimer}</p>
           </div>
         </div>
       </section>
@@ -106,10 +90,10 @@ function GroupsOnboardingSections() {
         id="onboarding"
       >
         <div className="landing-wrap">
-          <h2 data-reveal="rise" id="landing-onboarding-title" lang="en">
-            Meet your next
+          <h2 data-reveal="rise" id="landing-onboarding-title">
+            {m.onboardingTitleLead}
             <br />
-            <em>AI Superteam.</em>
+            <em>{m.onboardingTitleEm}</em>
           </h2>
           <ol className="landing-onboarding-steps">
             <li data-reveal="assemble">
@@ -123,8 +107,8 @@ function GroupsOnboardingSections() {
                   width={120}
                 />
               </div>
-              <h3>Pilih pekerjaan pertama.</h3>
-              <p>Mulai dari satu tugas yang paling menyita waktu tim.</p>
+              <h3>{m.onboarding1Title}</h3>
+              <p>{m.onboarding1Body}</p>
             </li>
             <li data-reveal="assemble">
               <div>
@@ -137,8 +121,8 @@ function GroupsOnboardingSections() {
                   width={120}
                 />
               </div>
-              <h3>Kenalkan bisnismu.</h3>
-              <p>Bagikan SOP dan file. Hubungkan aplikasi yang diperlukan.</p>
+              <h3>{m.onboarding2Title}</h3>
+              <p>{m.onboarding2Body}</p>
             </li>
             <li data-reveal="assemble">
               <div>
@@ -151,11 +135,8 @@ function GroupsOnboardingSections() {
                   width={120}
                 />
               </div>
-              <h3>Kerja bareng, makin cocok.</h3>
-              <p>
-                Tinjau hasil pertama. Sesuaikan brief, lalu tambah tugas
-                berikutnya.
-              </p>
+              <h3>{m.onboarding3Title}</h3>
+              <p>{m.onboarding3Body}</p>
             </li>
           </ol>
         </div>

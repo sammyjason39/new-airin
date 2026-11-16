@@ -53,8 +53,9 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | Regression test cases | Ada | Save chat as case + runs |
 | Knowledge base (profile + org) | Ada | Attach/detach shared KB |
 | Artifacts workspace | Ada | |
-| Marketplace install agents | Ada | Member+ browse; install gated |
-| Owner mode vs Advanced UI | Ada | Simplified team sidebar vs full rail |
+| Marketplace install agents | Ada | Member+ browse; install gated. Install membawa soul, MEMORY, skills bundled, `preferredProfileId` (contoh Jovan → `chief_of_staff`). Nama lama berbasis peran di-rename otomatis ke nama orang |
+| Simple vs Advanced UI | Ada | Simple (kode `owner`, default install baru): sidebar tim + Groups + Marketplace. Advanced: rail penuh |
+| Subtitle peran agen (Simple) | Ada | Di bawah nama agen + hover rail + nama pembicara di group chat. Fallback "Agen" bila peran tidak dikenal |
 
 **Soul / prompt layers (runtime order):** soul compose → skills catalog → org MEMORY.md → chat structure/tool instructions → per-turn (todos, matched skills, Composio) → optional KB catalog. Super Airin menambah rules orchestrator.
 
@@ -64,6 +65,7 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 |---|---|---|
 | Streaming SSE turns | Ada | Stop / regenerate patterns |
 | Deep link `/chat/:profileId/:sessionId` | Ada | |
+| Lanjut chat terakhir (Simple) | Ada | `/chat` dan ganti agen membuka session terakhir agen itu di browser ini (`localStorage`). **New chat** / `/new` tetap draft kosong. Advanced: `/chat` = draft |
 | Attachments (image/doc) | Ada | Cap chat attach **5 MB** |
 | Model / provider / effort picker | Ada | |
 | Agent todos panel | Ada | |
@@ -88,6 +90,8 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | Group files / memory | Ada | Memory cap **65 536** chars (API schema); workspace helper **4096** chars di path group memory |
 | Threads under messages | Ada | |
 | Max documents per group message | Ada | **5** |
+| Groups di sidebar Simple | Ada | Bagian **Groups** di bawah roster tim |
+| Laporan HTML di grup | Ada | Agen wajib `load_skill artifact-design` + template terkunci, simpan `artifacts/*.html`, sebut path di balasan |
 
 ### 5.6 Automations
 
@@ -120,7 +124,7 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | Skill tools | `load_skill`, `skill_manage` |
 | Automation tools | create/list/delete/run/… |
 | Channel artifact send | Discord / WhatsApp |
-| `send_to_bot` | Message profil lain in-org |
+| `send_to_bot` | A2A: kirim tugas ke profil lain in-org, tunggu jawaban (agen tujuan pakai tool-nya sendiri). Otomatis ada di setiap turn yang tidak dibatasi / tidak read-only. Depth max **3**, timeout default **5 menit**. Nama: exact → prefix unik → contains unik; gagal → daftar agen yang ada. Prompt menyuruh orkestrator delegasi, bukan mengarang angka |
 | Super Airin suite | create/update/list profiles, tools, groups, propose_tool, submit_plugin_draft, … |
 
 #### Custom tools
@@ -137,7 +141,9 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | SKILL.md + optional tool | Ada | Global + profile paths |
 | Bundled default skills | Ada | create-automation, manage-skills, skill-installer, update/archive-profile-memory, artifact/slide-deck-design, composio-integrations, airin-guide, grounded-research |
 | Super-only bundled | Ada | create-plugin, create-profile, create-skill, coding-agent |
-| Opt-in | Ada | agent-browser, google-meet, knowledge-base-wiki |
+| Opt-in | Ada | agent-browser, google-meet, knowledge-base-wiki, **hr-uu-ketenagakerjaan** (UU 13/2003, UU 6/2023 Bab IV, PP 35/2021, PP 36/2021; dipasang ke Alya) |
+| Paket laundry | Ada | 12 skill (local context, promo, cuaca, OpenRouter image, social, WhatsApp support, data analyst, finance Data View, visibility Apify, ops, …) — hanya saat install paket |
+| `artifact-design` template terkunci | Ada | `assets/report.html`: urutan tetap Executive summary → 3–5 KPI → chart → tabel; latar putih, ikut tema terang/gelap |
 | Coding backend skills | Ada | codex / claude-code / opencode / pi / cursor (runtime prompts) |
 | Marketplace install | Ada | |
 | Skill proposals / suggestions / curator | Ada | Org learning presets off/ask/auto |
@@ -176,7 +182,7 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | **Workflows** | Official | Step recipes + runs; beda dari automations |
 | **Supermemory** | Official | External memory provider |
 | **Google Meet** | Official + first-class page | Capture, transcripts, extension, Composio import gating |
-| **Data View** | Official | Local Google Sheet copy + Sync |
+| **Data View** | Official | Local Google Sheet copy + Sync. Satu link = satu tab (`gid`). Sheet publik "Anyone with the link" dibaca via CSV export tanpa Composio. Max **400 000** karakter per tab; `read_sheet` max **200** baris per panggilan |
 
 ### 5.12 Org memory & profile memory
 
@@ -268,5 +274,17 @@ Semua channel: base commands `!help|!new|!clear|!stop|!status` (variasi per chan
 | PM2 ecosystem | Ada |
 | Desktop (macOS published; Windows limited) | Ada — lihat `apps/desktop/README.md` |
 | Coolify / Tailscale / hardening guides | Docs |
+| Produksi Conextlab | https://useairin.id (lihat model §4.1) |
+
+### 5.20 Landing publik & waitlist
+
+| Fitur | Status | Catatan |
+|---|---|---|
+| Landing `/` | Ada | Untuk pengunjung yang belum login; user login diarahkan ke `/chat`. Bahasa ID/EN (toggle) |
+| Isi landing | Ada | Hero, roster agen, fitur, groups, perbandingan, industri (laundry, carwash, restoran, retail), logo integrasi |
+| Form waitlist | Ada | Field: nama bisnis, jenis bisnis, nama kontak, email, WhatsApp (8–15 digit). `POST /v1/public/waitlist` → **202**, body max 4 KB |
+| Daftar waitlist (admin) | Ada | `GET /v1/platform/waitlist`, platform admin, 50 per halaman, cursor `before` |
+| Waitlist Laundry Innovation Summit | Ada | `/laundry-innovation-summit` → `POST /v1/public/waitlist/laundry-innovation-summit`, disimpan sebagai audit event |
+| Daftar akun / bayar dari landing | **Tidak** | Sengaja di luar scope |
 
 ---

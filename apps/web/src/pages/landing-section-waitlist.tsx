@@ -1,7 +1,9 @@
-import { team } from "./landing-content";
 import { WaitlistForm } from "./landing-waitlist";
+import { useLandingCopy } from "./use-landing-copy";
 
 function WaitlistSection() {
+  const { content, m } = useLandingCopy();
+
   return (
     <section
       aria-labelledby="waitlist-title"
@@ -11,19 +13,14 @@ function WaitlistSection() {
       <div className="landing-wrap landing-waitlist-layout">
         <div data-reveal="rise">
           <h2 id="waitlist-title">
-            Mau bisnisnya kecil atau besar.
+            {m.waitlistTitleLead}
             <br />
-            <em>Mimpinya harus besar.</em>
+            <em>{m.waitlistTitleEm}</em>
           </h2>
-          <p className="landing-waitlist-lead">Superteam. Siap bantu kamu.</p>
-          <p>
-            Kami masih di tahap early limited testing untuk beberapa bisnis. Isi
-            form ini — kami akan hubungi kamu secepatnya. Beberapa akan kami
-            pilih sebagai Founding Member Users, untuk merasakan duluan
-            kehebatan Superteam ini.
-          </p>
+          <p className="landing-waitlist-lead">{m.waitlistLead}</p>
+          <p>{m.waitlistBody}</p>
           <div aria-hidden className="landing-waitlist-team">
-            {team.map((member) => (
+            {content.team.map((member) => (
               <img
                 alt=""
                 height={130}

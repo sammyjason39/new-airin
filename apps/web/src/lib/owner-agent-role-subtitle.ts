@@ -41,6 +41,7 @@ const LAUNDRY_PROFILE_NAME_TO_ROLE = {
 } as const satisfies Record<string, OwnerAgentRoleMessageKey>;
 
 const MARKETPLACE_PROFILE_ID_TO_ROLE = {
+  chief_of_staff: "owner.role.chiefOfStaff",
   "chief-of-staff": "owner.role.chiefOfStaff",
   "customer-success": "owner.role.customerSuccess",
   "finance-ops": "owner.role.laundryFinance",
@@ -150,4 +151,19 @@ export function agentRailHoverLabel(
   }
 
   return `${name} · ${role}`;
+}
+
+/** Group chat speaker line and rail hover: name, plus role when known. */
+export function agentNameWithRoleLabel(
+  profile: Pick<ProfileSummary, "id" | "name" | "isSuper">,
+  t: (
+    key: OwnerAgentRoleMessageKey | "owner.orchestrator" | "owner.agent"
+  ) => string
+): string {
+  const roleKey = ownerAgentSubtitleMessageKey(profile);
+
+  return agentRailHoverLabel(
+    profile,
+    roleKey === "owner.agent" ? "" : t(roleKey)
+  );
 }

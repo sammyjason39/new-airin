@@ -34,18 +34,20 @@ export function createSendToBotTool(
 ): ToolDefinition {
   return {
     description:
-      "Send a message to another agent in this organization by name and wait for their reply. Use when another teammate should handle the work. Depth is capped to stop agent ping-pong.",
+      "Agent-to-agent (A2A): send a task to another org agent by name and wait for their reply (they keep their tools). Call once per teammate; you may call several times to gather data, then answer the owner. Depth is capped to stop ping-pong.",
     name: SEND_TO_BOT_TOOL_NAME,
     parallelSafe: false,
     parameters: {
       additionalProperties: false,
       properties: {
         bot_name: {
-          description: "Exact or case-insensitive name of the target agent.",
+          description:
+            "Target agent name (exact, case-insensitive; unique prefix/contains also works).",
           type: "string",
         },
         message: {
-          description: "What the other agent should do or answer.",
+          description:
+            "Concrete ask for that agent (include sheet/period/context they need).",
           type: "string",
         },
         timeoutMs: {
@@ -99,14 +101,19 @@ export async function runSendToBotTool(
   }
 
   const { profiles } = await agentService.listProfiles(orgId);
-
-  const target = profiles.find(
-    (profile) => profile.name.trim().toLowerCase() === botName.toLowerCase()
-  );
+  const target = resolveBotByName(profiles, botName);
 
   if (!target) {
+    const available = profiles
+      .map((profile) => profile.name.trim())
+      .filter(Boolean)
+      .sort((a, b) => a.localeCompare(b))
+      .join(", ");
+
     return failSubAgentResult(
-      `No agent named "${botName}" in this organization.`
+      available
+        ? `No agent named "${botName}" in this organization. Available: ${available}.`
+        : `No agent named "${botName}" in this organization.`
     );
   }
 
@@ -167,4 +174,38 @@ function clampTimeout(value: number | null): number {
   }
 
   return Math.min(Math.max(Math.floor(value), 1000), MAX_SUB_AGENT_TIMEOUT_MS);
+}
+
+/** Exact name first, then a single unique prefix / contains match. */
+function resolveBotByName<T extends { id: string; name: string }>(
+  profiles: T[],
+  botName: string
+): T | undefined {
+  const needle = botName.trim().toLowerCase();
+
+  if (!needle) {
+    return undefined;
+  }
+
+  const exact = profiles.find(
+    (profile) => profile.name.trim().toLowerCase() === needle
+  );
+
+  if (exact) {
+    return exact;
+  }
+
+  const prefixed = profiles.filter((profile) =>
+    profile.name.trim().toLowerCase().startsWith(needle)
+  );
+
+  if (prefixed.length === 1) {
+    return prefixed[0];
+  }
+
+  const contained = profiles.filter((profile) =>
+    profile.name.trim().toLowerCase().includes(needle)
+  );
+
+  return contained.length === 1 ? contained[0] : undefined;
 }

@@ -5,8 +5,11 @@ import {
   Message01Icon,
   UserGroupIcon,
 } from "hugeicons-react";
+import { useLandingCopy } from "./use-landing-copy";
 
 function AgentSection() {
+  const { m } = useLandingCopy();
+
   return (
     <section
       aria-labelledby="landing-agent-title"
@@ -16,22 +19,19 @@ function AgentSection() {
       <div className="landing-wrap landing-agent-layout">
         <div data-reveal="rise">
           <h2 id="landing-agent-title">
-            AI agent itu
+            {m.agentTitleLead}
             <br />
-            <em>rekan kerja digital.</em>
+            <em>{m.agentTitleEm}</em>
           </h2>
-          <p>
-            Beri tujuan, konteks, dan akses ke alat kerja. Airin membantu
-            mengerjakan langkah-langkahnya, lalu membawa hasilnya ke timmu.
-          </p>
+          <p>{m.agentBody}</p>
           <a className="landing-text-link" href="#onboarding">
-            Kenalkan pada bisnismu <ArrowRight01Icon aria-hidden />
+            {m.agentLink} <ArrowRight01Icon aria-hidden />
           </a>
         </div>
         <div className="landing-flow" data-reveal="assemble">
           <div className="landing-flow-brief">
             <Message01Icon aria-hidden />
-            <span>“Bantu siapkan promo dari laporan minggu ini.”</span>
+            <span>{m.flowBrief}</span>
           </div>
           <div className="landing-flow-handoff">
             <div>
@@ -43,7 +43,7 @@ function AgentSection() {
                 width={72}
               />
               <strong>Dimas</strong>
-              <span>Baca laporan</span>
+              <span>{m.flowDimas}</span>
             </div>
             <ArrowRight01Icon aria-hidden />
             <div>
@@ -55,22 +55,22 @@ function AgentSection() {
                 width={72}
               />
               <strong>Kezia</strong>
-              <span>Siapkan materi</span>
+              <span>{m.flowKezia}</span>
             </div>
             <ArrowRight01Icon aria-hidden />
             <div>
               <span className="landing-flow-human">
                 <UserGroupIcon aria-hidden />
               </span>
-              <strong>Timmu</strong>
-              <span>Tinjau & putuskan</span>
+              <strong>{m.flowTeam}</strong>
+              <span>{m.flowTeamAction}</span>
             </div>
           </div>
           <div className="landing-flow-result">
             <File01Icon aria-hidden />
             <div>
-              <strong>Brief promo + konsep konten</strong>
-              <span>Siap dibahas bersama tim</span>
+              <strong>{m.flowResultTitle}</strong>
+              <span>{m.flowResultHint}</span>
             </div>
             <CheckmarkCircle02Icon aria-hidden />
           </div>

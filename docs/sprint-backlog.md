@@ -21,3 +21,30 @@
 1. [P0 — Laundry Innovation Summit demo](./sprint-backlog-p0.md) (P0-0 … **P0-13**)
 2. [P1 and cross-cutting](./sprint-backlog-p1.md) — post-summit, risks, hygiene
 
+---
+
+## Status (16 Nov 2026)
+
+Status only from code or a production check. "Not verified" means nobody checked it against the acceptance criteria yet.
+
+| ID | Item | Status | Evidence / gap |
+|---|---|---|---|
+| P0-0 | Demo environment | **Done (changed)** | Production at https://useairin.id, `/health` ok, provider set. Default reply language is **Bahasa Indonesia**, not English (product decision) |
+| P0-1 | Laundry pack | **Partial** | Six laundry agents in `catalog-laundry.ts`. Re-import time (< 15 min) not measured |
+| P0-2 | Social media agent | Not verified | Skills exist (`laundry-social-media`, `laundry-openrouter-image`) |
+| P0-3 | WhatsApp support agent | Not verified | Skill `laundry-whatsapp-support` exists; production bridge not re-tested |
+| P0-4 | Data analyst | **Partial** | Ardi answered the Business group forecast with sheet data. Weather API path not re-tested |
+| P0-5 | Finance via Data View | **Done (limit)** | Dimas used Data View sheets. Tab **Transaksi** is too large for Data View |
+| P0-6 | Visibility (Apify) | Not verified | Skill exists; Apify key not checked |
+| P0-7 | Operations | **Partial** | Toni answered in the Business group |
+| P0-8 | Simple UI (Owner mode) | **Done** | Mode renamed **Simple**; team sidebar with Groups and Marketplace; tool calls collapsed; last chat opens by default |
+| P0-9 | Onboarding → vertical | Not verified | `business-vertical.ts` exists; flow not re-tested |
+| P0-10 | Demo script | **Done (doc)** | `laundry-innovation-summit-demo-script.md` |
+| P0-11 | Landing + waitlist | **Done** | `/` landing (ID/EN), `POST /v1/public/waitlist`, admin list `GET /v1/platform/waitlist` |
+| P0-12 | Business profile | **Spec only** | No structured business-profile store in code yet |
+| P0-13 | Role labels in sidebar | **Done** | `owner-agent-role-subtitle.ts`; fallback "Agen"; role also shows in group chat speaker line |
+| — | Orchestrator (Jovan) + A2A | **Done (new)** | Not in original backlog. `send_to_bot` on every unrestricted turn; Jovan routes to specialists |
+| — | HR Indonesia (Alya) | **Done (new)** | Skill `hr-uu-ketenagakerjaan` |
+| — | Locked HTML report | **Done (new)** | `artifact-design/assets/report.html`, required in groups |
+| P1-3 | Clean baseline commit | **Open** | Working tree still has uncommitted product changes |
+

@@ -1,7 +1,9 @@
 import { CheckmarkCircle02Icon } from "hugeicons-react";
-import { comparison } from "./landing-content";
+import { useLandingCopy } from "./use-landing-copy";
 
 function ComparisonSection() {
+  const { content, m } = useLandingCopy();
+
   return (
     <section
       aria-labelledby="landing-comparison-title"
@@ -10,24 +12,18 @@ function ComparisonSection() {
       <div className="landing-wrap">
         <div className="landing-section-heading" data-reveal="rise">
           <h2 id="landing-comparison-title">
-            Dari satu chat
+            {m.comparisonTitleLead}
             <br />
-            <em>ke satu tim.</em>
+            <em>{m.comparisonTitleEm}</em>
           </h2>
-          <p>
-            Bandingkan Airin dengan alur kerja biasa menggunakan satu asisten di
-            chat. Fitur tiap layanan bisa berbeda.
-          </p>
+          <p>{m.comparisonBody}</p>
         </div>
         <div className="landing-table-scroll">
           <table className="landing-table">
-            <caption className="sr-only">
-              Perbandingan alur kerja AIRIN Superteam dengan satu asisten di
-              chat
-            </caption>
+            <caption className="sr-only">{m.comparisonCaption}</caption>
             <thead>
               <tr>
-                <th scope="col">Cara kerja</th>
+                <th scope="col">{m.comparisonTopicCol}</th>
                 <th scope="col">
                   <img
                     alt=""
@@ -38,11 +34,11 @@ function ComparisonSection() {
                   />
                   AIRIN Superteam
                 </th>
-                <th scope="col">Satu asisten di chat</th>
+                <th scope="col">{m.comparisonChatCol}</th>
               </tr>
             </thead>
             <tbody>
-              {comparison.map(([topic, airin, chat]) => (
+              {content.comparison.map(([topic, airin, chat]) => (
                 <tr key={topic}>
                   <th scope="row">{topic}</th>
                   <td>

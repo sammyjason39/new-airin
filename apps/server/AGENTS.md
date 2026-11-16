@@ -22,3 +22,12 @@ Orgs isolate profiles, sessions, automations, tools, MCP, skills, usage (`org_id
 | Contracts | `packages/core/src/contract.ts` |
 | Client `X-Org-Id` | `packages/client/src/client.ts` |
 | Web auth / switcher | `apps/web/src/context/auth-context.tsx`, `apps/web/src/components/OrgSwitcher.tsx` |
+
+## Other routes
+
+| Change | Where |
+|---|---|
+| Public waitlist + platform waitlist list | `apps/server/src/http/routes/demo-waitlist.ts` |
+| Agent marketplace list / install | `apps/server/src/http/routes/agent-marketplace.ts`, `apps/server/src/services/agent-marketplace-service.ts` |
+| A2A `send_to_bot` (added in `AgentService` tool resolve) | `apps/server/src/tools/send-to-bot-tool.ts` |
+| Group turn prompt (chat style, artifact rule) | `apps/server/src/services/agent-group-turn.ts` |

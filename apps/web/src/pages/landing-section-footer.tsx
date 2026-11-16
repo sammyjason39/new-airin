@@ -1,9 +1,13 @@
+import { useLandingCopy } from "./use-landing-copy";
+
 function LandingFooter() {
+  const { m } = useLandingCopy();
+
   return (
     <footer className="landing-footer">
       <div className="landing-wrap landing-footer-inner">
         <div className="landing-footer-brand">
-          <p className="landing-footer-created">Created by Conextlab.ai</p>
+          <p className="landing-footer-created">{m.footerCreated}</p>
           <div className="landing-footer-logos">
             <a
               aria-label="Conextlab.ai"
@@ -32,7 +36,7 @@ function LandingFooter() {
               />
             </a>
           </div>
-          <p className="landing-footer-note">A Ralali Group company</p>
+          <p className="landing-footer-note">{m.footerNote}</p>
         </div>
         <div className="landing-footer-contact">
           <p>
@@ -46,7 +50,7 @@ function LandingFooter() {
           </p>
           <p>
             <a href="mailto:hello@conextlab.ai">hello@conextlab.ai</a>
-            <span> — partnership atau pertanyaan lain</span>
+            <span>{m.footerContact}</span>
           </p>
         </div>
       </div>

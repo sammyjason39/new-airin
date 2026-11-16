@@ -1,7 +1,7 @@
 import { ArrowDown01Icon, ArrowRight01Icon } from "hugeicons-react";
 import type { Dispatch, SetStateAction } from "react";
-import { team } from "./landing-content";
 import { TeamWorkbench } from "./landing-workbench";
+import { useLandingCopy } from "./use-landing-copy";
 
 function LandingHero({
   active,
@@ -10,44 +10,44 @@ function LandingHero({
   active: number;
   setActive: Dispatch<SetStateAction<number>>;
 }) {
+  const { content, m } = useLandingCopy();
+  const agent = content.team[active] ?? content.team[0];
+
   return (
     <section
       aria-labelledby="landing-title"
       className="landing-hero landing-wrap"
     >
       <div className="landing-intro">
-        <h1 id="landing-title" lang="en">
-          <span>Your next hire</span>
+        <h1 id="landing-title">
+          <span>{m.heroTitleLine1}</span>
           <span>
-            is an{" "}
+            {m.heroTitleLine2Prefix}{" "}
             <span className="landing-title-avatar">
               <img
                 alt=""
                 height={88}
-                key={team[active].avatar}
-                src={`/characters/${team[active].avatar}.png`}
+                key={agent.avatar}
+                src={`/characters/${agent.avatar}.png`}
                 width={88}
               />
             </span>
           </span>
-          <em>AI Superteam.</em>
+          <em>{m.heroTitleEm}</em>
         </h1>
-        <p className="landing-hero-tagline">Kerja nyata. Tim lebih kuat.</p>
-        <p>
-          Rekan AI untuk bisnis kamu. Bantu balas pelanggan, baca laporan, dan
-          bikin konten. Orang-orang di timmu tetap pegang keputusan.
-        </p>
+        <p className="landing-hero-tagline">{m.heroTagline}</p>
+        <p>{m.heroBody}</p>
         <div className="landing-actions">
-          <a className="landing-button" href="#daftar-tunggu" lang="en">
-            Join Waitlist <ArrowRight01Icon aria-hidden />
+          <a className="landing-button" href="#daftar-tunggu">
+            {m.navCta} <ArrowRight01Icon aria-hidden />
           </a>
           <a className="landing-text-link" href="#use-cases">
-            Lihat cara kerja <ArrowDown01Icon aria-hidden />
+            {m.heroSeeHow} <ArrowDown01Icon aria-hidden />
           </a>
         </div>
         <div className="landing-hero-team">
           <div aria-hidden>
-            {team.map((member) => (
+            {content.team.map((member) => (
               <img
                 alt=""
                 height={32}
@@ -57,13 +57,13 @@ function LandingHero({
               />
             ))}
           </div>
-          <span>Satu tim. Banyak keahlian.</span>
+          <span>{m.heroTeamLine}</span>
         </div>
       </div>
       <TeamWorkbench active={active} setActive={setActive} />
       <a className="landing-scroll-hint" href="#ai-agent">
         <ArrowDown01Icon aria-hidden />
-        <span>Kenalan dengan tim barumu</span>
+        <span>{m.heroScroll}</span>
       </a>
     </section>
   );

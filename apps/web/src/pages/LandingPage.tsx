@@ -11,10 +11,12 @@ import { LandingFooter } from "./landing-section-footer";
 import { GroupsOnboardingSections } from "./landing-section-groups";
 import { RosterSection } from "./landing-section-roster";
 import { WaitlistSection } from "./landing-section-waitlist";
+import { useLandingCopy } from "./use-landing-copy";
 import "./landing-page.css";
 
 export function LandingPage() {
   const { isAuthenticated } = useAuth();
+  const { locale, m } = useLandingCopy();
   const [active, setActive] = useState(0);
   const page = useRef<HTMLDivElement>(null);
 
@@ -57,9 +59,9 @@ export function LandingPage() {
   }
 
   return (
-    <div className="landing" lang="id" ref={page}>
+    <div className="landing" lang={locale} ref={page}>
       <a className="landing-skip" href="#landing-main">
-        Langsung ke konten
+        {m.skip}
       </a>
       <LandingHeader />
       <main id="landing-main">

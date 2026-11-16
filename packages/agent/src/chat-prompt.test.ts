@@ -27,6 +27,7 @@ test.each([
   [["read_file", "edit_file"], "update-profile-memory skill"],
   [["write_file"], "artifact-design skill"],
   [["browser_navigate"], "browser_read"],
+  [["send_to_bot"], "send_to_bot (A2A)"],
 ] as const)("tool guidance follows available tools", (tools, marker) => {
   expect(prompt([...tools])).toContain(marker);
   expect(prompt([])).not.toContain(marker);

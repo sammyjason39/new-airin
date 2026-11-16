@@ -1,4 +1,4 @@
-import { expect, mock, spyOn, test } from "bun:test";
+import { afterEach, expect, mock, spyOn, test } from "bun:test";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { MemoryRouter } from "react-router-dom";
@@ -6,21 +6,30 @@ import {
   AuthContext,
   type AuthContextValue,
 } from "@/context/auth-context-shared";
+import { LocaleProvider } from "@/context/locale-context";
+import { LOCALE_STORAGE_KEY } from "@/lib/locale";
 import { LandingPage } from "./LandingPage";
 
 // SAFETY: LandingPage only reads isAuthenticated from this context.
 const guest = { isAuthenticated: false } as AuthContextValue;
 
+afterEach(() => {
+  localStorage.removeItem(LOCALE_STORAGE_KEY);
+});
+
 async function mountLanding() {
+  localStorage.removeItem(LOCALE_STORAGE_KEY);
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);
   await act(async () => {
     root.render(
       <MemoryRouter>
-        <AuthContext.Provider value={guest}>
-          <LandingPage />
-        </AuthContext.Provider>
+        <LocaleProvider>
+          <AuthContext.Provider value={guest}>
+            <LandingPage />
+          </AuthContext.Provider>
+        </LocaleProvider>
       </MemoryRouter>
     );
   });
@@ -35,7 +44,7 @@ test("guests can switch team members and see industry designs directly", async (
     expect(container.querySelectorAll("main > section")).toHaveLength(10);
     expect(
       container.querySelectorAll("#ai-team .landing-roster-grid > li")
-    ).toHaveLength(8);
+    ).toHaveLength(10);
     expect(
       container.querySelectorAll("#agent-groups .landing-group-message")
     ).toHaveLength(3);
@@ -121,9 +130,46 @@ test("guests can switch team members and see industry designs directly", async (
     expect(container.querySelector("#fitur")?.hasAttribute("hidden")).toBe(
       false
     );
+    expect(container.querySelector(".landing")?.getAttribute("lang")).toBe(
+      "id"
+    );
   } finally {
     await act(async () => root.unmount());
     container.remove();
+  }
+});
+
+test("language toggle switches landing copy between Indonesian and English", async () => {
+  localStorage.removeItem(LOCALE_STORAGE_KEY);
+  const { container, root } = await mountLanding();
+
+  try {
+    expect(container.querySelector(".landing")?.getAttribute("lang")).toBe(
+      "id"
+    );
+    expect(container.textContent).toContain("Kerja nyata. Tim lebih kuat.");
+    expect(container.textContent).toContain("Masuk");
+
+    const en = [
+      ...container.querySelectorAll<HTMLButtonElement>("button"),
+    ].find((button) => button.textContent?.trim() === "EN");
+
+    expect(en).toBeTruthy();
+    await act(async () => {
+      en?.click();
+    });
+
+    expect(container.querySelector(".landing")?.getAttribute("lang")).toBe(
+      "en"
+    );
+    expect(en?.getAttribute("aria-pressed")).toBe("true");
+    expect(container.textContent).toContain("Real work. A stronger team.");
+    expect(container.textContent).toContain("Log in");
+    expect(container.textContent).not.toContain("Kerja nyata. Tim lebih kuat.");
+  } finally {
+    await act(async () => root.unmount());
+    container.remove();
+    localStorage.removeItem(LOCALE_STORAGE_KEY);
   }
 });
 

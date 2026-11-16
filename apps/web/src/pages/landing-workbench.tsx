@@ -10,8 +10,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { industries, team } from "./landing-content";
 import { CampaignPoster } from "./landing-poster";
+import { useLandingCopy } from "./use-landing-copy";
 
 function TeamWorkbench({
   active,
@@ -20,12 +20,14 @@ function TeamWorkbench({
   active: number;
   setActive: Dispatch<SetStateAction<number>>;
 }) {
+  const { content, m } = useLandingCopy();
+  const { industries, team } = content;
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [visible, setVisible] = useState(true);
   const [reducedMotion, setReducedMotion] = useState(false);
   const workbench = useRef<HTMLDivElement>(null);
-  const agent = team[active];
+  const agent = team[active] ?? team[0];
 
   useEffect(() => {
     const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -63,7 +65,11 @@ function TeamWorkbench({
     }, 6500);
 
     return () => window.clearInterval(timer);
-  }, [reducedMotion, hovered, focused, visible, setActive]);
+  }, [reducedMotion, hovered, focused, visible, setActive, team.length]);
+
+  if (!agent) {
+    return null;
+  }
 
   return (
     <div
@@ -93,7 +99,7 @@ function TeamWorkbench({
           </div>
         </div>
         <div
-          aria-label="Pilih anggota tim AI"
+          aria-label={m.workbenchPickerAria}
           className="landing-team-picker"
           role="group"
         >
@@ -114,9 +120,9 @@ function TeamWorkbench({
         <div className="landing-workspace-bar">
           <span>
             <span className="landing-status-dot" />
-            Tim bisnismu
+            {m.workbenchTeam}
           </span>
-          <span>Demo tugas</span>
+          <span>{m.workbenchDemoTask}</span>
         </div>
         <div
           className="landing-workspace-scene"
@@ -124,7 +130,7 @@ function TeamWorkbench({
           key={agent.avatar}
         >
           <div className="landing-brief">
-            <span>Kamu</span>
+            <span>{m.workbenchYou}</span>
             <p>{agent.task}</p>
           </div>
           <div className="landing-agent-response">
@@ -146,61 +152,59 @@ function TeamWorkbench({
             <div className="landing-task-output landing-message-output">
               <div>
                 <img alt="" height={24} src="/icons/whatsapp.svg" width={24} />
-                <strong>Draf untuk Bu Rina</strong>
+                <strong>{m.workbenchDraftTitle}</strong>
                 <span>#LD-208</span>
               </div>
-              <p>
-                Halo Bu Rina, cucian Ibu sudah rapi dan siap diambil. Kami buka
-                sampai pukul 19.00. Terima kasih sudah menunggu!
-              </p>
+              <p>{m.workbenchDraftBody}</p>
               <span>
                 <CheckmarkCircle02Icon aria-hidden />
-                Menunggu pemeriksaan tim
+                {m.workbenchAwaiting}
               </span>
             </div>
           )}
           {agent.kind === "finance" && (
             <div className="landing-task-output landing-finance-output">
               <div>
-                <span>Penjualan minggu ini</span>
-                <strong>Rp18.450.000</strong>
+                <span>{m.workbenchSalesLabel}</span>
+                <strong>{m.workbenchSalesValue}</strong>
               </div>
               <div aria-hidden className="landing-mini-bars">
                 {[38, 62, 48, 75, 56, 92, 68].map((height, index) => (
-                  <i key={height} style={{ height: `${height}%` }}>
-                    <span>{["S", "S", "R", "K", "J", "S", "M"][index]}</span>
+                  <i key={`bar-${index}`} style={{ height: `${height}%` }}>
+                    <span>{m.workbenchWeekdays[index]}</span>
                   </i>
                 ))}
               </div>
               <p>
-                <File01Icon aria-hidden />3 invoice perlu ditindaklanjuti
+                <File01Icon aria-hidden />
+                {m.workbenchInvoices}
               </p>
             </div>
           )}
-          {agent.kind === "marketing" && (
+          {agent.kind === "marketing" && industries[2] ? (
             <div className="landing-task-output landing-marketing-output">
               <CampaignPoster compact industry={industries[2]} />
               <div>
-                <strong>Selasa, makan enak dulu.</strong>
-                <p>Menu favoritmu, siap menemani jam istirahat.</p>
-                <span>Draf caption Instagram</span>
+                <strong>{m.workbenchCaptionTitle}</strong>
+                <p>{m.workbenchCaptionBody}</p>
+                <span>{m.workbenchCaptionMeta}</span>
               </div>
             </div>
-          )}
+          ) : null}
           <div className="landing-deliverable">
             <File01Icon aria-hidden />
             <span>{agent.file}</span>
-            <span>Siap ditinjau</span>
+            <span>{m.workbenchReady}</span>
           </div>
         </div>
         <div className="landing-workspace-bottom">
-          <span>Data contoh · keputusan tetap di timmu</span>
+          <span>{m.workbenchFooter}</span>
           <UserGroupIcon aria-hidden />
         </div>
       </div>
       <div aria-hidden className="landing-workbench-note">
         <img alt="" height={28} src={`/icons/${agent.app}`} width={28} />
-        <span>Kerja di aplikasi yang kamu pakai.</span>
+        <span>{m.workbenchNote}</span>
         <CheckmarkCircle02Icon />
       </div>
     </div>

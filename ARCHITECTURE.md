@@ -91,6 +91,8 @@ The HTTP app does these steps in this order:
 
 A new route goes after org middleware unless it cannot have an org context. The order is in `app.ts`.
 
+Public routes with no session: the landing waitlist (`POST /v1/public/waitlist`, `POST /v1/public/waitlist/laundry-innovation-summit`) in [`demo-waitlist.ts`](./apps/server/src/http/routes/demo-waitlist.ts). A platform admin reads entries at `GET /v1/platform/waitlist`. The web app serves the landing page at `/` and sends a signed-in user to `/chat`.
+
 ## Multi-tenancy
 
 Org-scoped authenticated requests need an active org. The middleware resolves it from `X-Org-Id`, the plugin UI path, or the active org in the auth context or session. A local-token request with no org uses the user's org only when they belong to exactly one; with more, it returns 400. Auth and platform routes skip this check.
@@ -134,6 +136,12 @@ Turns outside a session (automations, plugin summaries, in-memory sub-agents, gr
 
 Builtin definitions live in `packages/core/src/tools/` and server runtime tools in `apps/server/src/tools/`. Custom JS, custom Python, MCP, Composio and plugin tools each have a loader or bridge in `apps/server/src/services/`. Tool definitions are shared; `profile_tools` controls which custom tools a profile can use. Airin can get extra runtime tools when the profile permits them. Loaders and workspace paths: [`packages/core/AGENTS.md`](./packages/core/AGENTS.md#tool-execution--workspace).
 
+Agent-to-agent (A2A): `AgentService` adds `send_to_bot` ([`send-to-bot-tool.ts`](./apps/server/src/tools/send-to-bot-tool.ts)) to every turn that has no tool limit and is not read-only. The tool runs a one-shot turn on the target profile with that profile's own tools, and returns its reply. `agentDepth` caps the chain at 3 hops. When the tool is present, `buildChatSystemPrompt` adds the delegation rules.
+
+## Agent marketplace
+
+The catalog is code: [`packages/core/src/agent-marketplace/`](./packages/core/src/agent-marketplace/) (`catalog.ts` general agents, `catalog-laundry.ts` laundry pack, `characters.ts` portraits). [`agent-marketplace-service.ts`](./apps/server/src/services/agent-marketplace-service.ts) lists entries, marks installed ones by name, renames old role-titled profiles to person names, and installs an entry as a profile with its soul, `MEMORY.md`, bundled skills, and an optional `preferredProfileId`.
+
 ## Workers and automations
 
 The server starts workers with PM2 through [`worker-manager-service.ts`](./apps/server/src/services/worker-manager-service.ts).
@@ -157,6 +165,8 @@ Attachments have SQLite records and files on disk. The server adds them to provi
 `sessions.app_user_id` marks retired sessions from the removed external-app integration. Normal reads and writes exclude them. Their files stay under `retired-app-users/`, in full operator backups only.
 
 Org memory is also on disk at `~/.airin/orgs/{orgId}/MEMORY.md`.
+
+The web client keeps some state in the browser only: UI mode (`airin-ui-mode`: `owner` shows as **Simple**, `advanced` as **Advanced**) and the last session per profile (`airin:session:{profileId}`). In Simple mode, `/chat` and switching agents open that stored session.
 
 ## Invariants
 

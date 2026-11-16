@@ -206,6 +206,13 @@ export function buildChatSystemPrompt(
       );
     }
 
+    if (tools.some((tool) => tool.name === "send_to_bot")) {
+      sections.push(
+        "You can reach other agents in this organization with send_to_bot (A2A). Use the teammate's exact name, give a concrete ask, wait for their reply, then answer the owner.",
+        "Orchestrators and leads should pull specialist data this way instead of inventing numbers or asking the owner to open another chat. You may call send_to_bot several times for different teammates in one turn, then synthesize."
+      );
+    }
+
     if (tools.some((tool) => tool.name === "browser_navigate")) {
       sections.push(
         "The browser_* tools drive the user's own cloud browser. The user sees it live in the chat's Browser panel and can type in it. Use them for websites that need the user's login or a real browser; use web_fetch for plain public pages.",

@@ -2,6 +2,7 @@ import { afterEach, expect, test } from "bun:test";
 import { act } from "react";
 import { createRoot } from "react-dom/client";
 import { LocaleProvider } from "@/context/locale-context";
+import { LOCALE_STORAGE_KEY } from "@/lib/locale";
 import { LanguageToggle } from "./LanguageToggle";
 
 const cleanups: Array<() => Promise<void>> = [];
@@ -10,9 +11,12 @@ afterEach(async () => {
   for (const cleanup of cleanups.splice(0)) {
     await cleanup();
   }
+
+  localStorage.removeItem(LOCALE_STORAGE_KEY);
 });
 
 async function renderToggle() {
+  localStorage.removeItem(LOCALE_STORAGE_KEY);
   const container = document.createElement("div");
   document.body.append(container);
   const root = createRoot(container);

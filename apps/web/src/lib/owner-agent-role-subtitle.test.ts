@@ -1,5 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import {
+  agentNameWithRoleLabel,
   agentRailHoverLabel,
   laundryAgentRoleMessageKey,
   marketplaceAgentRoleMessageKey,
@@ -88,5 +89,26 @@ describe("ownerAgentSubtitleMessageKey", () => {
         "HR"
       )
     ).toBe("Alya · HR");
+  });
+
+  test("formats group speaker label with translated role", () => {
+    const t = (key: "owner.role.laundryAnalyst" | "owner.agent" | string) =>
+      key === "owner.role.laundryAnalyst" ? "Analis data" : key;
+
+    expect(
+      agentNameWithRoleLabel(
+        { id: "laundry_analyst", isSuper: false, name: "Ardi" },
+        t
+      )
+    ).toBe("Ardi · Analis data");
+  });
+
+  test("keeps generic agents name-only in speaker labels", () => {
+    expect(
+      agentNameWithRoleLabel(
+        { id: "custom-bot", isSuper: false, name: "Helper" },
+        (key: "owner.agent" | string) => key
+      )
+    ).toBe("Helper");
   });
 });

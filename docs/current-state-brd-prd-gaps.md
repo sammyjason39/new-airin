@@ -44,6 +44,12 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | Org memory prompt summary | ~2048 bytes default |
 | In-memory stored chats cache | 50 LRU (no active turn) |
 | Core RSS strategy | ≤512 MB |
+| `send_to_bot` depth | 3 hop |
+| `send_to_bot` timeout | default 5 menit, max sama dengan `sub_agent` |
+| Data View salinan per tab | 400 000 karakter (JSON grid) |
+| Data View `read_sheet` | 200 baris per panggilan (default 50) |
+| Waitlist body | 4 KB |
+| Waitlist list (admin) | 50 per halaman |
 
 ### 7.2 Env gates (selected)
 
@@ -71,6 +77,9 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | Scanned PDF OCR | Not in `extract_document_text` |
 | Playwright as default agent test path | Repo policy: jangan kecuali diminta |
 | Unlimited org tree / general permission engine | Explicit non-goal of teams plan |
+| Signup / payment dari landing | Not supported (waitlist only) |
+| Tab Google Sheet > 400 000 karakter di Data View | Ditolak ("This sheet is too large for Data View.") |
+| Simple mode lanjut chat lintas browser | Tidak — session terakhir disimpan di `localStorage` browser |
 
 ---
 
@@ -78,8 +87,10 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 
 | Drift | Evidence |
 |---|---|
-| Overview channels list belum menyebut **Teams** | `docs/website/content/docs/overview.mdx` vs `apps/platform/teams` |
-| Pitch deck & `airin-guide` masih sebut **viewer** | `docs/deck/pitch-deck-customers.md`, bundled skill; DB hanya admin/member |
+| ~~Overview channels list belum menyebut **Teams**~~ | Diperbaiki 16 Nov 2026 |
+| Pitch deck & `airin-guide` masih sebut **viewer** | `docs/deck/pitch-deck-customers.md`, bundled skill; DB hanya admin/member. `agent-groups.mdx` sudah diperbaiki; `cloud-browser.mdx` masih sebut Viewers |
+| Kode memakai `owner` / `chief-of-staff`, UI memakai **Simple** / **Orchestrator** | `apps/web/src/lib/ui-mode.ts`, `i18n.ts` |
+| Routing Jovan menyebut nama agen tetap (Toni, Dimas, Ardi, …) | `catalog.ts`; org dengan nama lain bergantung pada pencocokan nama `send_to_bot` |
 | UI route `/settings/skills` platform-admin-only vs org admin skill learning di Organization | `apps/web` routing vs OrganizationPanel |
 | Root `AGENTS.md` satu baris workers tidak selalu sebut Slack/Teams | Diganti detail di ARCHITECTURE |
 | Plan file `organization-teams-shared-foundation-plan.md` masih berisi teks “current code” lama di bagian atas | Implementasi teams sudah ada; treat plan Progress, bukan as-is |
@@ -109,7 +120,10 @@ Gunakan bagian ini sebagai backlog **intent PRD** (masalah → hipotesis → MVP
 
 10. **Shared team chat history** (bukan private-per-user) — hari ini private by design.
 11. **Human-in-the-loop approvals** generik di luar skill/org-memory proposals — partial.
-12. **Multi-level sub-agents / swarm orchestration** — child depth 1.
+12. **Multi-level sub-agents / swarm orchestration** — child depth 1. A2A `send_to_bot` sudah ada (depth 3, sekuensial); belum ada UI untuk melihat jejak delegasi.
+12a. **Routing orkestrator dinamis** — Jovan memakai daftar nama di instruksi; belum membaca roster/peran org secara otomatis.
+12b. **Sheet besar untuk analisis** — tab > 400 000 karakter (contoh Transaksi ~7 950 baris) tidak bisa masuk Data View. Opsi: ringkasan bulanan di sheet, filter/paging di plugin, atau import ke `sqlite`.
+12c. **Lanjut chat lintas device** — Simple mode memakai `localStorage`; belum disimpan di server per user.
 13. **Eval / regression CI productization** — cases ada; pipeline produk?
 14. **Cognito retention / audit** — ephemeral by design; compliance gap?
 
@@ -168,6 +182,11 @@ Gunakan bagian ini sebagai backlog **intent PRD** (masalah → hipotesis → MVP
 | Plugins | `docs/plugins.md`, `packages/plugins/*` |
 | Channels | `apps/platform/{telegram,whatsapp,discord,slack,teams,automation}` |
 | Threat model | `THREAT_MODEL.md` |
+| UI mode / Simple | `apps/web/src/lib/ui-mode.ts`, `apps/web/src/components/OwnerTeamSidebar.tsx`, `apps/web/src/lib/profile-switch.ts`, `apps/web/src/pages/chat/use-chat-page.ts` |
+| Marketplace | `packages/core/src/agent-marketplace/{catalog,catalog-laundry,characters}.ts`, `apps/server/src/services/agent-marketplace-service.ts` |
+| A2A | `apps/server/src/tools/send-to-bot-tool.ts`, `packages/agent/src/chat-prompt.ts` |
+| Landing / waitlist | `apps/web/src/pages/LandingPage.tsx`, `landing-*.tsx`, `apps/server/src/http/routes/demo-waitlist.ts` |
+| Data View | `packages/plugins/data-view/src/actions.ts` |
 
 ---
 
@@ -186,6 +205,13 @@ Gunakan bagian ini sebagai backlog **intent PRD** (masalah → hipotesis → MVP
 - Live OpenAPI path count **252**; domain groups include auth, orgs, profiles, sessions, agent-groups, automations, mcp, meet, plugins, platform, skills, tools, workers, settings.
 - `viewer` invite → confirmed removed via `org-members.test.ts` (“removed viewer role…”).
 - Tidak menjalankan full E2E UI matrix semua channel di session ini; channel limits diambil dari code + docs + platform handlers. Untuk channel spesifik yang kritis ke PRD, jalankan smoke pairing di environment target sebelum lock requirement.
+
+### Update 14–16 Nov 2026 (produksi useairin.id)
+
+- Grup **Business** (Toni, Dimas, Ardi, Alya): dashboard income vs expense + forecast bulan depan selesai; keempat agen menjawab; artifact HTML tersimpan.
+- Data View: 10 tab masuk (Expenses, HR, Jurnal Kas, Pelanggan, Pembelian, Stok, Mesin, Supplier, Ops harian, Laundry Operations). **Transaksi** ditolak (terlalu besar). Error "share link" sebelumnya karena `gid` salah, bukan izin share.
+- Jovan terpasang sebagai orkestrator; `send_to_bot` diuji lewat chat.
+- Simple mode lanjut chat terakhir: unit test `use-chat-page.test.tsx` lulus; build + deploy ke produksi.
 
 ---
 

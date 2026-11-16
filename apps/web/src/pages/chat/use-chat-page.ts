@@ -1179,6 +1179,17 @@ export function useChatPage() {
       return;
     }
 
+    // Simple (owner): open the last chat for this agent instead of a blank draft.
+    if (uiMode === "owner") {
+      const storedSessionId = readStoredSessionId(profileId);
+
+      if (storedSessionId) {
+        navigate(buildChatPath(profileId, storedSessionId), { replace: true });
+
+        return;
+      }
+    }
+
     enterDraftChat(profileId);
   }, [
     profileId,
@@ -1187,6 +1198,8 @@ export function useChatPage() {
     profilesQuery.data,
     activeOrg?.id,
     authLoading,
+    navigate,
+    uiMode,
   ]);
 
   useEffect(() => {

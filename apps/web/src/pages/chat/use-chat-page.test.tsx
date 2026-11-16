@@ -17,8 +17,10 @@ import { AppProvider } from "@/context/app-context";
 import { AppContext } from "@/context/app-context-shared";
 import { AuthProvider } from "@/context/auth-context";
 import { AuthContext } from "@/context/auth-context-shared";
+import { UiModeProvider } from "@/context/ui-mode-context";
 import { client } from "@/lib/client";
 import { queryKeys } from "@/lib/query-keys";
+import { UI_MODE_STORAGE_KEY } from "@/lib/ui-mode";
 import { type ChatPageState, useChatPage } from "./use-chat-page";
 
 test.each([false, true])(
@@ -1691,3 +1693,122 @@ test.each([false, true])(
     }
   }
 );
+
+test("Simple mode opens the last stored chat on /chat", async () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
+  const previousProfile = useActiveChatProfileStore.getState();
+  const previousStorage = globalThis.localStorage;
+  const stored: Record<string, string> = {
+    [UI_MODE_STORAGE_KEY]: "owner",
+    "airin:active-chat-profile": "default",
+    "airin:session:default": "last-session",
+  };
+
+  Object.defineProperty(globalThis, "localStorage", {
+    configurable: true,
+    value: {
+      getItem: (key: string) => stored[key] ?? null,
+      removeItem(key: string) {
+        delete stored[key];
+      },
+      setItem(key: string, value: string) {
+        stored[key] = value;
+      },
+    },
+  });
+
+  useActiveChatProfileStore.setState({
+    orgId: "org1",
+    profileId: "default",
+  });
+
+  const spies = [
+    spyOn(client, "getMe").mockResolvedValue({
+      activeOrgId: "org1",
+      id: "u1",
+      isPlatformAdmin: false,
+      orgId: "org1",
+    } as never),
+    spyOn(client, "listUserOrgs").mockResolvedValue({
+      orgs: [{ id: "org1", name: "Org" }],
+    } as never),
+    spyOn(client, "listProfiles").mockResolvedValue({
+      profiles: [{ id: "default", name: "Default" }],
+    } as never),
+    spyOn(client, "getProfile").mockResolvedValue({
+      profile: { id: "default", skills: [] },
+    } as never),
+    spyOn(client, "getThinkingSettings").mockResolvedValue({} as never),
+    spyOn(client, "getSessionMessages").mockResolvedValue({
+      channel: "web",
+      messageMeta: [],
+      messages: [{ content: "hi", role: "user" }],
+      model: null,
+      questionnaire: null,
+      todos: [],
+    } as never),
+    spyOn(client, "getSessionStatus").mockResolvedValue({
+      active: false,
+    } as never),
+  ];
+
+  let pathname = "";
+  let page!: ChatPageState;
+
+  function Probe() {
+    page = useChatPage();
+    pathname = useLocation().pathname;
+
+    return null;
+  }
+
+  const container = document.createElement("div");
+  const root = createRoot(container);
+
+  try {
+    await act(async () =>
+      root.render(
+        <MemoryRouter initialEntries={["/chat"]}>
+          <QueryClientProvider client={queryClient}>
+            <UiModeProvider>
+              <AuthProvider>
+                <AppProvider>
+                  <Routes>
+                    <Route
+                      element={<Probe />}
+                      path="/chat/:profileId?/:sessionId?"
+                    />
+                  </Routes>
+                </AppProvider>
+              </AuthProvider>
+            </UiModeProvider>
+          </QueryClientProvider>
+        </MemoryRouter>
+      )
+    );
+    await act(async () => {
+      await Bun.sleep(40);
+    });
+
+    expect(pathname).toBe("/chat/default/last-session");
+    expect(page.session?.id).toBe("last-session");
+    expect(stored["airin:session:default"]).toBe("last-session");
+  } finally {
+    await act(async () => root.unmount());
+    queryClient.clear();
+
+    for (const spy of spies) {
+      spy.mockRestore();
+    }
+
+    useActiveChatProfileStore.setState(previousProfile);
+
+    if (previousStorage) {
+      Object.defineProperty(globalThis, "localStorage", previousStorage);
+    } else {
+      Reflect.deleteProperty(globalThis, "localStorage");
+    }
+  }
+});

@@ -1,7 +1,9 @@
 import { ArrowRight01Icon, CheckmarkCircle02Icon } from "hugeicons-react";
-import { featuredAgents } from "./landing-content";
+import { useLandingCopy } from "./use-landing-copy";
 
 function RosterSection() {
+  const { content, m } = useLandingCopy();
+
   return (
     <section
       aria-labelledby="landing-roster-title"
@@ -11,23 +13,20 @@ function RosterSection() {
       <div className="landing-wrap">
         <div className="landing-section-heading" data-reveal="rise">
           <h2 id="landing-roster-title">
-            Kenalan dengan
+            {m.rosterTitleLead}
             <br />
-            <em>tim AI kamu.</em>
+            <em>{m.rosterTitleEm}</em>
           </h2>
           <div>
-            <span className="landing-trained" lang="en">
+            <span className="landing-trained">
               <CheckmarkCircle02Icon aria-hidden />
-              Trained by professionals
+              {m.rosterTrained}
             </span>
-            <p>
-              Pilih spesialis sesuai pekerjaan yang ingin kamu bagi. Setiap agen
-              punya peran untuk membantu timmu.
-            </p>
+            <p>{m.rosterBody}</p>
           </div>
         </div>
         <ul className="landing-roster-grid">
-          {featuredAgents.map((agent) => (
+          {content.featuredAgents.map((agent) => (
             <li data-reveal="rise" key={agent.avatar}>
               <div className="landing-roster-portrait">
                 <img
@@ -47,9 +46,9 @@ function RosterSection() {
           ))}
         </ul>
         <div className="landing-roster-more">
-          <span>Marketplace · Simple &amp; Advanced</span>
+          <span>{m.rosterMore}</span>
           <a className="landing-text-link" href="#daftar-tunggu">
-            Temukan tim untuk bisnismu <ArrowRight01Icon aria-hidden />
+            {m.rosterLink} <ArrowRight01Icon aria-hidden />
           </a>
         </div>
       </div>

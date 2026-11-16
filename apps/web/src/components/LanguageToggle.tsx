@@ -8,16 +8,21 @@ const LANGUAGE_OPTIONS: { id: AppLocale; label: string }[] = [
 ];
 
 export function LanguageToggle({
+  className,
   disabled = false,
   onSelect,
 }: {
+  className?: string;
   disabled?: boolean;
   onSelect?: (locale: AppLocale) => void;
 } = {}) {
   const { locale, setLocale } = useLocale();
 
   return (
-    <div className="flex gap-0.5 rounded-lg bg-muted p-0.5">
+    <div
+      className={cn("flex gap-0.5 rounded-lg bg-muted p-0.5", className)}
+      role="group"
+    >
       {LANGUAGE_OPTIONS.map((option) => {
         const selected = option.id === locale;
 

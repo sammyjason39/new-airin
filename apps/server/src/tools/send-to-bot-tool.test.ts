@@ -49,7 +49,10 @@ describe("send_to_bot", () => {
       context(),
       agentServiceStub({
         listProfiles: async () => ({
-          profiles: [{ id: "profile_from", name: "Chief of Staff" }],
+          profiles: [
+            { id: "profile_from", name: "Chief of Staff" },
+            { id: "profile_alya", name: "Alya" },
+          ],
         }),
         runSendToBotPrompt: async () => {
           throw new Error("should not run");
@@ -58,6 +61,36 @@ describe("send_to_bot", () => {
     );
 
     expect(result.status).toBe("fail");
+    expect(result).toMatchObject({
+      error: expect.stringContaining("Available: Alya, Chief of Staff"),
+    });
+  });
+
+  test("resolves a unique prefix bot name", async () => {
+    const result = await runSendToBotTool(
+      { bot_name: "Al", message: "Cuti tahunan?" },
+      context(),
+      agentServiceStub({
+        listProfiles: async () => ({
+          profiles: [
+            { id: "profile_from", name: "Jovan" },
+            { id: "profile_alya", name: "Alya" },
+            { id: "profile_ardi", name: "Ardi" },
+          ],
+        }),
+        runSendToBotPrompt: async (input: { profileId: string }) => {
+          expect(input.profileId).toBe("profile_alya");
+
+          return {
+            output: "12 hari.",
+            status: "success",
+            summary: "ok",
+          };
+        },
+      })
+    );
+
+    expect(result).toMatchObject({ from: "Alya", status: "ok" });
   });
 
   test("calls the target profile and returns from", async () => {

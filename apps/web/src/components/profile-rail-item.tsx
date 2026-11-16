@@ -9,11 +9,9 @@ import { useLocation } from "react-router-dom";
 import { GroupAvatar } from "@/components/agent-groups/GroupAvatar";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { ProfileRailItemMenu } from "@/components/profile-rail-item-menu";
+import type { MessageKey } from "@/lib/i18n";
 import { PAGE_PATHS } from "@/lib/navigation";
-import {
-  agentRailHoverLabel,
-  ownerAgentSubtitleMessageKey,
-} from "@/lib/owner-agent-role-subtitle";
+import { agentNameWithRoleLabel } from "@/lib/owner-agent-role-subtitle";
 
 export type ProfileRailItemData =
   | { id: string; kind: "agent"; profile: ProfileSummary }
@@ -21,18 +19,13 @@ export type ProfileRailItemData =
 
 function railHoverLabel(
   item: ProfileRailItemData,
-  t: (key: string) => string
+  t: (key: MessageKey) => string
 ): string {
   if (item.kind !== "agent") {
     return item.group.name;
   }
 
-  const roleKey = ownerAgentSubtitleMessageKey(item.profile);
-
-  return agentRailHoverLabel(
-    item.profile,
-    roleKey === "owner.agent" ? "" : t(roleKey)
-  );
+  return agentNameWithRoleLabel(item.profile, t);
 }
 
 export function ProfileRailItem({
@@ -68,7 +61,7 @@ export function ProfileRailItem({
   setDeletingGroup: (group: AgentGroup | null) => void;
   setEditingGroup: (group: AgentGroup | null) => void;
   setMenuItemId: (id: string | null) => void;
-  t: (key: string) => string;
+  t: (key: MessageKey) => string;
   togglePin: (args: { itemId: string; pinned: boolean }) => void;
   navigate: NavigateFunction;
 }) {

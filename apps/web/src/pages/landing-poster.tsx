@@ -1,16 +1,19 @@
 import { ArrowRight01Icon } from "hugeicons-react";
-import type { industries } from "./landing-content";
+import type { LandingIndustry } from "./landing-content";
+import { useLandingCopy } from "./use-landing-copy";
 
 function CampaignPoster({
   industry,
   compact = false,
 }: {
-  industry: (typeof industries)[number];
+  industry: LandingIndustry;
   compact?: boolean;
 }) {
+  const { m } = useLandingCopy();
+
   return (
     <div
-      aria-label={`Contoh desain promo ${industry.label}, merek fiktif`}
+      aria-label={m.posterDemoAria.replace("{label}", industry.label)}
       className={`landing-poster landing-poster-${industry.id}${compact ? "landing-poster-compact" : ""}`}
     >
       <div className="landing-poster-top">

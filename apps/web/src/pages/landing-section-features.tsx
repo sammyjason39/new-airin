@@ -4,10 +4,13 @@ import {
   CheckmarkCircle02Icon,
   Shield01Icon,
 } from "hugeicons-react";
-import { industries, team } from "./landing-content";
 import { CampaignPoster } from "./landing-poster";
+import { useLandingCopy } from "./use-landing-copy";
 
 function FeatureSection() {
+  const { content, m } = useLandingCopy();
+  const { industries, team } = content;
+
   return (
     <section
       aria-labelledby="landing-features-title"
@@ -17,27 +20,21 @@ function FeatureSection() {
       <div className="landing-wrap">
         <div className="landing-section-heading" data-reveal="rise">
           <h2 id="landing-features-title">
-            Bagi pekerjaannya.
+            {m.featuresTitleLead}
             <br />
-            <em>Pegang kendalinya.</em>
+            <em>{m.featuresTitleEm}</em>
           </h2>
-          <p>
-            Setiap spesialis punya peran, konteks, dan alat untuk membantu
-            pekerjaan tim.
-          </p>
+          <p>{m.featuresBody}</p>
         </div>
         <div className="landing-feature-grid">
           <article className="landing-feature-team" data-reveal="assemble">
             <div className="landing-feature-copy">
               <h3>
-                Kenal bisnis.
+                {m.knowBusinessTitleLead}
                 <br />
-                Paham tugasnya.
+                {m.knowBusinessTitleEm}
               </h3>
-              <p>
-                Bagikan SOP, cara bicara, dan panduan bisnis. Atur keahlian tiap
-                agen sesuai kebutuhan tim.
-              </p>
+              <p>{m.knowBusinessBody}</p>
             </div>
             <div className="landing-role-cards">
               {team.map((member) => (
@@ -53,7 +50,7 @@ function FeatureSection() {
                   <span>{member.role}</span>
                   <small>
                     <CheckmarkCircle02Icon aria-hidden />
-                    Brief diterima
+                    {m.briefReceived}
                   </small>
                 </div>
               ))}
@@ -62,70 +59,47 @@ function FeatureSection() {
           <article className="landing-feature-schedule" data-reveal="rise">
             <div className="landing-feature-copy">
               <Calendar03Icon aria-hidden />
-              <h3>Rutinitas punya jadwal.</h3>
-              <p>
-                Briefing pagi sampai closing malam. Atur sesuai ritme bisnis.
-              </p>
+              <h3>{m.scheduleTitle}</h3>
+              <p>{m.scheduleBody}</p>
             </div>
             <div className="landing-schedule">
               <div>
-                <span>Sen</span>
-                <span>Sel</span>
-                <span>Rab</span>
-                <span>Kam</span>
-                <span>Jum</span>
+                {m.scheduleDays.map((day) => (
+                  <span key={day}>{day}</span>
+                ))}
               </div>
               <div>
-                <span>10</span>
-                <span>11</span>
-                <span>12</span>
-                <span>13</span>
-                <span>14</span>
+                {m.scheduleDates.map((date) => (
+                  <span key={date}>{date}</span>
+                ))}
               </div>
               <ul className="landing-schedule-list">
-                <li>
-                  <span className="landing-status-dot" />
-                  <strong>Briefing tim</strong>
-                  <span>08.00</span>
-                </li>
-                <li>
-                  <span className="landing-status-dot" />
-                  <strong>Cek absensi &amp; keterlambatan</strong>
-                  <span>09.30</span>
-                </li>
-                <li>
-                  <span className="landing-status-dot" />
-                  <strong>Rekap shift pagi · brief shift sore</strong>
-                  <span>15.00</span>
-                </li>
-                <li>
-                  <span className="landing-status-dot" />
-                  <strong>Catat invoice masuk</strong>
-                  <span>17.00</span>
-                </li>
-                <li>
-                  <span className="landing-status-dot" />
-                  <strong>Report closing order harian</strong>
-                  <span>22.00</span>
-                </li>
+                {m.scheduleItems.map(([label, time]) => (
+                  <li key={label}>
+                    <span className="landing-status-dot" />
+                    <strong>{label}</strong>
+                    <span>{time}</span>
+                  </li>
+                ))}
               </ul>
             </div>
           </article>
           <article className="landing-feature-access" data-reveal="rise">
             <div className="landing-feature-copy">
               <Shield01Icon aria-hidden />
-              <h3>Akses sesuai peran.</h3>
-              <p>
-                Tentukan aplikasi, file, dan alat yang boleh dipakai. Tim tetap
-                mengatur ruang kerja tiap agen.
-              </p>
+              <h3>{m.accessTitle}</h3>
+              <p>{m.accessBody}</p>
             </div>
             <div className="landing-access-list">
               {(
                 [
-                  ["whatsapp.svg", "WhatsApp", team[0].name],
-                  ["google-sheets.svg", "Google Sheets", team[1].name],
-                  ["gmail.svg", "Gmail", team[2].name],
+                  ["whatsapp.svg", "WhatsApp", team[0]?.name ?? "Hana"],
+                  [
+                    "google-sheets.svg",
+                    "Google Sheets",
+                    team[1]?.name ?? "Dimas",
+                  ],
+                  ["gmail.svg", "Gmail", team[2]?.name ?? "Kezia"],
                 ] as const
               ).map(([icon, name, agent]) => (
                 <div key={name}>
@@ -146,16 +120,13 @@ function FeatureSection() {
           <article className="landing-feature-design" data-reveal="spread">
             <div className="landing-feature-copy">
               <h3>
-                Dari brief
+                {m.designTitleLead}
                 <br />
-                jadi bahan promo.
+                {m.designTitleEm}
               </h3>
-              <p>
-                Konsep, teks, dan gambar dalam satu alur. Aktifkan alat gambar
-                untuk menyiapkan desain yang bisa tim tinjau.
-              </p>
+              <p>{m.designBody}</p>
               <a className="landing-text-link" href="#use-cases">
-                Lihat hasilnya <ArrowRight01Icon aria-hidden />
+                {m.designLink} <ArrowRight01Icon aria-hidden />
               </a>
             </div>
             <div className="landing-feature-posters">

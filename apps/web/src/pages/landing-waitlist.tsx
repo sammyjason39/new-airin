@@ -1,7 +1,9 @@
 import { ArrowRight01Icon, CheckmarkCircle02Icon } from "hugeicons-react";
 import { type FormEvent, useRef, useState } from "react";
+import { useLandingCopy } from "./use-landing-copy";
 
 function WaitlistForm() {
+  const { m } = useLandingCopy();
   const [status, setStatus] = useState<
     "idle" | "pending" | "success" | "error"
   >("idle");
@@ -41,7 +43,7 @@ function WaitlistForm() {
     return (
       <p className="landing-success" role="status">
         <CheckmarkCircle02Icon aria-hidden />
-        Form kamu sudah masuk. Kami akan hubungi secepatnya.
+        {m.waitlistSuccess}
       </p>
     );
   }
@@ -50,7 +52,7 @@ function WaitlistForm() {
     <form className="landing-form" onSubmit={submit}>
       <div className="landing-form-fields">
         <label>
-          Nama PIC
+          {m.waitlistContactName}
           <input
             autoComplete="name"
             maxLength={120}
@@ -59,7 +61,7 @@ function WaitlistForm() {
           />
         </label>
         <label>
-          Nama Perusahaan
+          {m.waitlistBusinessName}
           <input
             autoComplete="organization"
             maxLength={150}
@@ -68,16 +70,16 @@ function WaitlistForm() {
           />
         </label>
         <label>
-          Jenis Usaha
+          {m.waitlistBusinessType}
           <input
             maxLength={100}
             name="businessType"
-            placeholder="Contoh: laundry"
+            placeholder={m.waitlistBusinessTypePlaceholder}
             required
           />
         </label>
         <label>
-          Nomor WhatsApp
+          {m.waitlistWhatsapp}
           <input
             autoComplete="tel"
             maxLength={32}
@@ -89,12 +91,12 @@ function WaitlistForm() {
           />
         </label>
         <label>
-          Email
+          {m.waitlistEmail}
           <input
             autoComplete="email"
             maxLength={254}
             name="email"
-            placeholder="nama@bisnis.com"
+            placeholder={m.waitlistEmailPlaceholder}
             required
             type="email"
           />
@@ -105,12 +107,12 @@ function WaitlistForm() {
         disabled={status === "pending"}
         type="submit"
       >
-        {status === "pending" ? "Mengirim…" : "Kirim form"}
+        {status === "pending" ? m.waitlistPending : m.waitlistSubmit}
         <ArrowRight01Icon aria-hidden />
       </button>
       {status === "error" && (
         <p className="landing-error" id="waitlist-error" role="alert">
-          Pendaftaran belum tersimpan. Cek data kamu dan coba lagi.
+          {m.waitlistError}
         </p>
       )}
     </form>

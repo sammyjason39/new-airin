@@ -119,10 +119,11 @@ Parent: [sprint-backlog.md](./sprint-backlog.md)
 | Dirty tree breaks demo import | Branch from last known good tag; P1-3 before any customer deploy |
 | Apify key late | P0-6 stub with cached JSON fixture for stage; live key for backup laptop |
 | WhatsApp instability | Web Support agent + recorded clip |
-| Indonesian default replies | Force EN on demo org (`chat-prompt` / user language setting) |
+| Indonesian default replies | Superseded: marketplace agents now default to Bahasa Indonesia on purpose. For an EN demo, set the user language in Settings |
 | Composio not on stage account | Social stays draft-only; script says so |
 | Image gen not wired | Do not demo images in P0 |
-| Waitlist form has no backend on demo day | P0-11: mailto/Google Form fallback documented; or minimal POST route before summit |
+| Waitlist form has no backend on demo day | Closed: `POST /v1/public/waitlist` stores entries; platform admin reads them at `GET /v1/platform/waitlist` |
+| Large Google Sheet tabs | Data View rejects tabs over 400 000 characters (Transaksi). Keep a monthly summary tab for agents, or see BRD gap 12b |
 
 ---
 
@@ -130,7 +131,7 @@ Parent: [sprint-backlog.md](./sprint-backlog.md)
 
 | Action | Owner | When |
 |---|---|---|
-| Track `docs/current-state-brd-prd.md` in git | Demo lead | Before summit |
+| Track `docs/current-state-brd-prd.md` in git | Demo lead | Before summit — done (updated 16 Nov 2026) |
 | Track **`docs/sprint-backlog.md`** (this file) | Demo lead | Now |
 | Link sprint backlog from BRD §12 "PRD follow-on" | Product | P1 start |
 

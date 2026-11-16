@@ -20,7 +20,10 @@ Airin rules: `SUPER_AIRIN_SYSTEM_PROMPT` in `packages/db/src/constants.ts`.
 | Tool / skill | Notes |
 |---|---|
 | `update-profile-memory` / `archive-profile-memory` | MEMORY.md ↔ memory-archive/ |
-| `save_artifact` / `artifact-design` | Persist under `artifacts/`; skill holds design rules |
+| `save_artifact` / `artifact-design` | Persist under `artifacts/`; skill holds design rules and the locked report template `skills/bundled/artifact-design/assets/report.html` |
+| `send_to_bot` | A2A to another org profile by name; depth cap 3 — `apps/server/src/tools/send-to-bot-tool.ts`; prompt rules in `packages/agent/src/chat-prompt.ts` |
+| `hr-uu-ketenagakerjaan` | Opt-in skill; Indonesian labor law texts in `references/` |
+| Marketplace agents | `src/agent-marketplace/catalog.ts`, `catalog-laundry.ts`; bundled skill lists in `src/skills/bundled-names.ts` |
 | `knowledge_base_search` / `web_search` / `email` | KB, web, mailbox |
 | `search_files` / `ripgrep` | File/content search |
 | `bash` | Profile workspace shell — assign per profile; Airin by default |

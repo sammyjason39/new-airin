@@ -9,8 +9,17 @@
     width: 5.8rem;
   }
   .landing-header nav {
-    gap: 0.8rem;
+    gap: 0.55rem;
     font-size: 0.75rem;
+  }
+  .landing-nav-section {
+    display: none;
+  }
+  .landing-lang-toggle button {
+    min-width: 2.1rem;
+    min-height: 1.85rem;
+    padding: 0 0.5rem;
+    font-size: 0.7rem;
   }
   .landing-nav-cta {
     padding: 0.7rem 0.8rem;
