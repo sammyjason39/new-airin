@@ -96,20 +96,24 @@ export function userGuidePath(chapterId: string): string {
   return chapterId === "index" ? "/guide" : `/guide/${chapterId}`;
 }
 
-export function adjacentUserGuideChapters(chapterId: string): {
+export interface AdjacentUserGuideChapters {
   next: UserGuideChapter | null;
   previous: UserGuideChapter | null;
-} {
+}
+
+export function adjacentUserGuideChapters(
+  chapterId: string
+): AdjacentUserGuideChapters {
   const index = USER_GUIDE_CHAPTERS.findIndex(
     (chapter) => chapter.id === chapterId
   );
 
   if (index < 0) {
-    return { next: null, previous: null };
+    return { next: null, previous: null } satisfies AdjacentUserGuideChapters;
   }
 
   return {
     next: USER_GUIDE_CHAPTERS[index + 1] ?? null,
     previous: USER_GUIDE_CHAPTERS[index - 1] ?? null,
-  };
+  } satisfies AdjacentUserGuideChapters;
 }
