@@ -3,10 +3,15 @@ import type { ProfileService } from "../services/profile-service";
 import { SuperAirinSessionState } from "../services/super-airin-session-state";
 import { createSuperAirinTools } from "./super-airin-tools";
 
+function unusedProfileService(): ProfileService {
+  // SAFETY: Preference tools never call ProfileService methods.
+  return {} as ProfileService;
+}
+
 describe("super airin user preferences tools", () => {
   test("get_user_preferences returns language and timezone", async () => {
     const tools = createSuperAirinTools(
-      {} as ProfileService,
+      unusedProfileService(),
       new SuperAirinSessionState(),
       undefined,
       undefined,
@@ -29,7 +34,7 @@ describe("super airin user preferences tools", () => {
     const calls: string[] = [];
 
     const tools = createSuperAirinTools(
-      {} as ProfileService,
+      unusedProfileService(),
       new SuperAirinSessionState(),
       undefined,
       undefined,
@@ -53,7 +58,7 @@ describe("super airin user preferences tools", () => {
 
   test("set_user_language rejects unknown codes", async () => {
     const tools = createSuperAirinTools(
-      {} as ProfileService,
+      unusedProfileService(),
       new SuperAirinSessionState(),
       undefined,
       undefined,
@@ -69,7 +74,7 @@ describe("super airin user preferences tools", () => {
 
   test("set_user_timezone saves the IANA zone", async () => {
     const tools = createSuperAirinTools(
-      {} as ProfileService,
+      unusedProfileService(),
       new SuperAirinSessionState(),
       undefined,
       undefined,
