@@ -1702,21 +1702,21 @@ test("Simple mode opens the last stored chat on /chat", async () => {
   const previousProfile = useActiveChatProfileStore.getState();
   const previousStorage = globalThis.localStorage;
 
-  const stored = {
-    [UI_MODE_STORAGE_KEY]: "owner",
-    "airin:active-chat-profile": "default",
-    "airin:session:default": "last-session",
-  } satisfies Record<string, string>;
+  const stored = new Map<string, string>([
+    [UI_MODE_STORAGE_KEY, "owner"],
+    ["airin:active-chat-profile", "default"],
+    ["airin:session:default", "last-session"],
+  ]);
 
   Object.defineProperty(globalThis, "localStorage", {
     configurable: true,
     value: {
-      getItem: (key: string) => stored[key] ?? null,
-      removeItem(key: string) {
-        delete stored[key];
+      getItem: (key: string) => stored.get(key) ?? null,
+      removeItem: (key: string) => {
+        stored.delete(key);
       },
-      setItem(key: string, value: string) {
-        stored[key] = value;
+      setItem: (key: string, value: string) => {
+        stored.set(key, value);
       },
     },
   });
@@ -1803,7 +1803,7 @@ test("Simple mode opens the last stored chat on /chat", async () => {
 
     expect(pathname).toBe("/chat/default/last-session");
     expect(page.session?.id).toBe("last-session");
-    expect(stored["airin:session:default"]).toBe("last-session");
+    expect(stored.get("airin:session:default")).toBe("last-session");
   } finally {
     await act(async () => root.unmount());
     queryClient.clear();
@@ -1830,21 +1830,21 @@ test("Simple mode ?new=1 resumes the continuous session instead of wiping it", a
   const previousProfile = useActiveChatProfileStore.getState();
   const previousStorage = globalThis.localStorage;
 
-  const stored = {
-    [UI_MODE_STORAGE_KEY]: "owner",
-    "airin:active-chat-profile": "default",
-    "airin:session:default": "last-session",
-  } satisfies Record<string, string>;
+  const stored = new Map<string, string>([
+    [UI_MODE_STORAGE_KEY, "owner"],
+    ["airin:active-chat-profile", "default"],
+    ["airin:session:default", "last-session"],
+  ]);
 
   Object.defineProperty(globalThis, "localStorage", {
     configurable: true,
     value: {
-      getItem: (key: string) => stored[key] ?? null,
-      removeItem(key: string) {
-        delete stored[key];
+      getItem: (key: string) => stored.get(key) ?? null,
+      removeItem: (key: string) => {
+        stored.delete(key);
       },
-      setItem(key: string, value: string) {
-        stored[key] = value;
+      setItem: (key: string, value: string) => {
+        stored.set(key, value);
       },
     },
   });
@@ -1932,7 +1932,7 @@ test("Simple mode ?new=1 resumes the continuous session instead of wiping it", a
     });
 
     expect(pathname).toBe("/chat/default/last-session");
-    expect(stored["airin:session:default"]).toBe("last-session");
+    expect(stored.get("airin:session:default")).toBe("last-session");
     expect(createSession).not.toHaveBeenCalled();
   } finally {
     await act(async () => root.unmount());
