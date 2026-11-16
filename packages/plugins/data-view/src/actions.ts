@@ -293,6 +293,7 @@ async function spreadsheetInfo(
 async function fetchPublicCsv(spreadsheetId: string, gid: string | null) {
   const query =
     gid === null ? "format=csv" : `format=csv&gid=${encodeURIComponent(gid)}`;
+
   const response = await fetch(
     `https://docs.google.com/spreadsheets/d/${spreadsheetId}/export?${query}`
   );

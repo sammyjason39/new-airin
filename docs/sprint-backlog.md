@@ -46,5 +46,5 @@ Status only from code or a production check. "Not verified" means nobody checked
 | — | Orchestrator (Jovan) + A2A | **Done (new)** | Not in original backlog. `send_to_bot` on every unrestricted turn; Jovan routes to specialists |
 | — | HR Indonesia (Alya) | **Done (new)** | Skill `hr-uu-ketenagakerjaan` |
 | — | Locked HTML report | **Done (new)** | `artifact-design/assets/report.html`, required in groups |
-| P1-3 | Clean baseline commit | **Open** | Working tree still has uncommitted product changes |
+| P1-3 | Clean baseline commit | **Open** | Product changes are committed (`f986c3ba`), but there is no release tag after `v0.4.74` and no CHANGELOG entry |
 

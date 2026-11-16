@@ -18,6 +18,18 @@ Paste a Google Sheets link and click **Add**. The link opens the tab it points t
 - A sheet shared as **Anyone with the link** downloads directly. No Composio call.
 - A private sheet reads once through your own Google Sheets connection. Connect **Google Sheets** in **Settings → Composio** first.
 
+### One link per tab
+
+Each link adds one tab. The tab is the `gid=` number at the end of the link. To add several tabs, open each tab in Google Sheets, copy the link from the address bar, and add it.
+
+If you get an error about sharing but the sheet is shared, check the `gid=` number. A link to a tab that does not exist gives the same error.
+
+### Size limit
+
+A tab can hold about 400,000 characters of data. A larger tab gives **This sheet is too large for Data View.** Agents also read at most 200 rows per call.
+
+For a large tab, such as a full transaction log, add a summary tab in Google Sheets (for example, totals per month) and add that tab instead.
+
 ## Edit and sync
 
 | Action | Result |

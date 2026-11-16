@@ -34,6 +34,7 @@ export function resolveProfileSwitch(input: {
     storedSessionId = null,
     uiMode = "advanced",
   } = input;
+
   const onProfilesPage = isProfilesPath(pathname, PAGE_PATHS.profiles);
 
   // Files / Automations swap the agent in place. Draft /chat and session

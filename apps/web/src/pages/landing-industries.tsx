@@ -66,6 +66,7 @@ function IndustryExamples() {
   const { content, m } = useLandingCopy();
   const { industries } = content;
   const [industryId, setIndustryId] = useState(industries[0]?.id ?? "laundry");
+
   const industry =
     industries.find((item) => item.id === industryId) ?? industries[0];
 

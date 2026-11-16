@@ -452,6 +452,7 @@ const comparisonByLocale: Record<AppLocale, readonly ComparisonRow[]> = {
 };
 
 export type LandingIndustry = Industry;
+
 export type LandingTeamMember = TeamMember;
 
 export function getLandingContent(locale: AppLocale) {

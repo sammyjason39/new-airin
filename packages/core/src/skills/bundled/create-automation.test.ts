@@ -516,7 +516,9 @@ describe("ensureBundledSkillFiles", () => {
       "skills",
       "hr-uu-ketenagakerjaan"
     );
+
     const skill = await readFile(join(skillDir, "SKILL.md"), "utf8");
+
     const uu13 = await readFile(
       join(skillDir, "references", "uu-13-2003.md"),
       "utf8"

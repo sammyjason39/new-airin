@@ -34,6 +34,7 @@ export function ChatComposerTextarea({
   longPasteWordThreshold?: number;
 }) {
   const attachments = usePromptInputAttachments();
+
   const textarea = useChatComposerTextarea({
     availableSkills,
     disabled,

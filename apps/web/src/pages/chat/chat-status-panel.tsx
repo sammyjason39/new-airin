@@ -34,8 +34,11 @@ import {
 } from "@/pages/chat/chat-status-panel-shared";
 
 export { ChatStatusArtifactOpener } from "@/pages/chat/chat-status-artifacts";
+
 export { ChatHistoryButton } from "@/pages/chat/chat-status-history";
+
 export type { ChatStatusData } from "@/pages/chat/chat-status-panel-shared";
+
 export { ChatStatusProvider } from "@/pages/chat/chat-status-panel-shared";
 
 const CHAT_STATUS_PANEL_ID = "chat-status";

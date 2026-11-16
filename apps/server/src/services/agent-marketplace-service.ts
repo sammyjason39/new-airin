@@ -115,29 +115,41 @@ export class AgentMarketplaceService {
       );
     }
 
-    const soulFiles: Record<string, string> = {
-      "INSTRUCTIONS.md": entry.instructions,
+    const soulFiles: {
+      "INSTRUCTIONS.md": string;
+      "MEMORY.md"?: string;
+      "SOUL.md": string;
+      "STYLE.md": string;
+    } = {
+      "INSTRUCTIONS.md": entry.roleOneLiner
+        ? `${entry.instructions}\n\n## Role one-liner\n\n${entry.roleOneLiner}`
+        : entry.instructions,
       "SOUL.md": entry.soul,
       "STYLE.md": entry.style,
     };
-
-    if (entry.roleOneLiner) {
-      soulFiles["INSTRUCTIONS.md"] =
-        `${entry.instructions}\n\n## Role one-liner\n\n${entry.roleOneLiner}`;
-    }
 
     if (entry.memoryMarkdown) {
       soulFiles["MEMORY.md"] = entry.memoryMarkdown;
     }
 
+    const profileInput: {
+      id?: string;
+      name: string;
+      soulFiles: typeof soulFiles;
+      systemPrompt: string;
+    } = {
+      name: entry.name,
+      soulFiles,
+      systemPrompt: entry.systemPrompt,
+    };
+
+    if (entry.preferredProfileId) {
+      profileInput.id = entry.preferredProfileId;
+    }
+
     const created = await this.profiles.createProfile(
       orgId,
-      {
-        ...(entry.preferredProfileId ? { id: entry.preferredProfileId } : {}),
-        name: entry.name,
-        soulFiles,
-        systemPrompt: entry.systemPrompt,
-      },
+      profileInput,
       owner
     );
 

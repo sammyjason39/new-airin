@@ -1698,13 +1698,15 @@ test("Simple mode opens the last stored chat on /chat", async () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
+
   const previousProfile = useActiveChatProfileStore.getState();
   const previousStorage = globalThis.localStorage;
-  const stored: Record<string, string> = {
+
+  const stored = {
     [UI_MODE_STORAGE_KEY]: "owner",
     "airin:active-chat-profile": "default",
     "airin:session:default": "last-session",
-  };
+  } satisfies Record<string, string>;
 
   Object.defineProperty(globalThis, "localStorage", {
     configurable: true,
@@ -1725,22 +1727,28 @@ test("Simple mode opens the last stored chat on /chat", async () => {
   });
 
   const spies = [
+    // SAFETY: Partial client stubs; only fields the chat bootstrap reads.
     spyOn(client, "getMe").mockResolvedValue({
       activeOrgId: "org1",
       id: "u1",
       isPlatformAdmin: false,
       orgId: "org1",
     } as never),
+    // SAFETY: Partial org list for auth bootstrap.
     spyOn(client, "listUserOrgs").mockResolvedValue({
       orgs: [{ id: "org1", name: "Org" }],
     } as never),
+    // SAFETY: Partial profile list for the active org.
     spyOn(client, "listProfiles").mockResolvedValue({
       profiles: [{ id: "default", name: "Default" }],
     } as never),
+    // SAFETY: Partial profile detail for skills.
     spyOn(client, "getProfile").mockResolvedValue({
       profile: { id: "default", skills: [] },
     } as never),
+    // SAFETY: Empty thinking settings are enough for this path.
     spyOn(client, "getThinkingSettings").mockResolvedValue({} as never),
+    // SAFETY: Minimal session payload for the stored last chat.
     spyOn(client, "getSessionMessages").mockResolvedValue({
       channel: "web",
       messageMeta: [],
@@ -1749,6 +1757,7 @@ test("Simple mode opens the last stored chat on /chat", async () => {
       questionnaire: null,
       todos: [],
     } as never),
+    // SAFETY: Idle session status for the reopen path.
     spyOn(client, "getSessionStatus").mockResolvedValue({
       active: false,
     } as never),

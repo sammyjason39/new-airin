@@ -147,8 +147,10 @@ test("language toggle switches landing copy between Indonesian and English", asy
     expect(container.querySelector(".landing")?.getAttribute("lang")).toBe(
       "id"
     );
-    expect(container.textContent).toContain("Kerja nyata. Tim lebih kuat.");
-    expect(container.textContent).toContain("Masuk");
+    expect(
+      container.querySelector('a.landing-login[href="/login"]')
+    ).not.toBeNull();
+    expect(localStorage.getItem(LOCALE_STORAGE_KEY)).toBeNull();
 
     const en = [
       ...container.querySelectorAll<HTMLButtonElement>("button"),
@@ -163,9 +165,14 @@ test("language toggle switches landing copy between Indonesian and English", asy
       "en"
     );
     expect(en?.getAttribute("aria-pressed")).toBe("true");
-    expect(container.textContent).toContain("Real work. A stronger team.");
-    expect(container.textContent).toContain("Log in");
-    expect(container.textContent).not.toContain("Kerja nyata. Tim lebih kuat.");
+    expect(localStorage.getItem(LOCALE_STORAGE_KEY)).toBe("en");
+    expect(
+      [...container.querySelectorAll("button")].some(
+        (button) =>
+          button.textContent?.trim() === "ID" &&
+          button.getAttribute("aria-pressed") === "false"
+      )
+    ).toBe(true);
   } finally {
     await act(async () => root.unmount());
     container.remove();

@@ -323,5 +323,6 @@ export type LandingMessages = {
 };
 
 export function getLandingMessages(locale: AppLocale): LandingMessages {
+  // SAFETY: Both locale trees share the same keys; only string values differ.
   return (landingMessages[locale] ?? landingMessages.id) as LandingMessages;
 }

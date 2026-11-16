@@ -88,7 +88,7 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | Drift | Evidence |
 |---|---|
 | ~~Overview channels list belum menyebut **Teams**~~ | Diperbaiki 16 Nov 2026 |
-| Pitch deck & `airin-guide` masih sebut **viewer** | `docs/deck/pitch-deck-customers.md`, bundled skill; DB hanya admin/member. `agent-groups.mdx` sudah diperbaiki; `cloud-browser.mdx` masih sebut Viewers |
+| Pitch deck & `airin-guide` masih sebut **viewer** | `docs/deck/pitch-deck-customers.md`, bundled skill; DB hanya admin/member. `agent-groups.mdx` dan `cloud-browser.mdx` sudah diperbaiki |
 | Kode memakai `owner` / `chief-of-staff`, UI memakai **Simple** / **Orchestrator** | `apps/web/src/lib/ui-mode.ts`, `i18n.ts` |
 | Routing Jovan menyebut nama agen tetap (Toni, Dimas, Ardi, …) | `catalog.ts`; org dengan nama lain bergantung pada pencocokan nama `send_to_bot` |
 | UI route `/settings/skills` platform-admin-only vs org admin skill learning di Organization | `apps/web` routing vs OrganizationPanel |

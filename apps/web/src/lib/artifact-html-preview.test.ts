@@ -21,6 +21,7 @@ describe("htmlForArtifactPreview", () => {
       "<!doctype html><html lang='en' data-theme='light'><head></head><body>hi</body></html>",
       "dark"
     );
+
     expect(dark).toContain('data-theme="dark"');
     expect(dark).toContain("color-scheme:dark");
     expect(dark).not.toContain('data-theme="light"');

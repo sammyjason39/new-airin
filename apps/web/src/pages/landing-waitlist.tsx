@@ -4,6 +4,7 @@ import { useLandingCopy } from "./use-landing-copy";
 
 function WaitlistForm() {
   const { m } = useLandingCopy();
+
   const [status, setStatus] = useState<
     "idle" | "pending" | "success" | "error"
   >("idle");
