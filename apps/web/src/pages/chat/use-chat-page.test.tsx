@@ -1830,11 +1830,11 @@ test("Simple mode ?new=1 resumes the continuous session instead of wiping it", a
   const previousProfile = useActiveChatProfileStore.getState();
   const previousStorage = globalThis.localStorage;
 
-  const stored: Record<string, string> = {
+  const stored = {
     [UI_MODE_STORAGE_KEY]: "owner",
     "airin:active-chat-profile": "default",
     "airin:session:default": "last-session",
-  };
+  } satisfies Record<string, string>;
 
   Object.defineProperty(globalThis, "localStorage", {
     configurable: true,
