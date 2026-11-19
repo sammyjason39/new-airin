@@ -1,10 +1,14 @@
-import type {
-  ComposioCatalogToolkitSummary,
-  ComposioUserConnectionSummary,
-  ProviderClient,
-  SetupChecklistItem,
-  SetupChecklistResponse,
-  SkillSummary,
+import {
+  type ComposioCatalogToolkitSummary,
+  type ComposioUserConnectionSummary,
+  isRequiredGoogleToolkitSlug,
+  type ProviderClient,
+  REQUIRED_GOOGLE_TOOLKIT_SLUGS,
+  REQUIRED_GOOGLE_TOOLKIT_TITLES,
+  type RequiredGoogleToolkitSlug,
+  type SetupChecklistItem,
+  type SetupChecklistResponse,
+  type SkillSummary,
 } from "@airin/core";
 import { parseUserContext } from "@airin/core/user-context";
 import { z } from "zod";
@@ -58,20 +62,50 @@ export function listSetupChecklistCandidates(
   const assigned = new Set(sources.assignedSkillIds);
   const candidates: SetupChecklistCandidate[] = [];
 
-  for (const toolkit of sources.catalog) {
-    if (!connected.has(toolkit.slug)) {
-      candidates.push({
-        id: `toolkit:${toolkit.slug}`,
-        item: {
-          kind: "connect_toolkit",
-          title: `Connect ${toolkit.name}`,
-          toolkitSlug: toolkit.slug,
-        },
-        label: toolkit.description
-          ? `${toolkit.name}: ${toolkit.description}`
-          : toolkit.name,
-      });
+  // Google trio first — always offer them even if Composio catalog is thin.
+  const catalogBySlug = new Map(
+    sources.catalog.map((toolkit) => [toolkit.slug, toolkit] as const)
+  );
+
+  for (const slug of REQUIRED_GOOGLE_TOOLKIT_SLUGS) {
+    if (connected.has(slug)) {
+      continue;
     }
+
+    const toolkit = catalogBySlug.get(slug);
+
+    candidates.push({
+      id: `toolkit:${slug}`,
+      item: {
+        kind: "connect_toolkit",
+        title: REQUIRED_GOOGLE_TOOLKIT_TITLES[slug],
+        toolkitSlug: slug,
+      },
+      label: toolkit?.description
+        ? `${toolkit.name}: ${toolkit.description}`
+        : REQUIRED_GOOGLE_TOOLKIT_TITLES[slug],
+    });
+  }
+
+  for (const toolkit of sources.catalog) {
+    if (
+      connected.has(toolkit.slug) ||
+      isRequiredGoogleToolkitSlug(toolkit.slug)
+    ) {
+      continue;
+    }
+
+    candidates.push({
+      id: `toolkit:${toolkit.slug}`,
+      item: {
+        kind: "connect_toolkit",
+        title: `Connect ${toolkit.name}`,
+        toolkitSlug: toolkit.slug,
+      },
+      label: toolkit.description
+        ? `${toolkit.name}: ${toolkit.description}`
+        : toolkit.name,
+    });
   }
 
   for (const skill of sources.skills) {
@@ -112,6 +146,7 @@ const SETUP_CHECKLIST_SYSTEM = [
   "You help a new user get their AI agent ready for their goal.",
   "Read what the user wrote about themselves, then pick the setup steps from the candidate list that this goal needs.",
   `Pick at most ${MAX_ITEMS}, most important first. Pick none when nothing fits.`,
+  "Always include any toolkit:gmail, toolkit:googledrive, and toolkit:googlesheets candidates that appear — research data must land in the owner's Google Sheet.",
   "Use candidate ids exactly as written. Never invent an id.",
   'Reply with only a JSON object: {"goal": "<the goal in one short line>", "items": ["<id>", ...]}.',
   "Do not use markdown fences, labels, or surrounding prose.",
@@ -210,9 +245,67 @@ export async function buildSetupChecklist(
 
     return {
       goal: savedGoal ?? reply?.goal ?? null,
-      items: reply?.items ?? [],
+      items: mergeRequiredGoogleSetupItems(
+        reply?.items ?? [],
+        input.candidates
+      ),
     };
   } catch {
-    return { goal: savedGoal, items: [] };
+    return {
+      goal: savedGoal,
+      items: mergeRequiredGoogleSetupItems([], input.candidates),
+    };
   }
+}
+
+/**
+ * Always put missing Gmail / Drive / Sheets connect steps first so Tapinall
+ * research can land in the owner's workbook.
+ */
+export function mergeRequiredGoogleSetupItems(
+  items: readonly SetupChecklistItem[],
+  candidates: readonly SetupChecklistCandidate[]
+): SetupChecklistItem[] {
+  const required: SetupChecklistItem[] = [];
+
+  for (const slug of REQUIRED_GOOGLE_TOOLKIT_SLUGS) {
+    const match = candidates.find(
+      (candidate) =>
+        candidate.item.kind === "connect_toolkit" &&
+        candidate.item.toolkitSlug === slug
+    );
+
+    if (match) {
+      required.push(match.item);
+    }
+  }
+
+  const requiredSlugs = new Set(
+    required
+      .filter(
+        (
+          item
+        ): item is Extract<SetupChecklistItem, { kind: "connect_toolkit" }> =>
+          item.kind === "connect_toolkit"
+      )
+      .map((item) => item.toolkitSlug)
+  );
+
+  const rest = items.filter(
+    (item) =>
+      !(item.kind === "connect_toolkit" && requiredSlugs.has(item.toolkitSlug))
+  );
+
+  return [...required, ...rest].slice(0, MAX_ITEMS);
+}
+
+export function setupItemIsRequiredGoogle(
+  item: SetupChecklistItem
+): item is Extract<SetupChecklistItem, { kind: "connect_toolkit" }> & {
+  toolkitSlug: RequiredGoogleToolkitSlug;
+} {
+  return (
+    item.kind === "connect_toolkit" &&
+    isRequiredGoogleToolkitSlug(item.toolkitSlug)
+  );
 }

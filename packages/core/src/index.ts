@@ -57,7 +57,6 @@ export * from "./composio-config";
 export * from "./config";
 
 export * from "./contract";
-
 // Explicit Discord exports — omit helpers that collide with telegram-* names
 // (maskBotToken, generateHandshakeCode, normalizeHandshakeInput, parseAllowedUserIds,
 // isHeartbeatAlive, isProcessAlive). Shared implementations live in
@@ -72,54 +71,31 @@ export {
   resolveDiscordApplicationId,
   saveDiscordConfig,
 } from "./discord-config";
-
 export { getDiscordWorkerStatus } from "./discord-worker";
-
 export * from "./document-content";
-
 export * from "./email-config";
-
 export * from "./error-tracking";
-
 export * from "./error-tracking-config";
-
 export * from "./error-tracking-queue";
-
 export * from "./error-tracking-sentry";
-
 export * from "./fetch-idle";
-
 export * from "./fs";
-
 export * from "./ids";
-
 export * from "./image-content";
-
 export * from "./knowledge-base";
-
 export * from "./local-auth";
-
 export { log } from "./logger";
-
 export { createSmtpSender } from "./mail/smtp-sender";
-
 export * from "./message-content";
-
 export * from "./notification-destinations";
-
 export * from "./ollama-provider-config";
-
 export * from "./openrouter-model-slug";
-
 export * from "./plugins";
-
 export * from "./profile-avatar";
-
 export * from "./profiles";
-
 export * from "./provider-label";
-
 export * from "./provider-setup-prompt";
+export * from "./required-google-toolkits";
 
 export * from "./runtime";
 

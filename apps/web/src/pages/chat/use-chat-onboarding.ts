@@ -1,3 +1,4 @@
+import { isRequiredGoogleToolkitSlug } from "@airin/core";
 import { parseUserContext, renderUserContext } from "@airin/core/user-context";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -343,11 +344,29 @@ export function useOnboarding({
     skipGoal: () => setGoalSkipped(true),
     skipRest: () => {
       if (stored) {
-        const open = rows
-          .filter((row) => row.status === "open")
+        const openOptional = rows
+          .filter(
+            (row) =>
+              row.status === "open" &&
+              !(
+                row.item.kind === "connect_toolkit" &&
+                isRequiredGoogleToolkitSlug(row.item.toolkitSlug)
+              )
+          )
           .map((row) => row.key);
 
-        update({ ...stored, skipped: [...stored.skipped, ...open] });
+        update({ ...stored, skipped: [...stored.skipped, ...openOptional] });
+
+        const googleStillOpen = rows.some(
+          (row) =>
+            row.status !== "done" &&
+            row.item.kind === "connect_toolkit" &&
+            isRequiredGoogleToolkitSlug(row.item.toolkitSlug)
+        );
+
+        if (googleStillOpen) {
+          return;
+        }
       }
 
       setPhase("idle");

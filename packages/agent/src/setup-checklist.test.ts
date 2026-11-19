@@ -3,8 +3,10 @@ import type { SkillSummary } from "@airin/core";
 import {
   buildSetupChecklist,
   listSetupChecklistCandidates,
+  mergeRequiredGoogleSetupItems,
   parseSetupChecklistReply,
   type SetupChecklistSources,
+  setupItemIsRequiredGoogle,
 } from "./setup-checklist";
 
 function skill(id: string, name: string, enabled = true): SkillSummary {
@@ -32,6 +34,18 @@ const sources: SetupChecklistSources = {
       slug: "metaads",
     },
     { description: null, logoUrl: null, name: "Gmail", slug: "gmail" },
+    {
+      description: "Files",
+      logoUrl: null,
+      name: "Google Drive",
+      slug: "googledrive",
+    },
+    {
+      description: "Spreadsheets",
+      logoUrl: null,
+      name: "Google Sheets",
+      slug: "googlesheets",
+    },
   ],
   orgMemory: "# Org Memory\n\n## Pinned\n",
   skills: [
@@ -58,7 +72,71 @@ function providerReplying(reply: string) {
   return { generateText: async () => reply } as never;
 }
 
-describe("listSetupChecklistCandidates", () => {});
+describe("listSetupChecklistCandidates", () => {
+  test("puts missing Google Drive and Sheets before other apps", () => {
+    expect(
+      candidates
+        .filter((candidate) => candidate.id.startsWith("toolkit:"))
+        .map((candidate) => candidate.id)
+    ).toEqual([
+      "toolkit:googledrive",
+      "toolkit:googlesheets",
+      "toolkit:metaads",
+    ]);
+  });
+
+  test("still offers Google when the Composio catalog omits them", () => {
+    const thin = listSetupChecklistCandidates({
+      ...sources,
+      catalog: [],
+      userConnections: [],
+    });
+
+    expect(
+      thin
+        .filter((candidate) => candidate.id.startsWith("toolkit:"))
+        .map((candidate) => candidate.id)
+    ).toEqual(["toolkit:gmail", "toolkit:googledrive", "toolkit:googlesheets"]);
+  });
+});
+
+describe("mergeRequiredGoogleSetupItems", () => {
+  test("prepends missing Google connect steps", () => {
+    expect(
+      mergeRequiredGoogleSetupItems(
+        [
+          {
+            kind: "connect_toolkit",
+            title: "Connect Meta Ads",
+            toolkitSlug: "metaads",
+          },
+        ],
+        candidates
+      ).map((item) =>
+        item.kind === "connect_toolkit" ? item.toolkitSlug : item.kind
+      )
+    ).toEqual(["googledrive", "googlesheets", "metaads"]);
+  });
+});
+
+describe("setupItemIsRequiredGoogle", () => {
+  test("flags only the Google trio", () => {
+    expect(
+      setupItemIsRequiredGoogle({
+        kind: "connect_toolkit",
+        title: "Connect Gmail",
+        toolkitSlug: "gmail",
+      })
+    ).toBe(true);
+    expect(
+      setupItemIsRequiredGoogle({
+        kind: "connect_toolkit",
+        title: "Connect Meta Ads",
+        toolkitSlug: "metaads",
+      })
+    ).toBe(false);
+  });
+});
 
 describe("parseSetupChecklistReply", () => {
   test("maps ids to items in reply order", () => {
@@ -97,7 +175,7 @@ describe("parseSetupChecklistReply", () => {
 describe("buildSetupChecklist", () => {
   const userContext = "# About Me\n\n- Help with: Manage my Meta Ads\n";
 
-  test("keeps the saved goal over the model's goal", async () => {
+  test("keeps the saved goal and prepends required Google", async () => {
     const result = await buildSetupChecklist(
       { candidates, userContext },
       {
@@ -108,7 +186,11 @@ describe("buildSetupChecklist", () => {
     );
 
     expect(result.goal).toBe("Manage my Meta Ads");
-    expect(result.items).toHaveLength(1);
+    expect(
+      result.items.map((item) =>
+        item.kind === "connect_toolkit" ? item.toolkitSlug : item.kind
+      )
+    ).toEqual(["googledrive", "googlesheets", "metaads"]);
   });
 
   test("reads the goal from an import with no Help with", async () => {
@@ -126,10 +208,10 @@ describe("buildSetupChecklist", () => {
     );
 
     expect(result.goal).toBe("Run Meta ads for my shop");
-    expect(result.items[0]).toMatchObject({ toolkitSlug: "metaads" });
+    expect(result.items.at(-1)).toMatchObject({ toolkitSlug: "metaads" });
   });
 
-  test("returns no items when the provider fails", async () => {
+  test("still returns required Google when the provider fails", async () => {
     const result = await buildSetupChecklist(
       { candidates, userContext },
       {
@@ -142,6 +224,11 @@ describe("buildSetupChecklist", () => {
       }
     );
 
-    expect(result).toEqual({ goal: "Manage my Meta Ads", items: [] });
+    expect(result.goal).toBe("Manage my Meta Ads");
+    expect(
+      result.items.map((item) =>
+        item.kind === "connect_toolkit" ? item.toolkitSlug : item.kind
+      )
+    ).toEqual(["googledrive", "googlesheets"]);
   });
 });

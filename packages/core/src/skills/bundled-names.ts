@@ -9,6 +9,7 @@ export const DEFAULT_BUNDLED_SKILL_NAMES = [
   "composio-integrations",
   "airin-guide",
   "grounded-research",
+  "tapinall-research",
 ] as const;
 
 export const SUPER_AIRIN_BUNDLED_SKILL_NAMES = [

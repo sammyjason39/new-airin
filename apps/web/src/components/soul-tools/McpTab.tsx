@@ -17,6 +17,7 @@ import {
   McpPageState,
   McpServersSection,
 } from "@/components/soul-tools/mcp-tab/McpServersSection";
+import { TapinallCatalogPanel } from "@/components/soul-tools/mcp-tab/TapinallCatalogPanel";
 import { useMcpServersQuery } from "@/hooks/use-app-queries";
 import {
   useConnectMcpServerMutation,
@@ -211,6 +212,8 @@ export function McpTab({ embedded = false }: { embedded?: boolean } = {}) {
         open={pendingAuth !== null}
         serverName={pendingAuth?.name ?? ""}
       />
+
+      <TapinallCatalogPanel embedded={embedded} />
 
       <McpServersSection
         busy={busy}

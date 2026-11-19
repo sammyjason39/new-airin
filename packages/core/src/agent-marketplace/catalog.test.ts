@@ -20,6 +20,31 @@ describe("agent marketplace catalog", () => {
     expect(getAgentMarketplaceEntry("chief-of-staff")?.characterId).toBe(
       "jovan"
     );
+    expect(getAgentMarketplaceEntry("sales")?.bundledSkillNames).toEqual([
+      "tapinall-research",
+    ]);
+    expect(getAgentMarketplaceEntry("sales")?.composioApps).toEqual([
+      "gmail",
+      "googledrive",
+      "googlesheets",
+    ]);
+    expect(
+      getAgentMarketplaceEntry("hr-recruiting")?.bundledSkillNames
+    ).toEqual(["tapinall-research"]);
+    expect(getAgentMarketplaceEntry("hr-recruiting")?.composioApps).toEqual([
+      "gmail",
+      "googledrive",
+      "googlesheets",
+    ]);
+    expect(getAgentMarketplaceEntry("social-media")?.bundledSkillNames).toEqual(
+      ["tapinall-research"]
+    );
+    expect(getAgentMarketplaceEntry("social-media")?.composioApps).toEqual([
+      "instagram",
+      "gmail",
+      "googledrive",
+      "googlesheets",
+    ]);
     expect(
       AGENT_MARKETPLACE_CORE_PACK.every(
         (entry) => entry.soul.length > 0 && entry.characterId.length > 0

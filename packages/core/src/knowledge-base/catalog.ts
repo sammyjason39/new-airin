@@ -1,5 +1,5 @@
 import type { PublishedKnowledgeBaseDocument } from "../contract";
-import { AIRIN_DOCS_LLMS_URL, DEFAULT_KNOWLEDGE_SOURCES } from "./sources";
+import { airinDocsAgentGuidance } from "./sources";
 import {
   getProfileSharedDocumentIds,
   listKnowledgeBaseDocuments,
@@ -25,8 +25,6 @@ export async function composeKnowledgeBaseCatalog(
     ),
   ];
 
-  const sources = DEFAULT_KNOWLEDGE_SOURCES;
-
   const readyPublishedDocuments = publishedDocuments.filter(
     (document) => document.status === "ready"
   );
@@ -34,14 +32,6 @@ export async function composeKnowledgeBaseCatalog(
   const readyDocuments = documents.filter(
     (document) => document.status === "ready"
   );
-
-  if (
-    readyDocuments.length === 0 &&
-    readyPublishedDocuments.length === 0 &&
-    sources.length === 0
-  ) {
-    return "";
-  }
 
   const sections: string[] = [];
 
@@ -69,12 +59,8 @@ export async function composeKnowledgeBaseCatalog(
     );
   }
 
-  if (sources.length > 0) {
-    sections.push(
-      "# Airin documentation",
-      `For Airin product questions, web_fetch ${AIRIN_DOCS_LLMS_URL}, then web_fetch the matching .md page from that index. Do not use knowledge_base_search for inherited docs.`
-    );
-  }
+  // Always tell agents where product docs live (in-app guide and/or our docs site).
+  sections.push("# Airin documentation", airinDocsAgentGuidance());
 
   return sections.join("\n");
 }

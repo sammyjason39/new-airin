@@ -1,3 +1,4 @@
+import { isRequiredGoogleToolkitSlug } from "@airin/core";
 import { Button } from "@airin/ui/button";
 import { Input } from "@airin/ui/input";
 import { Spinner } from "@airin/ui/spinner";
@@ -17,6 +18,14 @@ import {
 import { type ComponentType, useState } from "react";
 import { GOAL_SUGGESTIONS } from "@/components/user-context-presets";
 import type { SetupChecklistRow } from "@/pages/chat/chat-page.shared";
+
+function rowIsRequiredGoogleOpen(row: SetupChecklistRow): boolean {
+  return (
+    row.status !== "done" &&
+    row.item.kind === "connect_toolkit" &&
+    isRequiredGoogleToolkitSlug(row.item.toolkitSlug)
+  );
+}
 
 type IconComponent = ComponentType<{ className?: string }>;
 
@@ -358,6 +367,10 @@ export function ChatSetupChecklist({
   rows: SetupChecklistRow[];
 }) {
   const done = rows.filter((row) => row.status === "done").length;
+  const googleRequiredOpen = rows.some(rowIsRequiredGoogleOpen);
+  const optionalOpen = rows.some(
+    (row) => row.status === "open" && !rowIsRequiredGoogleOpen(row)
+  );
 
   return (
     <section
@@ -380,6 +393,13 @@ export function ChatSetupChecklist({
         </span>
       </div>
 
+      {googleRequiredOpen ? (
+        <p className="rounded-lg border border-border bg-muted/40 px-3 py-2 text-muted-foreground text-sm">
+          Connect Gmail, Google Drive, and Google Sheets first. Research and
+          scraped data go into your Google Sheet.
+        </p>
+      ) : null}
+
       <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-xl border border-border bg-card">
         {rows.map((row) => (
           <SetupChecklistRowItem
@@ -398,7 +418,7 @@ export function ChatSetupChecklist({
       ) : null}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        {done < rows.length ? (
+        {optionalOpen && !googleRequiredOpen ? (
           <Button
             className="h-auto px-0 text-muted-foreground underline underline-offset-4 hover:bg-transparent hover:text-foreground"
             onClick={onSkipRest}
@@ -410,7 +430,12 @@ export function ChatSetupChecklist({
         ) : (
           <span />
         )}
-        <Button className="h-9 px-4" onClick={onFinish} type="button">
+        <Button
+          className="h-9 px-4"
+          disabled={googleRequiredOpen}
+          onClick={onFinish}
+          type="button"
+        >
           Start chatting
         </Button>
       </div>

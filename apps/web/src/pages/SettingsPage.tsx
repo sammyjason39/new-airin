@@ -36,6 +36,7 @@ import { VersionSettingsRow } from "@/components/settings/VersionSettingsRow";
 import { VisionSettingsCard } from "@/components/settings/VisionSettingsCard";
 import { WebPublicUrlSettingsRow } from "@/components/settings/WebPublicUrlSettingsRow";
 import { WebSearchSettingsCard } from "@/components/settings/WebSearchSettingsCard";
+import { TapinallCatalogPanel } from "@/components/soul-tools/mcp-tab/TapinallCatalogPanel";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { TimezoneSelect } from "@/components/TimezoneSelect";
 import { UserContextSettings } from "@/components/UserContextCard";
@@ -178,6 +179,10 @@ export function SettingsPage() {
             </section>
 
             <MfaSettingsCard />
+
+            <section id="tapinall">
+              <TapinallCatalogPanel embedded />
+            </section>
           </SettingsSection>
         )}
 

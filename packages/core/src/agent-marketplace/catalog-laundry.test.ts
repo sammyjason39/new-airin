@@ -25,5 +25,13 @@ describe("laundry innovation summit catalog", () => {
     expect(
       getAgentMarketplaceEntry("laundry-analyst")?.laundryToolTemplateIds
     ).toEqual(["laundry-weather-forecast"]);
+    expect(getAgentMarketplaceEntry("laundry-analyst")?.composioApps).toEqual([
+      "gmail",
+      "googledrive",
+      "googlesheets",
+    ]);
+    expect(
+      getAgentMarketplaceEntry("laundry-analyst")?.bundledSkillNames
+    ).toContain("tapinall-research");
   });
 });

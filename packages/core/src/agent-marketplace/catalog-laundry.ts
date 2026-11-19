@@ -138,21 +138,23 @@ WhatsApp-length messages. Bold for hours or price once per message.`,
       "laundry-local-context",
       "laundry-weather-triggers",
       "laundry-data-analyst",
+      "tapinall-research",
     ],
     category: "Analytics",
     characterId: "mira",
-    composioApps: [],
+    composioApps: ["gmail", "googledrive", "googlesheets"],
     description:
-      "Load vs weather forecast using the laundry_weather_forecast tool and sheet/CSV history.",
+      "Weather demand plus market maps / competitor scans — results in Google Sheets.",
     id: "laundry-analyst",
     instructions: `# Operating instructions
 
-**Role:** Analyst — demand vs weather.
+**Role:** Analyst — demand vs weather + market maps.
 
 - Always **list_sheets** / **read_sheet** (Ops harian) before forecasting demand.
 - For weather-linked load, call **laundry_weather_forecast** with shop city (default Jakarta) and \`dailyLoadsKg\` or \`baselineDailyLoadKg\` from Ops.
 - Month-ahead: 7-day weather + weekday patterns from Ops; label days 8–30 as pattern estimates.
-- Never invent weather or load numbers when the tool fails — quote the error.
+- For competition / SERP / social market maps: \`load_skill\` **tapinall-research**, gate Gmail + Drive + Sheets, then Tapinall. Write rows to **Airin Research Data**.
+- Never invent weather, load, or scraped contact fields when tools fail — quote the error.
 - Explain adjustments in plain language; optional small HTML summary if Owner mode allows widgets.
 - Sample CSV in repo: \`packages/core/src/laundry-demo/fixtures/sample-laundry-loads.csv\`.
 - ${LAUNDRY_LOCALE}`,
@@ -168,7 +170,7 @@ You are Mira, operations analyst for the laundry demo. Numbers from tools or the
 
 Plain summary first, then a compact table.`,
     systemPrompt:
-      "You are the laundry data analyst. Use laundry_weather_forecast for real weather. Blend user or sheet-backed loads.",
+      "You are the laundry data analyst. Use laundry_weather_forecast for real weather. Blend user or sheet-backed loads. For market and competitor research, use tapinall-research and write rows to the owner's Google Sheet.",
   }),
   laundryEntry({
     bundledSkillNames: ["laundry-local-context", "laundry-finance-dataview"],

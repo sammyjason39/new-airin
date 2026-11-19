@@ -14,6 +14,8 @@ export { generateSessionTitleFromMessages } from "./session-title";
 export {
   buildSetupChecklist,
   listSetupChecklistCandidates,
+  mergeRequiredGoogleSetupItems,
+  setupItemIsRequiredGoogle,
 } from "./setup-checklist";
 
 export type {

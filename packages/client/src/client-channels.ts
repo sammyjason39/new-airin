@@ -13,6 +13,9 @@ import type {
   RegenerateNotificationDestinationKeyResponse,
   SlackSettingsResponse,
   StartTelegramPairingRequest,
+  TapinallCatalogBrowseResponse,
+  TapinallCatalogSearchResponse,
+  TapinallCatalogStatus,
   TeamsSettingsResponse,
   TelegramAccessRequestsResponse,
   TelegramPairingStartResponse,
@@ -258,6 +261,30 @@ export class ChannelsClient extends AutomationsClient {
       {
         method: "POST",
       }
+    );
+  }
+
+  async getTapinallStatus(): Promise<TapinallCatalogStatus> {
+    return this.request<TapinallCatalogStatus>("/v1/tapinall/status");
+  }
+
+  async browseTapinallCatalog(): Promise<TapinallCatalogBrowseResponse> {
+    return this.request<TapinallCatalogBrowseResponse>(
+      "/v1/tapinall/catalog/browse"
+    );
+  }
+
+  async searchTapinallCatalog(
+    query: string,
+    limit = 25
+  ): Promise<TapinallCatalogSearchResponse> {
+    const params = new URLSearchParams({
+      limit: String(limit),
+      q: query,
+    });
+
+    return this.request<TapinallCatalogSearchResponse>(
+      `/v1/tapinall/catalog/search?${params}`
     );
   }
 

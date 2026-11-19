@@ -2718,6 +2718,64 @@ export interface McpRegistrySearchResponse {
   servers: McpRegistryServer[];
 }
 
+export interface TapinallCatalogStatus {
+  availableMicro: string | null;
+  balanceMicro: string | null;
+  configured: boolean;
+  mcpServerId: string | null;
+  mcpStatus: string | null;
+}
+
+export interface TapinallCatalogCategory {
+  indexedToolCount: number;
+  label: string;
+  platformCount: number;
+}
+
+export interface TapinallCatalogApp {
+  collectionIds: string[];
+  id: string;
+  label: string;
+}
+
+export interface TapinallCatalogCollection {
+  category: string;
+  description: string;
+  featured?: number | null;
+  id: string;
+  indexedToolCount: number;
+  label: string;
+  providerIds: string[];
+  startingPrice?: {
+    free: boolean;
+    priceMicro: string;
+    priceUnit: string;
+  } | null;
+}
+
+export interface TapinallCatalogBrowseResponse {
+  apps: TapinallCatalogApp[];
+  categories: TapinallCatalogCategory[];
+  collections: TapinallCatalogCollection[];
+}
+
+export interface TapinallCatalogTool {
+  asyncTask: boolean;
+  cached: boolean;
+  category: string;
+  description: string;
+  free: boolean;
+  id: string;
+  method: string;
+  name: string;
+  priceMicro: string;
+  priceUnit: string;
+}
+
+export interface TapinallCatalogSearchResponse {
+  tools: TapinallCatalogTool[];
+}
+
 export interface ToolSummary {
   description: string;
   handlerType: string;

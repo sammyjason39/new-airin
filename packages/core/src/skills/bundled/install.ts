@@ -22,6 +22,7 @@ const FORCE_REFRESH_BUNDLED_SKILL_NAMES = new Set<string>([
   "archive-profile-memory",
   "airin-guide",
   "grounded-research",
+  "tapinall-research",
   "hr-uu-ketenagakerjaan",
 ]);
 

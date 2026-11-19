@@ -73,6 +73,7 @@ import {
   DOCS_SCRIPT_URL,
   registerSystemRoutes,
 } from "./routes/system";
+import { registerTapinallRoutes } from "./routes/tapinall";
 import { registerTeamsRoutes } from "./routes/teams";
 import { registerToolRoutes } from "./routes/tools";
 import { registerUserContextRoutes } from "./routes/user-context";
@@ -467,6 +468,7 @@ export function createHonoApp(options: ServerOptions) {
   registerRegressionCaseRunRoutes(app, options);
   registerArtifactShareRoutes(app, options);
   registerMcpRoutes(app, options);
+  registerTapinallRoutes(app, options);
   registerSkillsMarketplaceRoutes(app);
   registerSkillRoutes(app, options);
   registerToolRoutes(app, options);
