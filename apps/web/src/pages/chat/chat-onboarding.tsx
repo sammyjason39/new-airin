@@ -367,7 +367,9 @@ export function ChatSetupChecklist({
   rows: SetupChecklistRow[];
 }) {
   const done = rows.filter((row) => row.status === "done").length;
+
   const googleRequiredOpen = rows.some(rowIsRequiredGoogleOpen);
+
   const optionalOpen = rows.some(
     (row) => row.status === "open" && !rowIsRequiredGoogleOpen(row)
   );

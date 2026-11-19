@@ -280,16 +280,13 @@ export function mergeRequiredGoogleSetupItems(
     }
   }
 
-  const requiredSlugs = new Set(
-    required
-      .filter(
-        (
-          item
-        ): item is Extract<SetupChecklistItem, { kind: "connect_toolkit" }> =>
-          item.kind === "connect_toolkit"
-      )
-      .map((item) => item.toolkitSlug)
-  );
+  const requiredSlugs = new Set<string>();
+
+  for (const item of required) {
+    if (item.kind === "connect_toolkit") {
+      requiredSlugs.add(item.toolkitSlug);
+    }
+  }
 
   const rest = items.filter(
     (item) =>

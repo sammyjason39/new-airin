@@ -33,6 +33,7 @@ describe("TapinallCatalogService", () => {
     const previousFetch = globalThis.fetch;
     process.env.TAPINALL_TOKEN = "tap_test_token";
 
+    // SAFETY: Test stub implements the fetch subset this status() call uses.
     globalThis.fetch = (async () =>
       new Response(
         JSON.stringify({ availableMicro: "1000000", balanceMicro: "1000000" }),
