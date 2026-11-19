@@ -1,13 +1,13 @@
-import {
-  REQUIRED_GOOGLE_TOOLKIT_SLUGS,
-  REQUIRED_GOOGLE_TOOLKIT_TITLES,
-  type RequiredGoogleToolkitSlug,
-} from "@airin/core";
 import type {
   TapinallCatalogApp,
   TapinallCatalogCollection,
   TapinallCatalogTool,
 } from "@airin/core/contract";
+import {
+  REQUIRED_GOOGLE_TOOLKIT_SLUGS,
+  REQUIRED_GOOGLE_TOOLKIT_TITLES,
+  type RequiredGoogleToolkitSlug,
+} from "@airin/core/required-google-toolkits";
 import { Button } from "@airin/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@airin/ui/card";
 import { Input } from "@airin/ui/input";

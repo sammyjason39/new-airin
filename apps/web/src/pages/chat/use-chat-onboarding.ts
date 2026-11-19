@@ -1,4 +1,4 @@
-import { isRequiredGoogleToolkitSlug } from "@airin/core";
+import { isRequiredGoogleToolkitSlug } from "@airin/core/required-google-toolkits";
 import { parseUserContext, renderUserContext } from "@airin/core/user-context";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";

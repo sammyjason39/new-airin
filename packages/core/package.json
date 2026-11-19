@@ -48,6 +48,7 @@
     "./openrouter-model-slug": "./src/openrouter-model-slug.ts",
     "./provider-label": "./src/provider-label.ts",
     "./provider-resolution": "./src/provider-resolution.ts",
+    "./required-google-toolkits": "./src/required-google-toolkits.ts",
     "./runtime": "./src/runtime.ts",
     "./dev-secrets-key": "./src/dev-secrets-key.ts",
     "./ensure-server": "./src/ensure-server.ts",

@@ -1,4 +1,4 @@
-import { isRequiredGoogleToolkitSlug } from "@airin/core";
+import { isRequiredGoogleToolkitSlug } from "@airin/core/required-google-toolkits";
 import { Button } from "@airin/ui/button";
 import { Input } from "@airin/ui/input";
 import { Spinner } from "@airin/ui/spinner";
