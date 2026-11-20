@@ -95,6 +95,10 @@ export function extractResultUrl<Value>(value: Value): string | null {
   for (const key of [
     "result_url",
     "resultUrl",
+    "rawUrl",
+    "raw_url",
+    "minUrl",
+    "min_url",
     "image_url",
     "imageUrl",
     "video_url",
@@ -112,6 +116,7 @@ export function extractResultUrl<Value>(value: Value): string | null {
   }
 
   for (const key of [
+    "generation",
     "results",
     "jobs",
     "outputs",
@@ -167,7 +172,7 @@ export function extractJobId<Value>(value: Value): string | null {
     }
   }
 
-  for (const key of ["results", "jobs", "data"]) {
+  for (const key of ["generation", "results", "jobs", "data"]) {
     const nested = record.get(key);
 
     if (Array.isArray(nested)) {
@@ -364,7 +369,7 @@ export function readToolStatus<Value>(raw: Value): string | null {
     return normalizeStatus(top);
   }
 
-  for (const key of ["results", "jobs", "content", "data"]) {
+  for (const key of ["generation", "results", "jobs", "content", "data"]) {
     const nested = record.get(key);
 
     if (Array.isArray(nested)) {
