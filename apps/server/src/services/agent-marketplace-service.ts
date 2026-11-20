@@ -108,11 +108,33 @@ export class AgentMarketplaceService {
       installedKeys.has(marketplaceNameKey(profile.name))
     );
 
+    // Idempotent: a prior install that failed on avatar (or a double-click)
+    // must return the existing profile instead of 409. Still sync catalog
+    // skills and Composio apps so Alya can pick up Docs/Sheets later.
     if (already) {
-      throw new AirinApiError(
-        "This marketplace agent is already installed.",
-        409
+      await this.assignBundledSkills(already.id, entry.bundledSkillNames ?? []);
+      await this.assignComposioHints(orgId, already.id, entry.composioApps);
+
+      return this.profiles.getProfile(orgId, already.id);
+    }
+
+    if (
+      entry.preferredProfileId &&
+      existing.profiles.some(
+        (profile) => profile.id === entry.preferredProfileId
+      )
+    ) {
+      const preferred = existing.profiles.find(
+        (profile) => profile.id === entry.preferredProfileId
+      )!;
+
+      await this.assignBundledSkills(
+        preferred.id,
+        entry.bundledSkillNames ?? []
       );
+      await this.assignComposioHints(orgId, preferred.id, entry.composioApps);
+
+      return this.profiles.getProfile(orgId, preferred.id);
     }
 
     const instructions = entry.roleOneLiner
@@ -157,6 +179,11 @@ export class AgentMarketplaceService {
       created.profile.id,
       entry.bundledSkillNames ?? []
     );
+    await this.assignComposioHints(
+      orgId,
+      created.profile.id,
+      entry.composioApps
+    );
 
     return created;
   }
@@ -176,6 +203,45 @@ export class AgentMarketplaceService {
         await this.db.assignSkillToProfile(profileId, skill.id);
       }
     }
+  }
+
+  /** Merge catalog Composio apps onto the profile; keep existing assignments. */
+  private async assignComposioHints(
+    orgId: string,
+    profileId: string,
+    slugs: readonly string[]
+  ): Promise<void> {
+    if (!this.db || slugs.length === 0) {
+      return;
+    }
+
+    const existing = await this.db.listProfileComposioToolkits(profileId);
+    const byToolkitId = new Map(
+      existing.map((row) => [row.toolkitId, row] as const)
+    );
+
+    for (const slug of slugs) {
+      const toolkit = await this.db.getComposioToolkitBySlug(orgId, slug);
+
+      if (!toolkit || byToolkitId.has(toolkit.id)) {
+        continue;
+      }
+
+      byToolkitId.set(toolkit.id, {
+        allowedActions: null,
+        profileId,
+        toolkitId: toolkit.id,
+      });
+    }
+
+    await this.db.replaceProfileComposioToolkits(
+      profileId,
+      [...byToolkitId.values()].map((row) => ({
+        allowedActions: row.allowedActions,
+        profileId,
+        toolkitId: row.toolkitId,
+      }))
+    );
   }
 }
 

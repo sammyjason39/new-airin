@@ -64,6 +64,7 @@ Tidak auto-assign. Assign sendiri bila dibutuhkan:
 | `google-meet` | Alur Google Meet |
 | `knowledge-base-wiki` | Compile dokumen knowledge jadi wiki Markdown |
 | `hr-uu-ketenagakerjaan` | Jawab pertanyaan UU/PP ketenagakerjaan dari teks resmi di skill (dipakai agen Marketplace Alya) |
+| `google-workspace-docs` | Kirim dokumen ke Google Docs / Sheets / Slides via Composio (PKWT, tabel, deck — bukan HTML) |
 
 ## Paket laundry (12 skill)
 

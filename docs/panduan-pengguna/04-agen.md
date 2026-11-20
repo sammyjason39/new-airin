@@ -45,7 +45,7 @@
 | Nama | Peran di sidebar (ID) | Isi singkat |
 |---|---|---|
 | **Jovan** | Orkestrator | Satu pintu; tarik jawaban spesialis lewat `send_to_bot` |
-| **Alya** | HR · Ketenagakerjaan | UU/PP ketenagakerjaan (skill `hr-uu-ketenagakerjaan`); bukan kuasa hukum |
+| **Alya** | HR · Ketenagakerjaan | UU/PP ketenagakerjaan + dokumen PKWT ke Google Docs (`hr-uu-ketenagakerjaan`, `google-workspace-docs`); bukan kuasa hukum |
 | **Maya** | Rekrutmen | Lowongan, shortlist, skor wawancara |
 | **Rani** | Payroll | Draft slip, checklist THR/absensi; bukan konsultan pajak |
 | **Dimas** | Keuangan | Piutang, catatan kas, ringkasan sederhana |

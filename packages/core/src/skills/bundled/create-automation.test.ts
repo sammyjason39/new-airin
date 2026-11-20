@@ -530,4 +530,17 @@ describe("ensureBundledSkillFiles", () => {
       await readFile(join(skillDir, "references", "pp-35-2021.md"), "utf8")
     ).toContain("PP No. 35");
   });
+
+  test("installs google-workspace-docs skill for Docs/Sheets/Slides delivery", async () => {
+    await ensureBundledSkillFiles();
+
+    const skill = await readFile(
+      join(configDir, "agent", "skills", "google-workspace-docs", "SKILL.md"),
+      "utf8"
+    );
+
+    expect(skill).toContain("google-workspace-docs");
+    expect(skill).toContain("googledocs");
+    expect(skill).toContain("No HTML deliverable");
+  });
 });

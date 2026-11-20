@@ -12,8 +12,14 @@ describe("agent marketplace catalog", () => {
     expect(new Set(list.map((entry) => entry.id)).size).toBe(10);
     expect(getAgentMarketplaceEntry("hr-indonesia")?.name).toBe("Alya");
     expect(getAgentMarketplaceEntry("hr-indonesia")?.bundledSkillNames).toEqual(
-      ["hr-uu-ketenagakerjaan"]
+      ["hr-uu-ketenagakerjaan", "google-workspace-docs"]
     );
+    expect(getAgentMarketplaceEntry("hr-indonesia")?.composioApps).toEqual([
+      "googledocs",
+      "googledrive",
+      "googlesheets",
+      "googleslides",
+    ]);
     expect(getAgentMarketplaceEntry("hr-recruiting")?.name).toBe("Maya");
     expect(getAgentMarketplaceEntry("hr-payroll")?.name).toBe("Rani");
     expect(getAgentMarketplaceEntry("chief-of-staff")?.name).toBe("Jovan");
