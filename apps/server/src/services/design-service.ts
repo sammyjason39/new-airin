@@ -74,6 +74,7 @@ export class DesignService {
 
   async listResults(orgId: string): Promise<DesignResultRecord[]> {
     const results = await readResults(orgId);
+
     const pending = results
       .filter(
         (item) =>
@@ -517,6 +518,7 @@ export class DesignService {
     ]);
 
     const jobId = extractJobId(raw);
+
     const settled = jobId
       ? await this.awaitJobResult(
           server,
