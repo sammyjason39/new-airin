@@ -465,7 +465,6 @@ function migrateSkillsTables(db: Database): void {
       updated_at TEXT NOT NULL
     );
     DROP INDEX IF EXISTS skills_name_unique;
-    CREATE UNIQUE INDEX IF NOT EXISTS skills_source_path_unique ON skills (source_path);
     CREATE TABLE IF NOT EXISTS profile_skills (
       profile_id TEXT NOT NULL,
       skill_id TEXT NOT NULL,
@@ -474,6 +473,18 @@ function migrateSkillsTables(db: Database): void {
       FOREIGN KEY (skill_id) REFERENCES skills (id) ON DELETE CASCADE
     );
   `);
+
+  // Fresh installs get a global unique path. Multi-org DBs already share
+  // source_path across tenants; migrateTenantUniqueness replaces this with
+  // (org_id, source_path). Never block boot when that later shape already won.
+  try {
+    db.exec(`
+      CREATE UNIQUE INDEX IF NOT EXISTS skills_source_path_unique
+      ON skills (source_path);
+    `);
+  } catch {
+    // Duplicate paths across orgs are expected after the org-scoped index.
+  }
 }
 
 function migrateAutomationsTable(db: Database): void {

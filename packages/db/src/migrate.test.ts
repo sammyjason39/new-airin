@@ -22,6 +22,33 @@ interface PluginCleanupRow {
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..");
 
+test("re-migrates when skills share source_path across orgs", () => {
+  const db = new Database(":memory:");
+
+  try {
+    migrateDatabase(db);
+    db.exec(`
+      INSERT INTO organizations (id, name, slug, created_at, updated_at)
+        VALUES ('org-a', 'A', 'a', 'now', 'now'),
+               ('org-b', 'B', 'b', 'now', 'now');
+      INSERT INTO skills (id, name, description, source_path, org_id, created_at, updated_at)
+        VALUES
+          ('s1', 'shared', '', '/shared/SKILL.md', 'org-a', 'now', 'now'),
+          ('s2', 'shared', '', '/shared/SKILL.md', 'org-b', 'now', 'now');
+      DROP INDEX IF EXISTS skills_source_path_unique;
+    `);
+
+    expect(() => migrateDatabase(db)).not.toThrow();
+    expect(
+      db
+        .query("SELECT COUNT(*) AS c FROM skills WHERE source_path = ?")
+        .get("/shared/SKILL.md")
+    ).toEqual({ c: 2 });
+  } finally {
+    db.close();
+  }
+});
+
 test("upgrades an existing database with a persistent waitlist", () => {
   const db = new Database(":memory:");
 
