@@ -47,9 +47,11 @@ export function DesignPage() {
   const [prompt, setPrompt] = useState("");
   const [aspectRatio, setAspectRatio] = useState("1:1");
   const [duration, setDuration] = useState("");
+
   const [paramValues, setParamValues] = useState<Record<string, string>>(() =>
     defaultParameterValues(defaultModelId("image"))
   );
+
   const [sourceUrls, setSourceUrls] = useState("");
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,6 +66,7 @@ export function DesignPage() {
   const durationOptions = durationOptionsForModel(model);
   const extraParameters = selectableParameters(model);
   const recommended = filterDesignPrompts("").slice(0, 8);
+
   const selectedModelLabel =
     modelId === defaultModelId(kind) ? "Auto" : (model?.name ?? "Auto");
 
@@ -157,6 +160,7 @@ export function DesignPage() {
 
     if (!request.prompt) {
       setError("Enter a prompt before estimating cost.");
+
       return;
     }
 
@@ -185,6 +189,7 @@ export function DesignPage() {
 
     if (!request.prompt) {
       setError("Enter a prompt before generating.");
+
       return;
     }
 

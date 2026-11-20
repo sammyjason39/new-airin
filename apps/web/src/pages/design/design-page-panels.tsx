@@ -50,6 +50,7 @@ export function DesignResultsPanel({
         <ul className="design-page__grid" style={{ marginTop: "1rem" }}>
           {results.map((item) => {
             const mediaUrl = item.videoUrl ?? item.imageUrl;
+
             const modelName =
               item.modelName ?? getDesignModel(item.model)?.name ?? item.model;
 

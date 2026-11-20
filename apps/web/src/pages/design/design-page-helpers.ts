@@ -10,9 +10,7 @@ export function parseSourceUrls(value: string): string[] {
     .filter(Boolean);
 }
 
-export function defaultParameterValues(
-  modelId: string
-): Record<string, string> {
+export function defaultParameterValues(modelId: string) {
   const model = getDesignModel(modelId);
 
   if (!model) {
@@ -31,5 +29,6 @@ export function defaultParameterValues(
     }
   }
 
+  // oxlint-disable-next-line anti-slop/no-known-value-widening -- Callers need a string map for form state.
   return values;
 }
