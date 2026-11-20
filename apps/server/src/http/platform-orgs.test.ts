@@ -1131,4 +1131,47 @@ describe("platform org routes", () => {
     expect(response.status).toBe(409);
     expect(await databaseAdapter.getUserById(platformAdmin!.id)).not.toBeNull();
   });
+
+  test("platform admin can read and update trial days", async () => {
+    const { app, authService, databaseAdapter } = createPlatformApp();
+
+    const session = await loginPlatformAdminSession(
+      app,
+      authService,
+      databaseAdapter
+    );
+
+    const getResponse = await app.fetch(
+      new Request("http://localhost:4310/v1/platform/billing/settings", {
+        headers: session.headers(),
+      })
+    );
+
+    expect(getResponse.status).toBe(200);
+    await expect(getResponse.json()).resolves.toEqual({
+      trialDays: 14,
+      updatedAt: expect.any(String),
+    });
+
+    const patchResponse = await app.fetch(
+      new Request("http://localhost:4310/v1/platform/billing/settings", {
+        body: JSON.stringify({ trialDays: 21 }),
+        headers: session.headers({
+          "Content-Type": "application/json",
+          "X-CSRF-Token": session.csrfToken,
+        }),
+        method: "PATCH",
+      })
+    );
+
+    expect(patchResponse.status).toBe(200);
+    await expect(patchResponse.json()).resolves.toEqual({
+      trialDays: 21,
+      updatedAt: expect.any(String),
+    });
+
+    expect(await databaseAdapter.getPlatformBillingSettings()).toMatchObject({
+      trialDays: 21,
+    });
+  });
 });

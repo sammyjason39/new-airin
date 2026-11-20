@@ -709,6 +709,16 @@ export interface PlatformOverviewResponse {
   };
 }
 
+/** Install-wide billing knobs (platform admin). */
+export interface PlatformBillingSettingsResponse {
+  trialDays: number;
+  updatedAt: string;
+}
+
+export interface UpdatePlatformBillingSettingsRequest {
+  trialDays: number;
+}
+
 export interface WaitlistSignup {
   businessName: string;
   businessType: string;
@@ -886,6 +896,23 @@ export interface OrgLlmQuotaStatusResponse {
   warningPercent: number;
 }
 
+/**
+ * Plan token/$ budget vs spend for the current UTC month. Shown as a Claude
+ * Code-style remaining band in Simple chat.
+ */
+export interface OrgPlanUsageResponse {
+  /** Monthly USD budget from the org plan; null when unlimited. */
+  budgetUsd: number | null;
+  month: string;
+  planId: string | null;
+  planName: string | null;
+  /** budgetUsd − spentUsd when budget is set; null when unlimited. */
+  remainingUsd: number | null;
+  spentUsd: number;
+  status: "blocked" | "ok" | "unlimited" | "warning";
+  warningPercent: number;
+}
+
 export interface OrgUsageLeader {
   name: string;
   requestCount: number;
@@ -1045,6 +1072,87 @@ export interface PinOrgMemoryRequest {
 
 export interface UnpinOrgMemoryRequest {
   bullet: string;
+}
+
+export type VaultNoteTypeContract = "note" | "mom" | "doc" | "sop" | "meeting";
+
+export interface VaultNoteResponse {
+  content: string;
+  createdAt: string;
+  id: string;
+  noteType: VaultNoteTypeContract;
+  slug: string;
+  tags: string[];
+  title: string;
+  updatedAt: string;
+}
+
+export interface VaultLinkResponse {
+  createdAt: string;
+  id: string;
+  linkType: string;
+  sourceId: string;
+  targetId?: string;
+  targetSlug: string;
+}
+
+export interface VaultNoteDetailResponse extends VaultNoteResponse {
+  brokenLinks: string[];
+  inboundLinks: VaultLinkResponse[];
+  outboundLinks: VaultLinkResponse[];
+}
+
+export interface ListVaultNotesResponse {
+  notes: VaultNoteResponse[];
+}
+
+export interface VaultGraphNodeResponse {
+  id: string;
+  linkCount: number;
+  noteType: VaultNoteTypeContract;
+  slug: string;
+  title: string;
+}
+
+export interface VaultGraphEdgeResponse {
+  id: string;
+  source: string;
+  target: string;
+  targetSlug: string;
+}
+
+export interface VaultGraphResponse {
+  edges: VaultGraphEdgeResponse[];
+  nodes: VaultGraphNodeResponse[];
+}
+
+export interface CreateVaultNoteRequest {
+  content?: string;
+  noteType?: VaultNoteTypeContract;
+  slug?: string;
+  tags?: string[];
+  title: string;
+}
+
+export interface UpdateVaultNoteRequest {
+  content?: string;
+  noteType?: VaultNoteTypeContract;
+  slug?: string;
+  tags?: string[];
+  title?: string;
+}
+
+export interface VaultSearchRequest {
+  limit?: number;
+  query: string;
+}
+
+export interface VaultSearchResponse {
+  chunkCount: number;
+  context: string;
+  notes: VaultNoteResponse[];
+  query: string;
+  titles: string[];
 }
 
 export type OrgMemoryChangeAction =

@@ -14,7 +14,7 @@ import type {
   ImageAttachment,
   ListWorkspaceFilesResponse,
 } from "@airin/core/contract";
-import { OrgMemoryClient } from "./client-org-memory";
+import { OrgVaultClient } from "./client-org-vault";
 
 function agentGroupPath(groupId: string): string {
   return `/v1/agent-groups/${encodeURIComponent(groupId)}`;
@@ -33,7 +33,7 @@ function agentGroupThreadPath(
 }
 
 /** Agent groups, their sessions, and the agents and groups pinned in the rail. */
-export class AgentGroupsClient extends OrgMemoryClient {
+export class AgentGroupsClient extends OrgVaultClient {
   async listAgentGroups(): Promise<ListAgentGroupsResponse> {
     return this.request<ListAgentGroupsResponse>("/v1/agent-groups");
   }

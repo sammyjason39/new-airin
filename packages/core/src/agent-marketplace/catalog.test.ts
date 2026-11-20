@@ -21,6 +21,7 @@ describe("agent marketplace catalog", () => {
       "jovan"
     );
     expect(getAgentMarketplaceEntry("sales")?.bundledSkillNames).toEqual([
+      "research-sheet-manager",
       "tapinall-research",
     ]);
     expect(getAgentMarketplaceEntry("sales")?.composioApps).toEqual([
@@ -30,14 +31,14 @@ describe("agent marketplace catalog", () => {
     ]);
     expect(
       getAgentMarketplaceEntry("hr-recruiting")?.bundledSkillNames
-    ).toEqual(["tapinall-research"]);
+    ).toEqual(["research-sheet-manager", "tapinall-research"]);
     expect(getAgentMarketplaceEntry("hr-recruiting")?.composioApps).toEqual([
       "gmail",
       "googledrive",
       "googlesheets",
     ]);
     expect(getAgentMarketplaceEntry("social-media")?.bundledSkillNames).toEqual(
-      ["tapinall-research"]
+      ["research-sheet-manager", "tapinall-research"]
     );
     expect(getAgentMarketplaceEntry("social-media")?.composioApps).toEqual([
       "instagram",

@@ -43,7 +43,7 @@
 ## FAQ (≥ 20)
 
 **1. Apa bedanya Simple dan Advanced?**  
-Simple untuk pemilik usaha (tim, grup, marketplace). Advanced untuk admin (tools, MCP, providers).
+Simple untuk pemilik usaha (tim, grup, marketplace). Advanced untuk admin (hub Plugins \| Skills \| Connectors, tools, providers).
 
 **2. Kenapa setiap buka Airin chat-nya kosong?**  
 Di Simple seharusnya terbuka chat terakhir *di browser itu*. Jika storage dibersihkan atau browser lain, mulai lagi atau pilih dari riwayat. Pakai **Chat baru** hanya jika memang ingin kosong.
@@ -141,9 +141,11 @@ Disimpan per browser. Di perangkat baru, buka dari riwayat atau lanjutkan manual
 | **Artifact** | File hasil agen di workspace / Artifacts |
 | **Skill** | Resep kerja (SKILL.md) yang bisa di-load |
 | **Tool** | Fungsi yang dipanggil agen (baca file, sheet, …) |
-| **MCP** | Server tool eksternal (Model Context Protocol) |
-| **Plugin** | Paket kemampuan org (Data View, Meet, …) |
-| **Composio** | Hub OAuth ke aplikasi SaaS |
+| **Connectors** | Hub app SaaS (Composio) + Airin Library + custom connectors |
+| **Custom connector** | Server tool eksternal; di bawah memakai protokol MCP |
+| **Airin Library** | Konektor data bawaan (internal: Tapinall) |
+| **Plugin** | Paket kemampuan org (Data View, Meet, …) di tab Plugins |
+| **Composio** | Hub OAuth ke aplikasi SaaS (blok Apps di Connectors) |
 | **Data View** | Salinan lokal Google Sheet + Sync |
 | **A2A / `send_to_bot`** | Agen mengirim tugas ke agen lain |
 | **Orkestrator** | Agen (Jovan) yang mendelegasikan ke spesialis |

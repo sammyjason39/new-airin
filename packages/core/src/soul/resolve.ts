@@ -130,6 +130,24 @@ export function getOrgMemoryHistoryDir(
   return join(getOrgMemoryDir(orgId, configDir), "memory-history");
 }
 
+/** Company vault root: ~/.airin/orgs/{orgId}/vault/ */
+export function getOrgVaultDir(orgId: string, configDir?: string): string {
+  return join(getOrgMemoryDir(orgId, configDir), "vault");
+}
+
+/** Company vault notes: ~/.airin/orgs/{orgId}/vault/notes/ */
+export function getOrgVaultNotesDir(orgId: string, configDir?: string): string {
+  return join(getOrgVaultDir(orgId, configDir), "notes");
+}
+
+/** Company vault links index: ~/.airin/orgs/{orgId}/vault/links.json */
+export function getOrgVaultLinksPath(
+  orgId: string,
+  configDir?: string
+): string {
+  return join(getOrgVaultDir(orgId, configDir), "links.json");
+}
+
 /** Org memory archive file for a given year-month: ~/.airin/orgs/{orgId}/memory-archive/YYYY-MM.md */
 export function getOrgMemoryArchiveFilePath(
   orgId: string,

@@ -1,8 +1,8 @@
 # 04. Agen
 
-> Bab ini menjelaskan agen bawaan, Marketplace, cara buat dan atur agen, soul, model, tools, skills, MCP, knowledge base, clone/export/import, pin/mute, subtitle peran, dan chat agent ACP.
+> Bab ini menjelaskan agen bawaan, Marketplace, cara buat dan atur agen, soul, model, tools, skills, connectors, knowledge base, clone/export/import, pin/mute, subtitle peran, dan chat agent ACP.
 
-**Siapa yang bisa:** Admin organisasi (install dari Marketplace, export/import), Member (chat, buat agen pribadi), pemilik agen / Platform admin (edit soul, tools, skills, MCP). Platform admin saja untuk Chat agent ACP.
+**Siapa yang bisa:** Admin organisasi (install dari Marketplace, export/import), Member (chat, buat agen pribadi), pemilik agen / Platform admin (edit soul, tools, skills, connectors). Platform admin saja untuk Chat agent ACP.
 
 ## Default Bot dan Airin
 
@@ -135,21 +135,21 @@ Install pack laundry (demo toko). Enam agen:
 - Model profil mengganti default workspace untuk agen itu.
 - Pilihan manual di chat Advanced disimpan per agen di browser.
 
-## Assign tools, skills, dan MCP
+## Assign tools, skills, dan connectors
 
 **Kenapa:** Agen hanya boleh memakai kemampuan yang Anda izinkan.
 
 **Manfaat:**
 - Tools = aksi (baca file, web, email, dll.).
 - Skills = instruksi siap pakai yang agen `load_skill` saat relevan.
-- MCP = server tools eksternal.
+- Connectors = app SaaS, Airin Library, atau custom connector.
 
 **Cara pakai:**
 1. Buka **Profiles** → pilih agen.
 2. Tab **Tools**: **Add tool**. Subtab Tools / Plugins / Apps sesuai kebutuhan.
-3. Tab **MCP**: **Add MCP server** atau **Add** untuk memakai server organisasi yang sudah ada.
+3. Tab **Connectors**: **Add custom connector** atau **Add** untuk memakai connector organisasi yang sudah ada.
 4. Tab **Skills**: **Add skill** atau **Create skill**.
-5. Di chat Advanced (Platform admin): ketik `/add-tool`, `/add-mcp`, `/add-skill`, atau `/add-plugin` untuk membuka dialog assign.
+5. Di chat Advanced (Platform admin): ketik `/add-tool`, `/add-mcp`, `/add-skill`, atau `/add-plugin` untuk membuka dialog assign (slash lama `/add-mcp` = custom connector).
 6. Mode Advanced: menu agen → **Edit agent** jika Anda pemilik, Admin organisasi, atau Platform admin.
 
 **Batas / catatan:**
@@ -190,7 +190,7 @@ Install pack laundry (demo toko). Enam agen:
 **Cara pakai — Clone:**
 1. Buka **Profiles** → pilih agen → tab **Prompt**.
 2. Di footer tekan **Duplicate**. Dialog **Clone profile?** → **Clone**.
-3. Hasil: `{nama} (copy)` terpilih. Soul, avatar, KB, prompt, model, tools, skills, MCP, toolkit Composio ikut. `MEMORY.md` kosong. Bukan default org.
+3. Hasil: `{nama} (copy)` terpilih. Soul, avatar, KB, prompt, model, tools, skills, connectors, toolkit Composio ikut. `MEMORY.md` kosong. Bukan default org.
 
 **Cara pakai — Export / Import:**
 1. Export: **Profiles** → agen → **Export agent** → konfirmasi **Export**. Unduh `.zip`.
@@ -200,7 +200,7 @@ Install pack laundry (demo toko). Enam agen:
 **Batas / catatan:**
 - **Airin** tidak bisa di-clone.
 - Pack **tidak** berisi: API key, token, config provider, artifacts tersimpan, riwayat chat, lampiran, assignment plugin.
-- Nama tool/MCP yang tidak ada di tujuan: tampil di preview dan dilewati — assign ulang setelah import.
+- Nama tool/connector yang tidak ada di tujuan: tampil di preview dan dilewati — assign ulang setelah import.
 - Export: Admin organisasi / Platform admin / pemilik (sesuai UI pack). Import UI pack: Admin organisasi atau Platform admin; server bisa menerima import Member sebagai agen pribadi owned.
 - Pack ≠ backup install penuh.
 

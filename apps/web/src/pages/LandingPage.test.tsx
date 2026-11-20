@@ -41,7 +41,7 @@ test("guests can switch team members and see industry designs directly", async (
   const { container, root } = await mountLanding();
 
   try {
-    expect(container.querySelectorAll("main > section")).toHaveLength(10);
+    expect(container.querySelectorAll("main > section")).toHaveLength(11);
     expect(
       container.querySelectorAll("#ai-team .landing-roster-grid > li")
     ).toHaveLength(10);
@@ -50,6 +50,20 @@ test("guests can switch team members and see industry designs directly", async (
     ).toHaveLength(3);
     expect(container.querySelector('a[href="/login"]')).not.toBeNull();
     expect(container.querySelector('a[href="#daftar-tunggu"]')).not.toBeNull();
+    expect(container.querySelector("#harga")).not.toBeNull();
+    expect(
+      container.querySelector(".landing-pricing-card h3")?.textContent
+    ).toBe("Lite");
+    expect(container.textContent).toContain("Rp400.000");
+    expect(container.textContent).toContain("Rp2.500.000");
+    expect(container.textContent).toContain("Rp4.500.000");
+    expect(container.textContent).toContain("Enterprise");
+    expect(
+      container.querySelectorAll(
+        '#harga a[href^="https://wa.me/6287728589845"]'
+      )
+    ).toHaveLength(4);
+    expect(container.textContent).toContain("WhatsApp");
     expect(
       Array.from(
         container.querySelectorAll<HTMLInputElement>(
@@ -150,7 +164,8 @@ test("language toggle switches landing copy between Indonesian and English", asy
     expect(
       container.querySelector('a.landing-login[href="/login"]')
     ).not.toBeNull();
-    expect(localStorage.getItem(LOCALE_STORAGE_KEY)).toBeNull();
+    // LocaleProvider persists the default locale on mount.
+    expect(localStorage.getItem(LOCALE_STORAGE_KEY)).toBe("id");
 
     const en = [
       ...container.querySelectorAll<HTMLButtonElement>("button"),

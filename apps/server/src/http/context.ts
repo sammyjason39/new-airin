@@ -7,6 +7,7 @@ import type { GoogleMeetService } from "../services/google-meet/service";
 import type { McpService } from "../services/mcp-service";
 import type { OrgMemoryService } from "../services/org-memory-service";
 import type { OrgService } from "../services/org-service";
+import type { OrgVaultService } from "../services/org-vault-service";
 import type { PluginService } from "../services/plugin-service";
 import type { SkillCuratorService } from "../services/skill-curator-service";
 import type { SkillProposalService } from "../services/skill-proposal-service";
@@ -34,6 +35,7 @@ export interface ServerOptions {
   onDataRestored?: () => Promise<void>;
   orgMemoryService?: OrgMemoryService | null;
   orgService?: OrgService | null;
+  orgVaultService?: OrgVaultService | null;
   pluginService?: PluginService | null;
   skillCuratorService?: SkillCuratorService | null;
   skillProposalService?: SkillProposalService | null;

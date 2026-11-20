@@ -48,13 +48,14 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | Default model + effort/thinking | Ada | |
 | ACP agent presets | Ada | Platform admin |
 | Channels per profile | Ada | Telegram, WhatsApp, Discord, Slack, Teams |
-| Tools / MCP / skills / Composio assignment | Ada | |
+| Tools / connectors / skills / Composio assignment | Ada | Tab profil **Connectors** (bukan MCP) |
 | Behavior / ownership assignments | Ada | Org admin atau owner |
 | Regression test cases | Ada | Save chat as case + runs |
 | Knowledge base (profile + org) | Ada | Attach/detach shared KB |
 | Artifacts workspace | Ada | |
-| Marketplace install agents | Ada | Member+ browse; install gated. Install membawa soul, MEMORY, skills bundled, `preferredProfileId` (contoh Jovan → `chief_of_staff`). Nama lama berbasis peran di-rename otomatis ke nama orang |
-| Simple vs Advanced UI | Ada | Simple (kode `owner`, default install baru): sidebar tim + Groups + Marketplace. Advanced: rail penuh |
+| Marketplace install agents | Ada | Member+ browse; install gated. UI Accio: **My agents \| Marketplace**. Install membawa soul, MEMORY, skills bundled, `preferredProfileId` (contoh Jovan → `chief_of_staff`). Nama lama berbasis peran di-rename otomatis ke nama orang |
+| Simple vs Advanced UI | Ada | Simple (`owner`): sidebar tim + Groups + Marketplace; chat tanpa opsi tool / $ per-call; plan usage band. Advanced: rail + sidebar **Plugins** hub |
+| Hub Accio Plugins \| Skills \| Connectors | Ada | Satu pill nav di `/settings/plugins`, `/settings/skills`, `/connectors`. Org admin+ untuk Plugins/Skills; member boleh Connectors |
 | Subtitle peran agen (Simple) | Ada | Di bawah nama agen + hover rail + nama pembicara di group chat. Fallback "Agen" bila peran tidak dikenal |
 
 **Soul / prompt layers (runtime order):** soul compose → skills catalog → org MEMORY.md → chat structure/tool instructions → per-turn (todos, matched skills, Composio) → optional KB catalog. Super Airin menambah rules orchestrator.
@@ -66,8 +67,11 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | Streaming SSE turns | Ada | Stop / regenerate patterns |
 | Deep link `/chat/:profileId/:sessionId` | Ada | |
 | Lanjut chat terakhir (Simple) | Ada | `/chat` dan ganti agen membuka session terakhir agen itu di browser ini (`localStorage`). **New chat** / `/new` tetap draft kosong. Advanced: `/chat` = draft |
+| Sembunyikan biaya / opsi tool (Simple) | Ada | Tidak menampilkan $ per tool call atau panel opsi tool teknis di chat Simple |
+| Plan usage band | Ada | Composer menampilkan sisa band usage plan org (bukan raw provider cost di bubble) |
+| Label tool Airin Library | Ada | Action label menyembunyikan prefix `tap.*` / vendor Tapinall dari anggota |
 | Attachments (image/doc) | Ada | Cap chat attach **5 MB** |
-| Model / provider / effort picker | Ada | |
+| Model / provider / effort picker | Ada | Advanced penuh; Simple minimal |
 | Agent todos panel | Ada | |
 | Tool call UI + inline HTML artifacts | Ada | Sandboxed iframe |
 | Cognito (ephemeral) mode | Ada | Tidak di history/URL; no MEMORY writes |
@@ -138,6 +142,7 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 
 | Fitur | Status | Catatan |
 |---|---|---|
+| Hub tab **Skills** | Ada | Card grid Accio di `/settings/skills`; grup sumber (Built-in, …) |
 | SKILL.md + optional tool | Ada | Global + profile paths |
 | Bundled default skills | Ada | create-automation, manage-skills, skill-installer, update/archive-profile-memory, artifact/slide-deck-design, composio-integrations, airin-guide, grounded-research |
 | Super-only bundled | Ada | create-plugin, create-profile, create-skill, coding-agent |
@@ -150,31 +155,41 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 | Post-turn skill review | Ada | |
 | Plugin-declared skills | Ada | In-process plugin `tool.ts` **error** (tidak dijalankan) |
 
-### 5.9 MCP
+### 5.9 Connectors (UI) + MCP (protokol)
 
-| Fitur | Status | Catatan |
+**UI Advanced:** tab **Connectors** di hub Accio (`/connectors`). Tiga blok:
+
+| Blok UI | Sumber data | Catatan |
+|---|---|---|
+| **Airin Library** | Tapinall catalog + status | Branding UI **Airin Library**; internal id skill/server `tapinall` boleh tetap |
+| **Apps** | Composio catalog | Kartu dengan **logo app** wajib; Connect / status Connected |
+| **Custom connectors** | MCP servers | Copy UI: custom connector; route manage tetap `/settings/mcp` |
+
+| Fitur protokol | Status | Catatan |
 |---|---|---|
 | Transports `http` + `stdio` | Ada | Streamable HTTP (bukan legacy SSE terpisah) |
-| Preinstalled Exa + Firecrawl | Ada | |
-| OAuth for HTTP MCP | Ada | `needs_auth` |
-| Org server CRUD + sync | Ada | Platform admin routes/UI |
-| Profile assignment | Ada | Platform admin |
+| Preinstalled Exa + Firecrawl (+ Tapinall bila dikonfigurasi) | Ada | |
+| OAuth for HTTP MCP | Ada | `needs_auth`; UI: Finish / Connect |
+| Org server CRUD + sync | Ada | Org admin+ di halaman Custom connectors; platform admin penuh |
+| Profile assignment | Ada | Tab profil **Connectors** → Custom connectors |
 | Result truncate | Ada | **1_000_000** chars; connect timeout 30s; call max 30 min |
-| ACP MCP bridge | Ada | Public token POST `/v1/acp-mcp/:token` |
+| ACP MCP bridge | Ada | Public token POST `/v1/acp-mcp/:token` (internal; bukan label sidebar) |
 
 ### 5.10 Composio
 
 | Fitur | Status | Catatan |
 |---|---|---|
-| Toolkit enable / connect / sync | Ada | OAuth callback public |
+| Toolkit enable / connect / sync | Ada | OAuth callback public; grid Accio di `/connectors` |
 | Profile toolkit assignment | Ada | |
-| `/health` `composioAvailable` | Selalu `false` | Live probe di system status |
+| `/health` `composioAvailable` | Selalu `false` | Live probe di system status; `composioConfigured` boleh `true` |
 | Personal OAuth | Ada | Tied to user + team |
+| Catalog size (produksi Aire, 20 Nov) | ~1829 apps | Semua punya `logoUrl` di API |
 
 ### 5.11 Plugins (official + custom)
 
 | Plugin / area | Status | Catatan |
 |---|---|---|
+| Hub tab **Plugins** | Ada | Card grid Accio di `/settings/plugins`; **Add plugin** |
 | Plugin lifecycle enable/disable/update/uninstall | Ada | Org admin+ |
 | Local npm / release install | Ada | Platform admin |
 | UI pages under `/plugins/:id` | Ada | |

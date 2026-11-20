@@ -85,7 +85,7 @@
 | `/enable-learning-loop` | Nyalakan pembelajaran otomatis setelah giliran kompleks (setelan org) |
 | `/add-plugin` | Dialog aktifkan plugin (Platform admin) |
 | `/add-tool` | Dialog assign tool (Platform admin) |
-| `/add-mcp` | Dialog assign/tambah MCP (Platform admin) |
+| `/add-mcp` | Dialog assign/tambah custom connector (Platform admin) |
 | `/add-skill` | Dialog tambah skill dari GitHub atau ZIP (Platform admin) |
 | `/open <plugin>` | Buka halaman plugin yang tersedia |
 | `@image` | Minta generate gambar dari pesan Anda |
@@ -170,17 +170,18 @@
 **Kenapa:** Simple seperti Grok: satu session per agen, selalu lanjut. Advanced tetap butuh halaman kosong kadang.
 
 **Manfaat:**
-- Simple: satu thread terus — refresh / `/new` tidak membuat sesi kosong.
+- Simple: satu thread terus per agen (refresh / buka ulang lanjut thread yang sama).
+- Simple escape: `/new` atau `/new session` membuka chat kosong dan mengunci ulang ke session baru.
 - Advanced: **Chat baru** / `/new` = sesi kosong, brief agen sama.
 
 **Cara pakai:**
 1. Simple: pilih agen → thread terakhir terbuka dan terus dipakai.
-2. Advanced: **Chat baru** di sidebar / empty state, atau `/new`.
-3. Simple: tidak ada tombol **Chat baru**; riwayat hanya untuk membuka thread lama bila perlu.
+2. Simple: ketik `/new` (atau `/new session`) bila ingin mulai ulang.
+3. Advanced: **Chat baru** di sidebar / empty state, atau `/new`.
 
 **Batas / catatan:**
 - Chat terakhir disimpan per browser dan per agen.
-- Advanced: `/new` harus tepat `/new` (tanpa teks lain).
+- `/new` / `/new session` harus tepat (tanpa teks lain).
 
 ## Branch
 

@@ -23,13 +23,13 @@
 
 ---
 
-## Status (16 Nov 2026)
+## Status (20 Nov 2026)
 
 Status only from code or a production check. "Not verified" means nobody checked it against the acceptance criteria yet.
 
 | ID | Item | Status | Evidence / gap |
 |---|---|---|---|
-| P0-0 | Demo environment | **Done (changed)** | Production at https://useairin.id, `/health` ok, provider set. Default reply language is **Bahasa Indonesia**, not English (product decision) |
+| P0-0 | Demo environment | **Done (changed)** | Production at https://useairin.id, `/health` ok, provider set. Default reply language is **Bahasa Indonesia**, not English (product decision). Redeploy Accio hub 20 Nov |
 | P0-1 | Laundry pack | **Partial** | Six laundry agents in `catalog-laundry.ts`. Re-import time (< 15 min) not measured |
 | P0-2 | Social media agent | Not verified | Skills exist (`laundry-social-media`, `laundry-openrouter-image`) |
 | P0-3 | WhatsApp support agent | Not verified | Skill `laundry-whatsapp-support` exists; production bridge not re-tested |
@@ -46,5 +46,8 @@ Status only from code or a production check. "Not verified" means nobody checked
 | — | Orchestrator (Jovan) + A2A | **Done (new)** | Not in original backlog. `send_to_bot` on every unrestricted turn; Jovan routes to specialists |
 | — | HR Indonesia (Alya) | **Done (new)** | Skill `hr-uu-ketenagakerjaan` |
 | — | Locked HTML report | **Done (new)** | `artifact-design/assets/report.html`, required in groups |
+| — | Stage-1 Simple UX (Library / no $ / usage band) | **Done (new)** | Airin Library branding; tool labels sanitized; Simple chat hides per-call $; plan usage band; prod verified |
+| — | Stage-2 Accio hub (Plugins \| Skills \| Connectors) | **Done (new)** | Hub tabs + connector app icons + Custom connectors; Marketplace My agents; nav tanpa MCP; E2E prod 20 Nov |
+| — | Accio Advanced home/chat shell | **Open** | Empty chat / home still pre-Accio layout (G-ACCIO-1) |
 | P1-3 | Clean baseline commit | **Open** | Product changes are committed (`f986c3ba`), but there is no release tag after `v0.4.74` and no CHANGELOG entry |
 

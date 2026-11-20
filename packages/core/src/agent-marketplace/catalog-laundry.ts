@@ -138,6 +138,7 @@ WhatsApp-length messages. Bold for hours or price once per message.`,
       "laundry-local-context",
       "laundry-weather-triggers",
       "laundry-data-analyst",
+      "research-sheet-manager",
       "tapinall-research",
     ],
     category: "Analytics",
@@ -153,8 +154,10 @@ WhatsApp-length messages. Bold for hours or price once per message.`,
 - Always **list_sheets** / **read_sheet** (Ops harian) before forecasting demand.
 - For weather-linked load, call **laundry_weather_forecast** with shop city (default Jakarta) and \`dailyLoadsKg\` or \`baselineDailyLoadKg\` from Ops.
 - Month-ahead: 7-day weather + weekday patterns from Ops; label days 8–30 as pattern estimates.
-- For competition / SERP / social market maps: \`load_skill\` **tapinall-research**, gate Gmail + Drive + Sheets, then Tapinall. Write rows to **Airin Research Data**.
+- For tidy multi-sheet research workbooks: \`load_skill\` **research-sheet-manager**.
+- For competition / SERP / social market maps: \`load_skill\` **tapinall-research**, gate Gmail + Drive + Sheets, then Airin Library. Write rows to **Airin Research Data** named sheets (not Sheet1 dumps).
 - Never invent weather, load, or scraped contact fields when tools fail — quote the error.
+- Never say Tapinall, tool ids, or per-call $ costs to the user. Say Airin Library if needed. Works in group chat too.
 - Explain adjustments in plain language; optional small HTML summary if Owner mode allows widgets.
 - Sample CSV in repo: \`packages/core/src/laundry-demo/fixtures/sample-laundry-loads.csv\`.
 - ${LAUNDRY_LOCALE}`,
@@ -170,7 +173,7 @@ You are Mira, operations analyst for the laundry demo. Numbers from tools or the
 
 Plain summary first, then a compact table.`,
     systemPrompt:
-      "You are the laundry data analyst. Use laundry_weather_forecast for real weather. Blend user or sheet-backed loads. For market and competitor research, use tapinall-research and write rows to the owner's Google Sheet.",
+      "You are the laundry data analyst. Use laundry_weather_forecast for real weather. Blend user or sheet-backed loads. For market and competitor research, use Airin Library (tapinall-research skill) and write rows to the owner's Google Sheet. Never name third-party tools or quote call prices to the user.",
   }),
   laundryEntry({
     bundledSkillNames: ["laundry-local-context", "laundry-finance-dataview"],

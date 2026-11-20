@@ -213,6 +213,24 @@ Gunakan bagian ini sebagai backlog **intent PRD** (masalah → hipotesis → MVP
 - Jovan terpasang sebagai orkestrator; `send_to_bot` diuji lewat chat.
 - Simple mode lanjut chat terakhir: unit test `use-chat-page.test.tsx` lulus; build + deploy ke produksi.
 
+### Update 19–20 Nov 2026 (Stage-1 + Accio hub Stage-2)
+
+**Verified on https://useairin.id (20 Nov):**
+
+- Deploy: rsync → `new-airin-src`, `docker buildx build -t airin:local`, compose `new-airin-agents` healthy.
+- API smoke 19/19: login, plugins, 37 skills, Composio catalog ~1829 + logos, Tapinall configured, 4 custom connectors, marketplace 10 agents, SPA hub routes, bundle hub copy.
+- Browser E2E Advanced: Plugins \| Skills \| Connectors pill tabs; Connectors search Gmail; Custom connectors page tanpa chrome “MCP”; Marketplace My agents \| Marketplace; sidebar **Plugins** saja; profil tab **Connectors**.
+
+**Residual / open (bukan regresi P0):**
+
+| ID | Gap | Catatan |
+|---|---|---|
+| G-ACCIO-1 | Shell home/chat Advanced Accio | Belum: empty chat / home masih layout lama |
+| G-ACCIO-2 | Nama server `Tapinall` di list profil | Hub Connectors memetakan ke Airin Library; baris profil masih `Tapinall` |
+| G-ACCIO-3 | Kata “MCP” di nama produk Composio | Vendor catalog (contoh “Ahrefs MCP”) — jangan diubah; bukan chrome Airin |
+| G-ACCIO-4 | DOM Connectors sangat besar | ~1800 kartu Apps; soft-nav kadang lag; hard navigation OK |
+| G-ACCIO-5 | Docs website MDX plugins/skills penuh Accio | `mcp`/`composio`/`integrations` sudah pointer Accio; `plugins.mdx` / `skills.mdx` belum rewrite layout hub |
+
 ---
 
 *End of current-state BRD / product baseline.*

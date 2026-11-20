@@ -47,6 +47,8 @@ const MarketplacePage = lazyPage(
   "MarketplacePage"
 );
 
+const DesignPage = lazyPage(() => import("@/pages/DesignPage"), "DesignPage");
+
 const LoginPage = lazyPage(() => import("@/pages/LoginPage"), "LoginPage");
 
 const LandingPage = lazyPage(
@@ -78,6 +80,8 @@ const OrganizationPage = lazyPage(
   () => import("@/pages/OrganizationPage"),
   "OrganizationPage"
 );
+
+const VaultPage = lazyPage(() => import("@/pages/VaultPage"), "VaultPage");
 
 const ProfileChannelSettingsPage = lazyPage(
   () => import("@/pages/profiles/profile-config-tab"),
@@ -288,6 +292,7 @@ function AppShell() {
                     element={<MarketplacePage />}
                     path={PAGE_PATHS.marketplace}
                   />
+                  <Route element={<DesignPage />} path={PAGE_PATHS.design} />
                   <Route
                     element={<CustomizePage />}
                     path={PAGE_PATHS.customize}
@@ -296,7 +301,7 @@ function AppShell() {
                     element={<LegacySettingsRedirect />}
                     path="/customize/*"
                   />
-                  <Route element={<PlatformAdminGuard />}>
+                  <Route element={<PlatformAdminGuard allowOrgAdmin />}>
                     <Route element={<SkillsPage />} path={PAGE_PATHS.skills} />
                   </Route>
                   <Route element={<PlatformAdminGuard allowOrgAdmin />}>
@@ -311,7 +316,7 @@ function AppShell() {
                   <Route element={<PlatformAdminGuard allowOrgAdmin />}>
                     <Route element={<ToolsPage />} path={PAGE_PATHS.tools} />
                   </Route>
-                  <Route element={<PlatformAdminGuard />}>
+                  <Route element={<PlatformAdminGuard allowOrgAdmin />}>
                     <Route element={<McpPage />} path={PAGE_PATHS.mcp} />
                   </Route>
                   <Route element={<PlatformAdminGuard allowOrgAdmin />}>
@@ -377,6 +382,7 @@ function AppShell() {
                     element={<TeamDetailPage />}
                     path="/organization/teams/:teamId"
                   />
+                  <Route element={<VaultPage />} path={PAGE_PATHS.vault} />
                   <Route
                     element={<NotificationsPage />}
                     path="/notifications"

@@ -41,7 +41,7 @@ function deleteProfileDescription(name?: string, isDefault?: boolean): string {
 
 function removeAssignmentTitle(kind?: string): string {
   if (kind === "mcp") {
-    return "Delete MCP server?";
+    return "Delete custom connector?";
   }
 
   if (kind === "skill") {
@@ -57,7 +57,7 @@ function removeAssignmentTitle(kind?: string): string {
 
 function removeAssignmentDescription(kind?: string, name?: string): string {
   if (kind === "mcp") {
-    return `Delete "${name}" from this profile? The server stays registered in Soul.`;
+    return `Delete "${name}" from this profile? The connector stays available to assign again.`;
   }
 
   if (kind === "skill") {
@@ -65,7 +65,7 @@ function removeAssignmentDescription(kind?: string, name?: string): string {
   }
 
   if (kind === "composio") {
-    return `Remove "${name}" from this profile? The org connection stays on Integrations.`;
+    return `Remove "${name}" from this profile? The org connection stays on Connectors.`;
   }
 
   return `Delete "${name}" from this profile?`;

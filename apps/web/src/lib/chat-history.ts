@@ -506,6 +506,50 @@ export function readStoredSessionId(profileId: string): string | null {
   }
 }
 
+export function groupSessionStorageKey(groupId: string): string {
+  return `airin:group-session:${groupId}`;
+}
+
+/** Last group chat session on this browser for Simple continuous mode. */
+export function readStoredGroupSessionId(groupId: string): string | null {
+  if (typeof localStorage === "undefined" || !groupId) {
+    return null;
+  }
+
+  try {
+    return localStorage.getItem(groupSessionStorageKey(groupId));
+  } catch {
+    return null;
+  }
+}
+
+export function writeStoredGroupSessionId(
+  groupId: string,
+  sessionId: string
+): void {
+  if (typeof localStorage === "undefined" || !(groupId && sessionId)) {
+    return;
+  }
+
+  try {
+    localStorage.setItem(groupSessionStorageKey(groupId), sessionId);
+  } catch {
+    // private mode / quota — preference is best-effort
+  }
+}
+
+export function clearStoredGroupSessionId(groupId: string): void {
+  if (typeof localStorage === "undefined" || !groupId) {
+    return;
+  }
+
+  try {
+    localStorage.removeItem(groupSessionStorageKey(groupId));
+  } catch {
+    // private mode / quota — preference is best-effort
+  }
+}
+
 export function lastChatModelStorageKey(profileId: string): string {
   return `airin:last-model:${profileId}`;
 }

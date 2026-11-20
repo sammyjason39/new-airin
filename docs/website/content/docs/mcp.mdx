@@ -1,15 +1,17 @@
 ---
-title: "MCP Servers"
-description: "Connect external MCP servers to Airin profiles and expose new tools safely."
+title: "Custom connectors (MCP)"
+description: "Register external tool servers (MCP protocol) and assign them to agents. In the dashboard these are Custom connectors."
 ---
 
-An **MCP server** is an external tool provider. Airin acts as an **MCP client**: it connects to servers you register, caches their tools, and exposes them in chat like [builtin tools](/builtin-tools).
+In the Airin dashboard, these are **Custom connectors** (hub **Plugins → Connectors**, or `/settings/mcp`). Under the hood they use the **MCP** protocol. This page keeps the protocol name for operators.
 
-- Register a server once (platform admin)
-- Assign it to profiles that need it
+A **custom connector** is an external tool provider. Airin acts as an MCP client: it connects to servers you register, caches their tools, and exposes them in chat like [builtin tools](/builtin-tools).
+
+- Register a connector once (org admin / platform admin)
+- Assign it to profiles that need it (Agent → **Connectors**)
 - Tools appear at chat time, namespaced as `{serverName}__{toolName}`
 
-Use MCP when you need product-specific or internal capabilities — databases, SaaS APIs, local binaries — without writing custom Airin code. For capabilities every profile should have by default, use a builtin tool or [bundled skill](/skills) instead.
+Use a custom connector when you need product-specific or internal capabilities — databases, SaaS APIs, local binaries — without writing custom Airin code. For SaaS OAuth apps (Gmail, Slack, …) prefer [Composio](/composio) on the **Connectors** hub. For capabilities every profile should have by default, use a builtin tool or [bundled skill](/skills) instead.
 
 ## Transports
 

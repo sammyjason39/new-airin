@@ -17,6 +17,8 @@ function LandingHeader() {
             width={414}
           />
         </a>
+        {/* Section ids (#fitur, #use-cases, #onboarding, #harga, #daftar-tunggu) live on sibling landing-* sections. */}
+        {/* oxlint-disable react-doctor/anchor-target-exists */}
         <nav aria-label={m.headerNavAria}>
           <a className="landing-nav-section" href="#fitur">
             {m.headerFeatures}
@@ -26,6 +28,9 @@ function LandingHeader() {
           </a>
           <a className="landing-nav-section" href="#onboarding">
             {m.headerOnboarding}
+          </a>
+          <a className="landing-nav-section" href="#harga">
+            {m.headerPricing}
           </a>
           <div aria-label={m.langAria} className="landing-lang">
             <LanguageToggle className="landing-lang-toggle" />
@@ -37,6 +42,7 @@ function LandingHeader() {
             {m.headerWaitlist} <ArrowRight01Icon aria-hidden />
           </a>
         </nav>
+        {/* oxlint-enable react-doctor/anchor-target-exists */}
       </div>
     </header>
   );

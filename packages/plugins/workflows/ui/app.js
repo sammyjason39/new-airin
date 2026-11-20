@@ -1863,7 +1863,7 @@ function skipReason(step) {
 function failedStep(run) {
   return run.steps?.find((step) => step.status === "failed");
 }
-var WORKFLOW_DOCS = "https://ahmadrosid.github.io/airin/workflows";
+var WORKFLOW_DOCS = "https://github.com/Conextlab-MIT/new-airin/blob/main/docs/website/content/docs/workflows.mdx";
 var DISMISSED_KEY = "airin:workflows:dismissed-runs";
 function loadDismissed() {
   try {
@@ -3720,6 +3720,6 @@ function apply(ctx) {
   ctx.slots.register("page", WorkflowsPage);
 }
 export {
-  apply,
-  inject
+  inject,
+  apply
 };

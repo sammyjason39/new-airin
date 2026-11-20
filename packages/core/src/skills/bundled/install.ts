@@ -23,6 +23,7 @@ const FORCE_REFRESH_BUNDLED_SKILL_NAMES = new Set<string>([
   "airin-guide",
   "grounded-research",
   "tapinall-research",
+  "research-sheet-manager",
   "hr-uu-ketenagakerjaan",
 ]);
 

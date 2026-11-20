@@ -4,7 +4,7 @@ Parent: [current-state-brd-prd.md](./current-state-brd-prd.md)
 
 ## 1. Ringkasan produk (as-is)
 
-Airin adalah **platform agen AI multi-tenant untuk tim**. Satu server melayani banyak organisasi. Setiap organisasi punya anggota, profil agen, tools, skills, MCP, plugin, saluran messaging, automations, dan memori bersama.
+Airin adalah **platform agen AI multi-tenant untuk tim**. Satu server melayani banyak organisasi. Setiap organisasi punya anggota, profil agen, tools, skills, connectors (Composio + Airin Library + custom connectors), plugin, saluran messaging, automations, dan memori bersama.
 
 Janji produk (dari README / overview):
 
@@ -19,9 +19,9 @@ Janji produk (dari README / overview):
 
 ## 2. Mental model (empat konsep inti)
 
-1. **Organization (tenant)** — batas isolasi: members, profiles, sessions, tools, skills, MCP, usage, org memory, automations, plugins.
-2. **Profile (agent)** — bot dengan soul files, model, tool/skill/MCP allowlist, knowledge base, channel settings.
-3. **Tool / skill / MCP / plugin access** — profil tidak otomatis mendapat semua kemampuan; assignment eksplisit.
+1. **Organization (tenant)** — batas isolasi: members, profiles, sessions, tools, skills, connectors, usage, org memory, automations, plugins.
+2. **Profile (agent)** — bot dengan soul files, model, tool/skill/connector allowlist, knowledge base, channel settings.
+3. **Tool / skill / connector / plugin access** — profil tidak otomatis mendapat semua kemampuan; assignment eksplisit. Di UI Advanced, connector = Composio app, Airin Library, atau custom connector (protokol MCP di bawah).
 4. **Channel** — web, CLI, desktop, Telegram, WhatsApp, Discord, Slack, Microsoft Teams memakai profil yang sama; worker = bridge transport, bukan runtime agen terpisah.
 
 Dua cara kerja sama antar agen:
@@ -33,8 +33,8 @@ Dua mode UI web:
 
 | Mode | Untuk | Isi |
 |---|---|---|
-| **Simple** (kode: `owner`) | Pemilik usaha non-teknis (default install baru) | Sidebar tim (agen + peran), Groups, Marketplace; chat membuka percakapan terakhir; detail tool disembunyikan |
-| **Advanced** (kode: `advanced`) | Admin / operator | Rail profil penuh, Settings, Tools, MCP, Skills, usage token |
+| **Simple** (kode: `owner`) | Pemilik usaha non-teknis (default install baru) | Sidebar tim (agen + peran), Groups, Marketplace; chat membuka percakapan terakhir; detail tool / harga per-call disembunyikan; band plan usage di composer |
+| **Advanced** (kode: `advanced`) | Admin / operator | Rail profil + AppSidebar: **Plugins** (hub Accio: Plugins \| Skills \| Connectors), Automations, Settings, Tools, Usage. Tidak ada item nav **MCP** / **Connections** |
 
 Istilah sesi (wajib dipakai konsisten — lihat `GLOSSARY.md`):
 
@@ -55,13 +55,13 @@ Istilah sesi (wajib dipakai konsisten — lihat `GLOSSARY.md`):
 
 | Aktor | Scope | Bisa | Tidak bisa (as-is) |
 |---|---|---|---|
-| **Platform admin** | Seluruh install | Buat/hapus org, providers, MCP registry, backup/import, upgrade, audit, plugin releases, local token rotate, disable user install-wide, cross-org agent search (command palette), buka chat via deep link untuk support | Tidak otomatis jadi anggota setiap team; chat history pribadinya tetap hanya miliknya |
+| **Platform admin** | Seluruh install | Buat/hapus org, providers, custom connector registry, backup/import, upgrade, audit, plugin releases, local token rotate, disable user install-wide, cross-org agent search (command palette), buka chat via deep link untuk support | Tidak otomatis jadi anggota setiap team; chat history pribadinya tetap hanya miliknya |
 | **Parent org admin** | Parent organization | Publish shared resources (knowledge, skills, agents, tools, models), buat team, lihat team summaries | Tidak otomatis baca chat/file team; nested teams tidak didukung |
-| **Org / team admin** | Satu org (standalone atau team) | Invite members (admin/member), manage settings yang diizinkan, tools/usage/workers/plugins org, org memory, skills learning, import/export pack | Tidak manage install-wide providers/MCP (kecuali digabung platform admin); tidak create profile di UI tanpa platform admin (lihat §5.3) |
-| **Org member** | Satu org | Chat, groups (integrasi), connectors, Google Meet (dengan syarat), artifacts milik sendiri, Simple mode UX, install agen Marketplace (bila diizinkan) | Tidak invite members; tidak system pages; artifacts orang lain tidak terlihat |
+| **Org / team admin** | Satu org (standalone atau team) | Invite members (admin/member), manage settings yang diizinkan, tools/usage/workers/plugins org, hub Plugins/Skills/Connectors, org memory, skills learning, import/export pack | Tidak manage install-wide providers / custom connector registry (kecuali digabung platform admin); tidak create profile di UI tanpa platform admin (lihat §5.3) |
+| **Org member** | Satu org | Chat, groups (integrasi), Connectors (connect akun sendiri), Google Meet (dengan syarat), artifacts milik sendiri, Simple mode UX, install agen Marketplace (bila diizinkan) | Tidak invite members; tidak system pages penuh; artifacts orang lain tidak terlihat |
 | **Pengunjung landing** | Publik | Baca landing `/`, isi form waitlist | Tidak login, tidak daftar akun, tidak bayar |
 | **Invitee** | Pra-join | Terima invite token, set password | Tidak akses dashboard sebelum accept |
-| **Unauthenticated public** | Token-scoped | Artifact share `/s/:token`, automation webhook, notification webhook, Teams inbound, MCP/Composio OAuth callback, Meet extension pair, setup/login/reset | Tidak akses data org |
+| **Unauthenticated public** | Token-scoped | Artifact share `/s/:token`, automation webhook, notification webhook, Teams inbound, connector OAuth callback, Meet extension pair, setup/login/reset | Tidak akses data org |
 
 ### 3.2 Peran resmi di kode
 
@@ -114,6 +114,7 @@ Workers: PM2 (opsional tapi jalur resmi)
 | Build | Source di VPS (`new-airin-src`), `docker buildx build -t airin:local .`, lalu `docker compose up -d` |
 | TLS | nginx + Let's Encrypt |
 | Data | Docker volume `new-airin-agents_airin-data` → `/airin/data` |
-| Org uji | Grup **Business** (Toni Ops, Dimas Finance, Ardi Analyst, Alya HR) + Jovan orkestrator; Data View terhubung ke Google Sheet laundry |
+| Org uji | Org **Aire** (admin produksi); historis grup **Business** (Toni Ops, Dimas Finance, Ardi Analyst, Alya HR) + Jovan; Data View + Google Sheet laundry |
+| Hub Accio (20 Nov) | `/settings/plugins`, `/settings/skills`, `/connectors`; custom connectors UI di `/settings/mcp` (tanpa kata MCP di chrome) |
 
 ---

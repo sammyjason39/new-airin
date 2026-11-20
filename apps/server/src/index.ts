@@ -97,6 +97,7 @@ import { McpService } from "./services/mcp-service";
 import { cleanupInterruptedMeetImports } from "./services/meet-recording-import";
 import { OrgMemoryService } from "./services/org-memory-service";
 import { OrgService } from "./services/org-service";
+import { OrgVaultService } from "./services/org-vault-service";
 import {
   PluginService,
   shutdownPluginRuntime,
@@ -502,6 +503,8 @@ skillsService.setPluginService(pluginService);
 agent.setPluginService(pluginService);
 
 const orgMemoryService = new OrgMemoryService(database.adapter);
+const orgVaultService = new OrgVaultService();
+agent.setOrgVaultService(orgVaultService);
 
 const skillProposalService = new SkillProposalService(
   database.adapter,
@@ -604,6 +607,7 @@ const app = createHonoApp({
   },
   orgMemoryService,
   orgService,
+  orgVaultService,
   pluginService,
   skillCuratorService,
   skillProposalService,

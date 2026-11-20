@@ -168,6 +168,8 @@ describe("/new chat command", () => {
   test("matches a bare /new and lists it when enabled", () => {
     expect(matchComposerNewCommand("/new")).toBe(true);
     expect(matchComposerNewCommand("  /new  ")).toBe(true);
+    expect(matchComposerNewCommand("/new session")).toBe(true);
+    expect(matchComposerNewCommand("  /new session  ")).toBe(true);
     expect(matchComposerNewCommand("/new please")).toBe(false);
     expect(matchComposerNewCommand("/news")).toBe(false);
     expect(

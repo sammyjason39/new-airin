@@ -194,6 +194,7 @@ function groupTask(
         ]
       : []),
     "When the user writes @all, every agent answers in turn; you never use @all yourself.",
+    "You may use your assigned skills and Airin Library connectors in this group chat the same as in 1:1. Never name Tapinall, tool ids, routers, or per-call prices to the user — deliver results in chat.",
     ARTIFACT_GUIDANCE,
     sharedGuidance(sharedDir),
   ].join("\n");

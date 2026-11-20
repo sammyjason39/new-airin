@@ -107,11 +107,11 @@ const BTW_COMMAND_PATTERN = /^\/btw(?:\s+([\s\S]*))?$/i;
 
 /** Starts a blank chat with the current agent. Client-only; not sent to the model. */
 const NEW_SLASH_COMMAND: ReservedSlashCommand = {
-  description: "Start a new chat",
+  description: "Start a new chat (unlocks Simple continuous session)",
   name: "new",
 };
 
-const NEW_COMMAND_PATTERN = /^\/new$/i;
+const NEW_COMMAND_PATTERN = /^\/new(?:\s+session)?$/i;
 
 /** `@` tokens the server acts on (`@image` asks the agent for generate_image). */
 const COMPOSER_MENTIONS: ReservedSlashCommand[] = [

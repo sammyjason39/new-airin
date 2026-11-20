@@ -22,8 +22,8 @@ import {
   ComposioToolkitRowList,
   ComposioToolkitTile,
 } from "@/components/ComposioToolkitRows";
-import { IntegrationsTabs } from "@/components/IntegrationsTabs";
 import { IntegrationCardShell } from "@/components/integration-settings.shared";
+import { LibraryHubTabs } from "@/components/library-hub/LibraryHubTabs";
 import { useAuth } from "@/context/use-auth";
 import { useProfilesQuery } from "@/hooks/use-app-queries";
 import {
@@ -49,11 +49,11 @@ import {
 
 const EMPTY_PROFILES: ProfileSummary[] = [];
 
-/** Keeps the Plugins tab reachable while Composio is loading, failing, or unset. */
+/** Keeps the hub tabs reachable while Composio is loading, failing, or unset. */
 function WithIntegrationsTabs({ children }: { children: ReactNode }) {
   return (
     <div className="space-y-10">
-      <IntegrationsTabs>{null}</IntegrationsTabs>
+      <LibraryHubTabs>{null}</LibraryHubTabs>
       {children}
     </div>
   );
@@ -96,7 +96,7 @@ function ComposioToolkitList({
 
   return (
     <div className="space-y-10">
-      <IntegrationsTabs>
+      <LibraryHubTabs>
         <div className="relative w-full sm:w-72">
           <Search01Icon
             aria-hidden
@@ -115,7 +115,7 @@ function ComposioToolkitList({
             value={search}
           />
         </div>
-      </IntegrationsTabs>
+      </LibraryHubTabs>
 
       {isSearching ? (
         <section className="space-y-3">

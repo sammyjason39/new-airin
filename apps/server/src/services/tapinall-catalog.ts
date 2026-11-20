@@ -188,7 +188,7 @@ export class TapinallCatalogService {
 
     if (!source) {
       throw new AirinApiError(
-        "Tapinall is not connected. Add the Tapinall MCP server first.",
+        "Airin Library is not connected. Add the Airin Library connector first.",
         400
       );
     }
@@ -260,7 +260,7 @@ export class TapinallCatalogService {
       if (!response.ok) {
         throw new AirinApiError(
           readTapinallErrorMessage(raw) ||
-            `Tapinall catalog request failed (${response.status}).`,
+            `Airin Library request failed (${response.status}).`,
           response.status >= 400 && response.status < 600
             ? response.status
             : 502
@@ -274,17 +274,17 @@ export class TapinallCatalogService {
       }
 
       if (error instanceof z.ZodError) {
-        throw new AirinApiError("Tapinall catalog response was invalid.", 502);
+        throw new AirinApiError("Airin Library response was invalid.", 502);
       }
 
       if (error instanceof Error && error.name === "AbortError") {
-        throw new AirinApiError("Tapinall catalog request timed out.", 504);
+        throw new AirinApiError("Airin Library request timed out.", 504);
       }
 
       throw new AirinApiError(
         error instanceof Error
           ? error.message
-          : "Tapinall catalog request failed.",
+          : "Airin Library request failed.",
         502
       );
     } finally {
@@ -342,14 +342,14 @@ async function readBodyCapped(
     const length = Number(lengthHeader);
 
     if (Number.isFinite(length) && length > maxBytes) {
-      throw new AirinApiError("Tapinall catalog response is too large.", 502);
+      throw new AirinApiError("Airin Library response is too large.", 502);
     }
   }
 
   const buffer = await response.arrayBuffer();
 
   if (buffer.byteLength > maxBytes) {
-    throw new AirinApiError("Tapinall catalog response is too large.", 502);
+    throw new AirinApiError("Airin Library response is too large.", 502);
   }
 
   return new TextDecoder().decode(buffer);

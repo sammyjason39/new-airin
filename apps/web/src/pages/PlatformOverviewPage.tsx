@@ -1,10 +1,16 @@
 import { Button } from "@airin/ui/button";
 import { buttonVariants } from "@airin/ui/button-variants";
 import { Card, CardContent } from "@airin/ui/card";
+import { Input } from "@airin/ui/input";
 import { Spinner } from "@airin/ui/spinner";
 import { cn } from "@airin/ui/utils";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import {
+  keepPreviousData,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { formatUsd } from "@/lib/chat-usage";
 import { client, formatError } from "@/lib/client";
@@ -99,8 +105,83 @@ export function PlatformOverviewPage() {
           )}
         </CardContent>
       </Card>
+      <PlatformBillingSettings />
       <PlatformWaitlist />
     </div>
+  );
+}
+
+function PlatformBillingSettings() {
+  const queryClient = useQueryClient();
+  const { data, error, isLoading } = useQuery({
+    queryFn: () => client.getPlatformBillingSettings(),
+    queryKey: ["platform", "billing", "settings"],
+    staleTime: 30_000,
+  });
+  const [trialDays, setTrialDays] = useState("");
+
+  useEffect(() => {
+    if (data) {
+      setTrialDays(String(data.trialDays));
+    }
+  }, [data]);
+
+  const save = useMutation({
+    mutationFn: () =>
+      client.updatePlatformBillingSettings({
+        trialDays: Number(trialDays),
+      }),
+    onSuccess: (next) => {
+      queryClient.setQueryData(["platform", "billing", "settings"], next);
+    },
+  });
+
+  return (
+    <section aria-labelledby="platform-billing-heading" className="space-y-3">
+      <h2 className="font-semibold text-lg" id="platform-billing-heading">
+        Trial days
+      </h2>
+      {isLoading && !data ? (
+        <Spinner aria-label="Loading billing settings" className="size-5" />
+      ) : null}
+      {error ? (
+        <p className="text-destructive text-sm" role="alert">
+          {formatError(error)}
+        </p>
+      ) : null}
+      {data ? (
+        <form
+          className="flex flex-wrap items-end gap-3"
+          onSubmit={(event) => {
+            event.preventDefault();
+            save.mutate();
+          }}
+        >
+          <label className="space-y-1 text-sm">
+            <span className="text-muted-foreground text-xs">Days</span>
+            <Input
+              className="w-28"
+              inputMode="numeric"
+              max={365}
+              min={0}
+              name="trialDays"
+              onChange={(event) => setTrialDays(event.target.value)}
+              required
+              type="number"
+              value={trialDays}
+            />
+          </label>
+          <Button disabled={save.isPending} size="sm" type="submit">
+            Save
+          </Button>
+          {save.error ? (
+            <p className="text-destructive text-sm" role="alert">
+              {formatError(save.error)}
+            </p>
+          ) : null}
+        </form>
+      ) : null}
+    </section>
   );
 }
 

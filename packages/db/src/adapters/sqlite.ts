@@ -34,6 +34,7 @@ import type {
   StoredAutomationRunRecord,
   StoredAutomationRunStepRecord,
   StoredAutomationWebhookSecret,
+  StoredBillingSubscriptionRecord,
   StoredBrowserSessionRecord,
   StoredComposioToolkitRecord,
   StoredComposioUserConnectionRecord,
@@ -468,6 +469,26 @@ interface OrganizationRow {
   skills_post_turn_review: number;
   skills_write_approval: number;
   slug: string;
+  updated_at: string;
+}
+
+interface BillingSubscriptionRow {
+  cancel_at_period_end: number;
+  created_at: string;
+  current_period_end: string | null;
+  current_period_start: string | null;
+  included_seats: number;
+  interval: string;
+  org_id: string;
+  pending_interval: string | null;
+  pending_plan_id: string | null;
+  pending_seat_count: number | null;
+  plan_id: string;
+  seat_count: number;
+  setup_hours_entitled: number;
+  setup_hours_used: number;
+  status: string;
+  trial_ends_at: string | null;
   updated_at: string;
 }
 
@@ -3414,6 +3435,63 @@ function createSqliteDatabaseAdapter(db: Database): DatabaseAdapter {
     LIMIT 1
   `);
 
+  const getPlatformBillingSettingsStmt = db.prepare<
+    { trial_days: number; updated_at: string },
+    SQLQueryBindings[]
+  >(`
+    SELECT trial_days, updated_at
+    FROM platform_billing_settings
+    WHERE id = 1
+    LIMIT 1
+  `);
+
+  const upsertPlatformBillingSettingsStmt = db.prepare(`
+    INSERT INTO platform_billing_settings (id, trial_days, updated_at)
+    VALUES (1, ?, ?)
+    ON CONFLICT(id) DO UPDATE SET
+      trial_days = excluded.trial_days,
+      updated_at = excluded.updated_at
+  `);
+
+  const getBillingSubscriptionStmt = db.prepare<
+    BillingSubscriptionRow,
+    SQLQueryBindings[]
+  >(`
+    SELECT
+      org_id, plan_id, status, interval, seat_count, included_seats,
+      trial_ends_at, current_period_start, current_period_end,
+      cancel_at_period_end, pending_plan_id, pending_seat_count, pending_interval,
+      setup_hours_entitled, setup_hours_used, created_at, updated_at
+    FROM billing_subscriptions
+    WHERE org_id = ?
+    LIMIT 1
+  `);
+
+  const upsertBillingSubscriptionStmt = db.prepare(`
+    INSERT INTO billing_subscriptions (
+      org_id, plan_id, status, interval, seat_count, included_seats,
+      trial_ends_at, current_period_start, current_period_end,
+      cancel_at_period_end, pending_plan_id, pending_seat_count, pending_interval,
+      setup_hours_entitled, setup_hours_used, created_at, updated_at
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT(org_id) DO UPDATE SET
+      plan_id = excluded.plan_id,
+      status = excluded.status,
+      interval = excluded.interval,
+      seat_count = excluded.seat_count,
+      included_seats = excluded.included_seats,
+      trial_ends_at = excluded.trial_ends_at,
+      current_period_start = excluded.current_period_start,
+      current_period_end = excluded.current_period_end,
+      cancel_at_period_end = excluded.cancel_at_period_end,
+      pending_plan_id = excluded.pending_plan_id,
+      pending_seat_count = excluded.pending_seat_count,
+      pending_interval = excluded.pending_interval,
+      setup_hours_entitled = excluded.setup_hours_entitled,
+      setup_hours_used = excluded.setup_hours_used,
+      updated_at = excluded.updated_at
+  `);
+
   const createOrgInviteStmt = db.prepare(`
     INSERT INTO org_invites (
       id, org_id, email, role, token_hash, invited_by_user_id,
@@ -5376,6 +5454,12 @@ function createSqliteDatabaseAdapter(db: Database): DatabaseAdapter {
       return getAutomationWebhookSecretStmt.get(automationId) ?? null;
     },
 
+    async getBillingSubscription(orgId) {
+      const row = getBillingSubscriptionStmt.get(orgId);
+
+      return row ? toBillingSubscriptionRecord(row) : null;
+    },
+
     async getBrowserSessionBySessionTokenHash(sessionTokenHash) {
       const row = getBrowserSessionByTokenHashStmt.get(sessionTokenHash);
 
@@ -5576,6 +5660,22 @@ function createSqliteDatabaseAdapter(db: Database): DatabaseAdapter {
       );
 
       return row ? toSkillProposalRecord(row) : null;
+    },
+
+    async getPlatformBillingSettings() {
+      const row = getPlatformBillingSettingsStmt.get();
+
+      if (!row) {
+        return {
+          trialDays: 14,
+          updatedAt: "1970-01-01T00:00:00.000Z",
+        } satisfies import("../types").StoredPlatformBillingSettingsRecord;
+      }
+
+      return {
+        trialDays: row.trial_days,
+        updatedAt: row.updated_at,
+      };
     },
 
     async getPluginRelease(pluginId, version) {
@@ -6807,6 +6907,28 @@ function createSqliteDatabaseAdapter(db: Database): DatabaseAdapter {
       );
     },
 
+    async upsertBillingSubscription(record) {
+      upsertBillingSubscriptionStmt.run(
+        record.orgId,
+        record.planId,
+        record.status,
+        record.interval,
+        record.seatCount,
+        record.includedSeats,
+        record.trialEndsAt,
+        record.currentPeriodStart,
+        record.currentPeriodEnd,
+        record.cancelAtPeriodEnd ? 1 : 0,
+        record.pendingPlanId,
+        record.pendingSeatCount,
+        record.pendingInterval,
+        record.setupHoursEntitled,
+        record.setupHoursUsed,
+        record.createdAt,
+        record.updatedAt
+      );
+    },
+
     async upsertComposioToolkit(record) {
       upsertComposioToolkitStmt.run(
         record.id,
@@ -6874,6 +6996,10 @@ function createSqliteDatabaseAdapter(db: Database): DatabaseAdapter {
 
     async upsertOrgMember(record) {
       runUpsertOrgMemberStmt(record);
+    },
+
+    async upsertPlatformBillingSettings(record) {
+      upsertPlatformBillingSettingsStmt.run(record.trialDays, record.updatedAt);
     },
 
     async upsertPluginRelease(record) {
@@ -7859,6 +7985,37 @@ function toOrganizationRecord(row: OrganizationRow): StoredOrganizationRecord {
     skillsPostTurnReview: row.skills_post_turn_review !== 0,
     skillsWriteApproval: row.skills_write_approval !== 0,
     slug: row.slug,
+    updatedAt: row.updated_at,
+  };
+}
+
+function toBillingSubscriptionRecord(
+  row: BillingSubscriptionRow
+): StoredBillingSubscriptionRecord {
+  return {
+    cancelAtPeriodEnd: row.cancel_at_period_end !== 0,
+    createdAt: row.created_at,
+    currentPeriodEnd: row.current_period_end,
+    currentPeriodStart: row.current_period_start,
+    includedSeats: row.included_seats,
+    // SAFETY: CHECK constraint + typed upsert keep interval values valid.
+    interval: row.interval as StoredBillingSubscriptionRecord["interval"],
+    orgId: row.org_id,
+    pendingInterval:
+      // SAFETY: CHECK constraint + typed upsert keep interval values valid.
+      row.pending_interval as StoredBillingSubscriptionRecord["pendingInterval"],
+    pendingPlanId:
+      // SAFETY: CHECK constraint + typed upsert keep plan ids valid.
+      row.pending_plan_id as StoredBillingSubscriptionRecord["pendingPlanId"],
+    pendingSeatCount: row.pending_seat_count,
+    // SAFETY: CHECK constraint + typed upsert keep plan ids valid.
+    planId: row.plan_id as StoredBillingSubscriptionRecord["planId"],
+    seatCount: row.seat_count,
+    setupHoursEntitled: row.setup_hours_entitled,
+    setupHoursUsed: row.setup_hours_used,
+    // SAFETY: CHECK constraint + typed upsert keep status values valid.
+    status: row.status as StoredBillingSubscriptionRecord["status"],
+    trialEndsAt: row.trial_ends_at,
     updatedAt: row.updated_at,
   };
 }

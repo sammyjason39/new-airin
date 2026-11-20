@@ -16,6 +16,7 @@ import type {
   OrgInviteCreatedResponse,
   OrgLlmQuotaStatusResponse,
   OrgMemberResponse,
+  OrgPlanUsageResponse,
   OrgSharedResourceResponse,
   OrgUsageSummaryResponse,
   ProfileResponse,
@@ -97,6 +98,13 @@ export class OrgsClient extends AuthClient {
     );
   }
 
+  async getOrganizationPlanUsage(orgId: string): Promise<OrgPlanUsageResponse> {
+    return this.request<OrgPlanUsageResponse>(
+      `/v1/orgs/${encodeURIComponent(orgId)}/plan-usage`,
+      { headers: { "X-Org-Id": orgId } }
+    );
+  }
+
   async updateOrganization(
     orgId: string,
     request: UpdateOrganizationRequest
@@ -165,6 +173,21 @@ export class OrgsClient extends AuthClient {
     import("@airin/core/contract").PlatformOverviewResponse
   > {
     return this.request("/v1/platform/overview");
+  }
+
+  async getPlatformBillingSettings(): Promise<
+    import("@airin/core/contract").PlatformBillingSettingsResponse
+  > {
+    return this.request("/v1/platform/billing/settings");
+  }
+
+  async updatePlatformBillingSettings(
+    request: import("@airin/core/contract").UpdatePlatformBillingSettingsRequest
+  ): Promise<import("@airin/core/contract").PlatformBillingSettingsResponse> {
+    return this.request("/v1/platform/billing/settings", {
+      body: JSON.stringify(request),
+      method: "PATCH",
+    });
   }
 
   async listPlatformWaitlist(

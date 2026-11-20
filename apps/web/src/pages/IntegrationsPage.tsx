@@ -8,7 +8,6 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import { CodingAgentsSettingsCard } from "@/components/CodingAgentsSettingsCard";
-import { ComposioConnectionsCard } from "@/components/ComposioConnectionsCard";
 import { ErrorTrackingSettingsCard } from "@/components/ErrorTrackingSettingsCard";
 import { NotificationDestinationsCard } from "@/components/NotificationDestinationsCard";
 import { useAuth } from "@/context/use-auth";
@@ -18,6 +17,7 @@ import {
   PAGE_PATHS,
   visibleIntegrationSections,
 } from "@/lib/navigation";
+import { ConnectorsHubPage } from "@/pages/ConnectorsHubPage";
 
 function resolveSection(value: string | null): IntegrationSectionId {
   if (
@@ -44,9 +44,7 @@ function IntegrationSectionPanel({
   }
 
   if (section === "composio") {
-    return canUseOrgIntegrations ? (
-      <ComposioConnectionsCard bordered embedded />
-    ) : null;
+    return canUseOrgIntegrations ? <ConnectorsHubPage /> : null;
   }
 
   if (section === "notifications") {
@@ -102,24 +100,24 @@ export function IntegrationsPage() {
     return <Navigate replace to="/settings" />;
   }
 
+  if (onConnectors) {
+    return (
+      <IntegrationSectionPanel
+        canUseOrgIntegrations={Boolean(activeOrg)}
+        section={selected.id}
+      />
+    );
+  }
+
   return (
-    <div
-      className={cn(
-        "mx-auto space-y-6",
-        onConnectors ? "min-w-0 max-w-4xl" : "max-w-3xl"
-      )}
-    >
-      {onConnectors ? null : (
-        <Link
-          className="block w-fit text-muted-foreground text-sm hover:text-foreground"
-          to="/settings"
-        >
-          ← Back to Settings
-        </Link>
-      )}
-      {onConnectors ? null : (
-        <h1 className="font-medium text-xl">{selected.label}</h1>
-      )}
+    <div className={cn("mx-auto max-w-3xl space-y-6")}>
+      <Link
+        className="block w-fit text-muted-foreground text-sm hover:text-foreground"
+        to="/settings"
+      >
+        ← Back to Settings
+      </Link>
+      <h1 className="font-medium text-xl">{selected.label}</h1>
       <IntegrationSectionPanel
         canUseOrgIntegrations={Boolean(activeOrg)}
         section={selected.id}

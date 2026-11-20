@@ -39,7 +39,8 @@
 | Grup | [Groups](/groups) |
 | Marketplace | [Marketplace](/marketplace) |
 | Otomasi | [Automations](/automations) |
-| Koneksi Composio | [Connections](/connectors) |
+| Hub Plugins \| Skills \| Connectors | [Plugins](/settings/plugins) · [Skills](/settings/skills) · [Connectors](/connectors) |
+| Custom connectors (tambah server) | [Custom connectors](/settings/mcp) |
 | Hub Settings | [Settings](/settings) |
 | Preferensi (tema, MFA, sesi) | [Preferences](/settings/preferences) |
 | Organisasi & undang member | [Organization](/organization) |
@@ -49,9 +50,6 @@
 | AI Providers | [AI Providers](/settings/providers) |
 | Image generation | [Image generation](/settings/providers#image-generation) |
 | Tools | [Tools](/settings/tools) |
-| Skills (katalog org) | [Skills](/settings/skills) |
-| MCP | [MCP](/settings/mcp) |
-| Plugins | [Plugins](/settings/plugins) |
 | Notifikasi inbox | [Notifications](/notifications) |
 | Google Meet | [Google Meet](/google-meet) |
 

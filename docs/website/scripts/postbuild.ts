@@ -177,7 +177,8 @@ async function main() {
   ];
 
   const siteUrl =
-    process.env.AIRIN_DOCS_SITE_URL ?? "https://ahmadrosid.github.io/airin";
+    process.env.AIRIN_DOCS_SITE_URL ??
+    "https://github.com/Conextlab-MIT/new-airin/tree/main/docs/website/content/docs";
 
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -1,8 +1,8 @@
 # 11. Integrasi dan tools
 
-> Tool bawaan, tool kustom, Composio, MCP, plugin (Workflows, Supermemory, Meet, Data View), browser, gambar, dan coding agent.
+> Tool bawaan, tool kustom, Connectors (Composio + Airin Library + custom connectors), plugin (Workflows, Supermemory, Meet, Data View), browser, gambar, dan coding agent.
 
-**Siapa yang bisa:** Platform admin (assign tool, MCP, plugin package, kunci Composio). Admin organisasi (enable plugin/app, email mailbox, sebagian provider). Member memakai tool yang sudah di-assign; tiap orang menghubungkan akun Composio sendiri.
+**Siapa yang bisa:** Platform admin (assign tool, custom connector, plugin package, kunci Composio). Admin organisasi (enable plugin/app, email mailbox, sebagian provider). Member memakai tool yang sudah di-assign; tiap orang menghubungkan akun Composio sendiri di Connectors.
 
 ## Model mental
 
@@ -64,49 +64,60 @@
 - Nama setting: `UPPER_SNAKE_CASE`; dilarang `PATH`, `NODE_OPTIONS`, `PYTHONPATH`, awalan `AIRIN_`.
 - Python default sequential (tidak parallelSafe).
 
+## Connectors (hub Accio)
+
+**Kenapa:** Satu tempat untuk app SaaS, Airin Library, dan custom connector — tanpa istilah teknis MCP di dashboard.
+
+**Cara pakai:**
+1. Mode **Advanced** → sidebar **Plugins** → tab **Connectors** ([/connectors](/connectors)).
+2. **Airin Library** — konektor data bawaan (riset, sheets, …). Status Connected bila sudah dikonfigurasi.
+3. **Apps** — daftar Composio dengan ikon app. Admin: Enable; tiap member: **Connect** akun sendiri.
+4. **Custom connectors** — server tool tambahan. Tombol **Custom connector** membuka [halaman kelola](/settings/mcp) (**Add connector**).
+5. Tab hub lain: [Plugins](/settings/plugins) (sistem tambahan) dan [Skills](/settings/skills).
+
 ## Composio (SaaS: Gmail, Slack, GitHub, …)
 
 **Kenapa:** Agen bertindak di akun SaaS Anda tanpa API kustom.
 
 **Cara pakai:**
-1. Buat akun di composio.dev; salin **project API key** (bukan `ck_` MCP consumer key).
-2. **Platform admin** (bukan Admin org): **Settings → Integrations → Composio** → paste project API key → **Save**. Kartu kunci ini hanya untuk platform admin.
-3. Admin org: **Enable** app yang diizinkan.
+1. Buat akun di composio.dev; salin **project API key** (bukan consumer key `ck_`).
+2. **Platform admin** (bukan Admin org): **Settings → Integrations / Providers area → Composio** → paste project API key → **Save**. Kartu kunci ini hanya untuk platform admin.
+3. Admin org: di [Connectors](/connectors) → **Apps**, enable app yang diizinkan.
 4. Tiap member: **Connect** akun sendiri.
-5. Admin: tombol **profiles** di baris app → centang agen yang boleh memakai.
+5. Admin: assign toolkit ke profil agen di halaman agen.
 
 **Batas / catatan:**
 - Web chat memakai koneksi orang yang bicara. Channel/CLI memakai koneksi admin org paling awal.
 - Automasi tanpa orang → tidak resolve tool Composio pribadi.
 - OAuth di channel butuh **Public web URL** yang bukan loopback.
-- ~200 app; agen memakai `composio__search_actions` + `composio__invoke_action` (bukan ratusan tool sekaligus).
+- Katalog produksi besar (ribuan app); agen memakai `composio__search_actions` + `composio__invoke_action` (bukan semua tool sekaligus).
 
-## MCP servers
+## Custom connectors
 
-**Kenapa:** Tool eksternal (database, SaaS MCP) tanpa menulis kode Airin.
+**Kenapa:** Tool eksternal (database, SaaS) tanpa menulis kode Airin. Di bawah memakai protokol MCP; di UI disebut **custom connector**.
 
 **Cara pakai:**
-1. Platform admin: **Settings → Agent tools → MCP** → **Add server** (HTTP, Sign-in, atau Command).
+1. Admin: [Custom connectors](/settings/mcp) → **Add connector** (HTTP, Sign-in, atau Command).
 2. **Test connection** → simpan.
-3. **Agent** → profil → tab **MCP** → assign server.
+3. **Agent** → profil → tab **Connectors** → **Add custom connector** atau assign yang sudah ada.
 4. Nama tool di chat: `{serverName}__{toolName}`.
 
 **Batas / catatan:**
-- Hanya platform admin yang mengelola server; org admin/member memakai setelah assign.
-- Status: `connected` / `disconnected` / `needs_auth` (**Sign-in required**) / `error`.
-- Preinstall: **exa**, **firecrawl**. Keyless Firecrawl berbagi kuota harian IP host.
-- Sign-in MCP butuh URL publik; dynamic client registration saja (client_id/secret paste belum didukung).
-- Hapus server custom: **Force delete** (lepas dari semua profil). Preinstalled tidak bisa dihapus.
+- Org admin+ mengelola; member memakai setelah assign.
+- Status: Connected / Not connected / Connecting / Error.
+- Preinstall umum: **exa**, **firecrawl**; **Airin Library** bila dikonfigurasi.
+- Sign-in butuh URL publik; dynamic client registration saja (client_id/secret paste belum didukung).
+- Hapus custom: **Force delete** (lepas dari semua profil). Preinstalled tidak bisa dihapus.
 
 ## Plugins
 
-**Kenapa:** Fitur utuh (halaman + tool + data) tanpa mengubah core.
+**Kenapa:** Fitur utuh (halaman + tool + data) tanpa mengubah core — contoh sheet maker, PPT, vibecoding nanti.
 
 **Cara pakai (umum):**
-1. Platform admin: **Settings → Agent tools → Plugins** → preview/install paket (official skip approval terpisah).
+1. Hub [Plugins](/settings/plugins) → **Add plugin** (folder agen / npm, sesuai peran).
 2. Admin org: enable untuk organisasi.
 3. Platform admin: assign tool/skill plugin ke profil.
-4. Member: buka dari **Settings → Installed plugins**.
+4. Plugin dengan UI: buka dari daftar plugin yang sudah on.
 
 ### Workflows
 
@@ -209,10 +220,11 @@ Lihat [10. Otomasi dan workflow](./10-otomasi-dan-workflow.md).
 
 ## Halaman terkait
 
-- [Connections / Composio](/connectors)
+- [Connectors](/connectors)
 - [Tools](/settings/tools)
-- [MCP](/settings/mcp) (platform admin)
+- [Custom connectors](/settings/mcp)
 - [Plugins](/settings/plugins)
+- [Skills](/settings/skills)
 - [Google Meet](/google-meet)
 - [AI Providers](/settings/providers) (platform admin)
 - [00. Peta halaman](./00-peta-halaman.md)

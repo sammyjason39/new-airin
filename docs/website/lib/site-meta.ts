@@ -6,11 +6,12 @@ export const SITE_DESCRIPTION =
   "Airin is an open-source platform for teams to build and run AI agents with their own memory, tools, and workspaces. Self-host or use managed hosting.";
 
 export const SITE_URL =
-  process.env.AIRIN_DOCS_SITE_URL ?? "https://ahmadrosid.github.io/airin";
+  process.env.AIRIN_DOCS_SITE_URL ??
+  "https://github.com/Conextlab-MIT/new-airin/tree/main/docs/website/content/docs";
 
-const AUTHOR_NAME = "Ahmad Rosid";
+const AUTHOR_NAME = "Conextlab";
 
-const AUTHOR_ROLE = "Creator and maintainer of Airin";
+const AUTHOR_ROLE = "Airin maintainers";
 
 export const OG_IMAGE_URL = `${SITE_URL}/airin-demo.png`;
 
@@ -58,7 +59,7 @@ export function buildJsonLd(
       "@type": "Person",
       jobTitle: AUTHOR_ROLE,
       name: AUTHOR_NAME,
-      url: "https://github.com/ahmadrosid",
+      url: "https://github.com/Conextlab-MIT",
     },
     description,
     name: title,
@@ -145,7 +146,7 @@ export function buildLlmsTxt(pages: PageMetadata[]) {
     "",
     `Maintainer: ${AUTHOR_NAME} (${AUTHOR_ROLE})`,
     `Website: ${SITE_URL}/`,
-    "Repository: https://github.com/ahmadrosid/airin",
+    "Repository: https://github.com/Conextlab-MIT/new-airin",
     "",
     "## For AI agents",
     "",

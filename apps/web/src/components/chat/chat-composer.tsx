@@ -78,6 +78,7 @@ import {
 } from "@/components/chat/ChatMessageQueuePanel";
 import { ChatAddCapabilitiesDialogs } from "@/components/chat/chat-add-capabilities-dialogs";
 import { ChatContextUsageRing } from "@/components/chat/chat-context-usage";
+import { ChatPlanUsageBand } from "@/components/chat/chat-plan-usage-band";
 import { ImageAttachmentPreview } from "@/components/chat/image-attachment-preview";
 import { OwnerEffortPicker } from "@/components/chat/owner-effort-picker";
 import { TextAttachmentPreview } from "@/components/chat/text-attachment-preview";
@@ -488,6 +489,7 @@ function ChatComposerBarePrompt({
                 <ChatAttachmentButton disabled={disabled} />
               </div>
               <div className="ml-auto flex shrink-0 items-center gap-1.5">
+                {isMinimal ? <ChatPlanUsageBand /> : null}
                 <ChatDictationButton
                   disabled={disabled}
                   onActiveChange={setDictationActive}

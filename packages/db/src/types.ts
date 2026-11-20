@@ -617,11 +617,38 @@ export interface StoredOrgSharedResourceRecord {
   updatedAt: string;
 }
 
+export interface StoredPlatformBillingSettingsRecord {
+  trialDays: number;
+  updatedAt: string;
+}
+
+export interface StoredBillingSubscriptionRecord {
+  cancelAtPeriodEnd: boolean;
+  createdAt: string;
+  currentPeriodEnd: string | null;
+  currentPeriodStart: string | null;
+  includedSeats: number;
+  interval: "month" | "quarter" | "year";
+  orgId: string;
+  pendingInterval: "month" | "quarter" | "year" | null;
+  pendingPlanId: "lite" | "plus" | "pro" | "enterprise" | null;
+  pendingSeatCount: number | null;
+  planId: "lite" | "plus" | "pro" | "enterprise";
+  seatCount: number;
+  setupHoursEntitled: number;
+  setupHoursUsed: number;
+  status: "trial" | "active" | "past_due" | "suspended" | "cancelled";
+  trialEndsAt: string | null;
+  updatedAt: string;
+}
+
 export interface StoredOrganizationRecord {
   allowedInviteDomains?: string[];
   archivedAt?: string | null;
   createdAt: string;
   id: string;
+  /** Plan token budget as USD cents (e.g. Lite $10 → 1000). */
+  monthlyLlmCostLimitUsdCents?: number;
   monthlyLlmTokenLimit?: number;
   monthlyLlmTurnLimit?: number;
   monthlyLlmWarningPercent?: number;
@@ -1130,6 +1157,9 @@ export interface DatabaseAdapter {
   getAutomationWebhookSecret(
     automationId: string
   ): Promise<StoredAutomationWebhookSecret | null>;
+  getBillingSubscription(
+    orgId: string
+  ): Promise<StoredBillingSubscriptionRecord | null>;
   getBrowserSessionBySessionTokenHash(
     sessionTokenHash: string
   ): Promise<StoredBrowserSessionRecord | null>;
@@ -1220,6 +1250,7 @@ export interface DatabaseAdapter {
     profileId: string,
     skillName: string
   ): Promise<StoredSkillProposal | null>;
+  getPlatformBillingSettings(): Promise<StoredPlatformBillingSettingsRecord>;
   getPluginRelease(
     pluginId: string,
     version: string
@@ -1770,6 +1801,9 @@ export interface DatabaseAdapter {
     automationId: string,
     readThroughAt: string
   ): Promise<void>;
+  upsertBillingSubscription(
+    record: StoredBillingSubscriptionRecord
+  ): Promise<void>;
   upsertComposioToolkit(record: StoredComposioToolkitRecord): Promise<void>;
   upsertComposioUserConnection(
     record: StoredComposioUserConnectionRecord
@@ -1780,6 +1814,9 @@ export interface DatabaseAdapter {
   ): Promise<void>;
   upsertOrganization(record: StoredOrganizationRecord): Promise<void>;
   upsertOrgMember(record: StoredOrgMemberRecord): Promise<void>;
+  upsertPlatformBillingSettings(
+    record: StoredPlatformBillingSettingsRecord
+  ): Promise<void>;
   upsertPluginRelease(
     record: StoredPluginReleaseRecord
   ): Promise<UpsertPluginReleaseResult>;

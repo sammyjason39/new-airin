@@ -24,6 +24,10 @@ const IGNORED_PATHS = [
   /^apps\/web\/src\/components\/moodstone\/(core\/|svg\.ts$)/,
   // Bundled skill reference corpora (laws, long source excerpts), not hand-edited.
   /^packages\/core\/src\/skills\/bundled\/[^/]+\/references\//,
+  // Design prompt/model seed JSON — data fixtures, not hand-edited prose.
+  /^apps\/web\/src\/lib\/design\/(higgsfield-models|prompt-library\.seed)\.json$/,
+  // Standalone product overview HTML deck.
+  /^docs\/airin-product-overview\.html$/,
 ];
 
 const git = (args: string[]) =>

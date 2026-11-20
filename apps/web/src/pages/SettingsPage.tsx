@@ -180,7 +180,7 @@ export function SettingsPage() {
 
             <MfaSettingsCard />
 
-            <section id="tapinall">
+            <section id="airin-library">
               <TapinallCatalogPanel embedded />
             </section>
           </SettingsSection>

@@ -118,7 +118,7 @@ function appCards({
 
   const connect = popular.map((preset) => ({
     description: preset.description,
-    key: preset.toolkit,
+    key: "toolkit" in preset ? preset.toolkit : preset.name,
     name: preset.name,
     onPick: () => onConnect(preset),
     preset,

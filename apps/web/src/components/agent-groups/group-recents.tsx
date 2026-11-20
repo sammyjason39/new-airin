@@ -77,7 +77,7 @@ export function GroupRecents({ groupId }: { groupId: string }) {
       />
       <RecentsHeader
         collapsed={collapsed}
-        newChatHref={groupPath(groupId)}
+        newChatHref={`${groupPath(groupId)}?new=1`}
         onToggle={toggle}
       />
       {!collapsed && sessions.length > 0 ? (
@@ -116,7 +116,7 @@ export function GroupRecents({ groupId }: { groupId: string }) {
           await deleteSession.mutateAsync(deleteTarget.id);
 
           if (location.pathname === groupPath(groupId, deleteTarget.id)) {
-            navigate(groupPath(groupId), { replace: true });
+            navigate(`${groupPath(groupId)}?new=1`, { replace: true });
           }
 
           setDeleteTarget(null);

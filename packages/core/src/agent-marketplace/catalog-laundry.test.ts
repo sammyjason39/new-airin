@@ -33,5 +33,8 @@ describe("laundry innovation summit catalog", () => {
     expect(
       getAgentMarketplaceEntry("laundry-analyst")?.bundledSkillNames
     ).toContain("tapinall-research");
+    expect(
+      getAgentMarketplaceEntry("laundry-analyst")?.bundledSkillNames
+    ).toContain("research-sheet-manager");
   });
 });

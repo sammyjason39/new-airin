@@ -368,6 +368,57 @@ export class SettingsClient extends SystemClient {
       method: "PUT",
     });
   }
+
+  async getDesignStatus(): Promise<{
+    connected: boolean;
+    needsAuth?: boolean;
+    serverId?: string | null;
+    serverName?: string | null;
+    toolCount?: number;
+  }> {
+    return this.request("/v1/design/status");
+  }
+
+  async listDesignResults(): Promise<{
+    results: Array<{
+      createdAt: string;
+      id: string;
+      kind: "image" | "video";
+      model: string;
+      prompt: string;
+      resultUrl?: string | null;
+    }>;
+  }> {
+    return this.request("/v1/design/results");
+  }
+
+  async generateDesign(body: {
+    aspectRatio?: string;
+    count?: number;
+    duration?: number;
+    estimateOnly?: boolean;
+    kind: "image" | "video";
+    model: string;
+    params?: Record<string, unknown>;
+    profileId?: string;
+    prompt: string;
+    sourceMediaUrls?: string[];
+  }): Promise<{
+    estimate?: unknown;
+    result?: {
+      createdAt?: string;
+      id?: string;
+      kind?: "image" | "video";
+      model?: string;
+      prompt?: string;
+      resultUrl?: string | null;
+    };
+  }> {
+    return this.request("/v1/design/generate", {
+      body: JSON.stringify(body),
+      method: "POST",
+    });
+  }
 }
 
 /** A browser `PushSubscription.toJSON()`, as the server stores it. */

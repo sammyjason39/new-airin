@@ -69,11 +69,11 @@ export function ProfileMcpSection({
             <McpServerIcon aria-hidden className="size-6 text-foreground/80" />
           </div>
           <h3 className="font-semibold text-base text-foreground">
-            No MCP servers
+            No custom connectors
           </h3>
           <Button disabled={busy} onClick={onCreateOpen} type="button">
             <Add01Icon aria-hidden className="size-4" />
-            Add MCP server
+            Add custom connector
           </Button>
         </div>
 
@@ -121,7 +121,9 @@ export function ProfileMcpSection({
     <div className="pt-5">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <h3 className="font-semibold text-foreground text-sm">MCP servers</h3>
+          <h3 className="font-semibold text-foreground text-sm">
+            Custom connectors
+          </h3>
           <span className="rounded-full bg-muted px-2 py-0.5 font-medium text-muted-foreground text-xs tabular-nums">
             {detail.mcpServers.length}
           </span>
@@ -134,7 +136,7 @@ export function ProfileMcpSection({
           variant="outline"
         >
           <Add01Icon aria-hidden className="size-4" />
-          Add MCP server
+          Add custom connector
         </Button>
       </div>
 

@@ -26,12 +26,15 @@ describe("visibleNavGroups", () => {
     expect(ids).toContain("tools");
     expect(ids).not.toContain("mcp");
     expect(ids).not.toContain("providers");
+    expect(ids).not.toContain("skills");
     expect(ids).toContain("organization");
     expect(ids).toContain("profiles");
     expect(ids).not.toContain("integrations");
     expect(ids).toContain("workers");
     expect(ids).toContain("files");
-    expect(ids).toContain("plugin-management");
+    expect(ids).toContain("composio");
+    expect(ids).toContain("design");
+    expect(ids).not.toContain("plugin-management");
     expect(ids).toContain("usage");
   });
 
@@ -43,6 +46,8 @@ describe("visibleNavGroups", () => {
     expect(member).toContain("organization");
     expect(member).not.toContain("workers");
     expect(member).toContain("files");
+    expect(member).toContain("composio");
+    expect(member).toContain("design");
     expect(member).not.toContain("plugin-management");
     expect(member).not.toContain("usage");
   });
@@ -67,6 +72,10 @@ test("old /customize links still resolve to Settings pages", () => {
     "/settings/plugins/abc"
   );
   expect(settingsPathFromLegacy("/customizer")).toBeNull();
+});
+
+test("Design resolves from /design", () => {
+  expect(pageIdFromPath("/design")).toBe("design");
 });
 
 describe("plugin navigation", () => {
@@ -177,6 +186,27 @@ describe("canOpenPage", () => {
     ).toBe(true);
     expect(
       canOpenPage("tools", { isPlatformAdmin: false, orgRole: "member" })
+    ).toBe(false);
+  });
+
+  test("Design opens for org members like Marketplace", () => {
+    expect(
+      canOpenPage("design", { isPlatformAdmin: false, orgRole: "member" })
+    ).toBe(true);
+    expect(
+      canOpenPage("design", { isPlatformAdmin: false, orgRole: undefined })
+    ).toBe(false);
+  });
+
+  test("Skills and custom connectors open for an org admin", () => {
+    expect(
+      canOpenPage("skills", { isPlatformAdmin: false, orgRole: "admin" })
+    ).toBe(true);
+    expect(
+      canOpenPage("mcp", { isPlatformAdmin: false, orgRole: "admin" })
+    ).toBe(true);
+    expect(
+      canOpenPage("skills", { isPlatformAdmin: false, orgRole: "member" })
     ).toBe(false);
   });
 });

@@ -1,0 +1,1034 @@
+<!doctype html>
+<html data-theme="light" lang="id">
+  <head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Airin — Product Overview (BRD · PRD · Roadmap)</title>
+    <style>
+    :root {
+      --bg: #ffffff;
+      --panel: #f7f8fa;
+      --text: #14171f;
+      --muted: #5b6270;
+      --border: #e3e6eb;
+      --accent: #3b5bdb;
+      --done: #2f9e44;
+      --partial: #e8590c;
+      --open: #868e96;
+      --spec: #9c36b5;
+      --new: #1c7ed6;
+      --radius: 1rem;
+      --font: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    @media (prefers-color-scheme: dark) {
+      html:not([data-theme="light"]) {
+        --bg: #11141a;
+        --panel: #1a1e26;
+        --text: #eef0f4;
+        --muted: #a3aab8;
+        --border: #2b313c;
+        --accent: #748ffc;
+      }
+    }
+    html[data-theme="dark"] {
+      --bg: #11141a;
+      --panel: #1a1e26;
+      --text: #eef0f4;
+      --muted: #a3aab8;
+      --border: #2b313c;
+      --accent: #748ffc;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font: 15px / 1.55 var(--font);
+      color: var(--text);
+      background: var(--bg);
+    }
+    .page {
+      max-width: 1100px;
+      padding: 2rem 1.25rem 4rem;
+      margin: 0 auto;
+    }
+    header .kicker {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    h1 {
+      margin: 0.25rem 0 0.5rem;
+      font-size: 2rem;
+    }
+    h2 {
+      padding-top: 0.5rem;
+      margin: 2.5rem 0 1rem;
+      font-size: 1.35rem;
+      border-top: 1px solid var(--border);
+    }
+    h3 {
+      margin: 1.5rem 0 0.5rem;
+      font-size: 1.05rem;
+    }
+    p.meta {
+      margin: 0;
+      color: var(--muted);
+    }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      padding: 0.75rem 0;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    nav a {
+      padding: 0.35rem 0.8rem;
+      font-size: 0.85rem;
+      color: var(--text);
+      text-decoration: none;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+    }
+    nav a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .panel {
+      padding: 1.25rem 1.5rem;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .exec ul {
+      padding-left: 1.2rem;
+      margin: 0.5rem 0 0;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .stat {
+      padding: 1rem;
+      background: var(--panel);
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .stat b {
+      display: block;
+      font-size: 1.8rem;
+      line-height: 1.1;
+    }
+    .stat span {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+    .stat.c1 {
+      border-color: color-mix(in srgb, var(--accent) 45%, transparent);
+    }
+    .stat.c2 {
+      border-color: color-mix(in srgb, var(--done) 45%, transparent);
+    }
+    .stat.c3 {
+      border-color: color-mix(in srgb, var(--partial) 45%, transparent);
+    }
+    .stat.c4 {
+      border-color: color-mix(in srgb, var(--spec) 45%, transparent);
+    }
+    .stat.c5 {
+      border-color: color-mix(in srgb, var(--new) 45%, transparent);
+    }
+    table {
+      width: 100%;
+      font-size: 0.9rem;
+      border-collapse: collapse;
+    }
+    th,
+    td {
+      padding: 0.55rem 0.6rem;
+      vertical-align: top;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .tbl {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+    .badge {
+      display: inline-block;
+      padding: 0.1rem 0.55rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      border-radius: 999px;
+    }
+    .b-done {
+      background: var(--done);
+    }
+    .b-partial {
+      background: var(--partial);
+    }
+    .b-open {
+      background: var(--open);
+    }
+    .b-spec {
+      background: var(--spec);
+    }
+    .b-new {
+      background: var(--new);
+    }
+    .bar {
+      display: flex;
+      height: 18px;
+      margin: 0.75rem 0 0.35rem;
+      overflow: hidden;
+      border-radius: 999px;
+    }
+    .bar div {
+      height: 100%;
+    }
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .legend i {
+      display: inline-block;
+      width: 0.7rem;
+      height: 0.7rem;
+      margin-right: 0.35rem;
+      vertical-align: -1px;
+      border-radius: 3px;
+    }
+    .roadmap {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+    .col h3 {
+      margin-top: 0;
+    }
+    .col ul {
+      padding-left: 1.1rem;
+      margin: 0;
+    }
+    .col li {
+      margin: 0.35rem 0;
+    }
+    .col.now {
+      border-top: 4px solid var(--done);
+    }
+    .col.next {
+      border-top: 4px solid var(--partial);
+    }
+    .col.later {
+      border-top: 4px solid var(--spec);
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+    .muted {
+      color: var(--muted);
+    }
+    code {
+      padding: 0.05rem 0.3rem;
+      font-size: 0.85em;
+      background: color-mix(in srgb, var(--accent) 10%, transparent);
+      border-radius: 4px;
+    }
+    footer {
+      margin-top: 3rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    @media print {
+      nav {
+        display: none;
+      }
+      h2 {
+        break-before: auto;
+      }
+      .panel,
+      .tbl {
+        break-inside: avoid;
+      }
+    }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <header>
+        <div class="kicker">Airin · Product baseline</div>
+        <h1>BRD, PRD, Roadmap, dan Fitur Saat Ini</h1>
+        <p class="meta">
+          Versi kode 0.4.74 · <code>main</code> @ <code>f986c3ba</code> ·
+          Diperbarui 16 Nov 2026 · Produksi:
+          <a href="https://useairin.id">useairin.id</a>
+        </p>
+        <p class="meta">
+          Sumber: <code>docs/current-state-brd-prd*.md</code>,
+          <code>docs/sprint-backlog*.md</code>
+        </p>
+      </header>
+
+      <nav>
+        <a href="#summary">Ringkasan</a>
+        <a href="#brd">BRD</a>
+        <a href="#features">Fitur saat ini</a>
+        <a href="#prd">PRD / Sprint</a>
+        <a href="#roadmap">Roadmap</a>
+        <a href="#limits">Batas &amp; gap</a>
+      </nav>
+
+      <!-- ============ SUMMARY ============ -->
+      <h2 id="summary">Executive summary</h2>
+      <div class="panel exec">
+        <p>
+          <strong
+            >Airin adalah platform agen AI multi-tenant untuk tim
+            bisnis.</strong
+          >
+          Pemilik usaha punya “tim” agen dengan peran jelas (Ops, Finance,
+          Analyst, HR, Sales, CS, Social). Agen bekerja bersama lewat grup chat
+          atau lewat orkestrator (Jovan) yang mendelegasikan tugas ke spesialis.
+        </p>
+        <ul>
+          <li>
+            Produksi berjalan di <strong>useairin.id</strong>. Uji grup
+            <strong>Business</strong>
+            (Toni, Dimas, Ardi, Alya) menghasilkan dashboard income vs expense +
+            forecast dari Google Sheet.
+          </li>
+          <li>
+            <strong>Simple mode</strong>
+            untuk owner non-teknis sudah jadi: sidebar tim + peran, Groups,
+            Marketplace, lanjut chat terakhir.
+          </li>
+          <li>
+            Landing publik + <strong>waitlist</strong> aktif. Belum ada signup /
+            pembayaran (sengaja).
+          </li>
+          <li>
+            Gap terbesar: <strong>business profile</strong> (P0-12) belum
+            dibangun, sheet besar tidak muat di Data View, belum ada release tag
+            sejak v0.4.74.
+          </li>
+        </ul>
+      </div>
+
+      <div class="stats">
+        <div class="stat c1">
+          <b>8</b
+          ><span
+            >Channel (web, CLI, desktop, Telegram, WhatsApp, Discord, Slack,
+            Teams)</span
+          >
+        </div>
+        <div class="stat c5">
+          <b>16</b><span>Agen Marketplace (10 umum + 6 paket laundry)</span>
+        </div>
+        <div class="stat c2"><b>6 / 14</b><span>Item P0 selesai</span></div>
+        <div class="stat c3"><b>3</b><span>Item P0 parsial</span></div>
+        <div class="stat c4"><b>252</b><span>Endpoint API (OpenAPI)</span></div>
+      </div>
+
+      <!-- ============ BRD ============ -->
+      <h2 id="brd">BRD — Model produk</h2>
+
+      <div class="grid2">
+        <div class="panel">
+          <h3>Mental model</h3>
+          <ol>
+            <li>
+              <strong>Organization</strong>
+              — batas isolasi data (members, profiles, sessions, tools, memory).
+            </li>
+            <li>
+              <strong>Profile (agent)</strong>
+              — identitas (soul), model, tools, skills, knowledge base.
+            </li>
+            <li>
+              <strong>Akses tools/skills/MCP/plugin</strong>
+              — eksplisit per profil.
+            </li>
+            <li>
+              <strong>Channel</strong>
+              — semua channel memakai profil yang sama.
+            </li>
+          </ol>
+        </div>
+        <div class="panel">
+          <h3>Cara agen bekerja sama</h3>
+          <ul>
+            <li>
+              <strong>Agent group</strong>
+              — owner bicara ke 2–12 agen dalam satu chat (<code>@handle</code>,
+              <code>@all</code>).
+            </li>
+            <li>
+              <strong>A2A <code>send_to_bot</code></strong>
+              — orkestrator mengirim tugas ke spesialis, menunggu jawaban, lalu
+              merangkum. Max 3 hop.
+            </li>
+          </ul>
+          <h3>Mode UI</h3>
+          <ul>
+            <li>
+              <strong>Simple</strong>
+              — owner bisnis (default install baru).
+            </li>
+            <li><strong>Advanced</strong> — admin / operator.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Aktor</h3>
+      <div class="tbl">
+        <table>
+          <tr>
+            <th>Aktor</th>
+            <th>Scope</th>
+            <th>Bisa</th>
+          </tr>
+          <tr>
+            <td>Platform admin</td>
+            <td>Seluruh install</td>
+            <td>Org, provider, MCP, backup, upgrade, audit, waitlist</td>
+          </tr>
+          <tr>
+            <td>Parent org admin</td>
+            <td>Parent org</td>
+            <td>Publish shared resources, buat team</td>
+          </tr>
+          <tr>
+            <td>Org admin</td>
+            <td>Satu org</td>
+            <td>Invite member, settings, tools, plugins, org memory</td>
+          </tr>
+          <tr>
+            <td>Org member</td>
+            <td>Satu org</td>
+            <td>
+              Chat, groups, connectors, artifacts sendiri, Simple mode, install
+              Marketplace (bila diizinkan)
+            </td>
+          </tr>
+          <tr>
+            <td>Pengunjung landing</td>
+            <td>Publik</td>
+            <td>Baca landing, isi waitlist</td>
+          </tr>
+          <tr>
+            <td>Jovan (orkestrator)</td>
+            <td>Agen</td>
+            <td>
+              Satu pintu untuk owner; delegasi ke spesialis via
+              <code>send_to_bot</code>
+            </td>
+          </tr>
+          <tr>
+            <td>Airin (Super)</td>
+            <td>Agen admin</td>
+            <td>Buat/kelola profil, tools, groups, plugin drafts</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>Tim agen Marketplace</h3>
+      <div class="tbl">
+        <table>
+          <tr>
+            <th>Agen</th>
+            <th>Peran</th>
+            <th>Paket</th>
+          </tr>
+          <tr>
+            <td>Jovan</td>
+            <td>Orkestrator / Chief of Staff</td>
+            <td>Umum</td>
+          </tr>
+          <tr>
+            <td>Alya</td>
+            <td>HR · UU Ketenagakerjaan</td>
+            <td>Umum</td>
+          </tr>
+          <tr>
+            <td>Maya</td>
+            <td>Recruiting</td>
+            <td>Umum</td>
+          </tr>
+          <tr>
+            <td>Rani</td>
+            <td>Payroll</td>
+            <td>Umum</td>
+          </tr>
+          <tr>
+            <td>Dimas</td>
+            <td>Finance</td>
+            <td>Umum + Laundry</td>
+          </tr>
+          <tr>
+            <td>Fajar</td>
+            <td>Sales</td>
+            <td>Umum</td>
+          </tr>
+          <tr>
+            <td>Hana</td>
+            <td>Customer success</td>
+            <td>Umum</td>
+          </tr>
+          <tr>
+            <td>Kezia</td>
+            <td>Social media</td>
+            <td>Umum</td>
+          </tr>
+          <tr>
+            <td>Bima</td>
+            <td>Operations</td>
+            <td>Umum</td>
+          </tr>
+          <tr>
+            <td>Nisa</td>
+            <td>Legal drafts</td>
+            <td>Umum</td>
+          </tr>
+          <tr>
+            <td>Sari</td>
+            <td>Social media</td>
+            <td>Laundry</td>
+          </tr>
+          <tr>
+            <td>Rina</td>
+            <td>WhatsApp support</td>
+            <td>Laundry</td>
+          </tr>
+          <tr>
+            <td>Ardi</td>
+            <td>Data analyst</td>
+            <td>Laundry</td>
+          </tr>
+          <tr>
+            <td>Gilang</td>
+            <td>Visibility (Maps / Apify)</td>
+            <td>Laundry</td>
+          </tr>
+          <tr>
+            <td>Toni</td>
+            <td>Operations</td>
+            <td>Laundry</td>
+          </tr>
+        </table>
+      </div>
+
+      <h3>Arsitektur (ringkas)</h3>
+      <div class="panel">
+        <p>
+          Clients (web, CLI, desktop) + channel workers → HTTP/SSE dengan
+          <code>X-Org-Id</code>
+          → server Hono (rate limit → auth → org → routes) →
+          <code>AgentService</code> (tools, MCP, plugins, skills) → SQLite +
+          file soul/memory.
+        </p>
+        <p class="muted">
+          Satu container Docker: API + web + workers. Data di
+          <code>/airin/data</code>, dashboard port 4310. Batas lean: ≤512 MB RSS
+          untuk core.
+        </p>
+      </div>
+
+      <!-- ============ FEATURES ============ -->
+      <h2 id="features">Fitur saat ini</h2>
+
+      <div class="tbl">
+        <table>
+          <tr>
+            <th>Area</th>
+            <th>Fitur</th>
+            <th>Status</th>
+          </tr>
+          <tr>
+            <td>Auth</td>
+            <td>
+              Setup wizard, email/password, MFA TOTP, passkey, reset password,
+              invite, session list
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Multi-tenant</td>
+            <td>
+              Banyak org, parent org + teams (1 level), shared
+              knowledge/skills/agents/tools/models
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Profil / agen</td>
+            <td>
+              Soul files, system prompt, avatar, model + thinking, channels,
+              tools/skills/MCP, knowledge base, clone/import/export, regression
+              cases
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Marketplace</td>
+            <td>
+              Install agen dengan soul, memory, skills; rename otomatis nama
+              lama ke nama orang
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Simple mode</td>
+            <td>
+              Sidebar tim + subtitle peran, Groups, Marketplace, tool call
+              terlipat
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Simple mode</td>
+            <td>
+              Buka chat terakhir agen (per browser); New chat = draft kosong
+            </td>
+            <td><span class="badge b-new">Baru</span></td>
+          </tr>
+          <tr>
+            <td>Chat web</td>
+            <td>
+              Streaming, lampiran ≤5 MB, todo panel, inline HTML artifacts,
+              cognito, branch, compact, questionnaire, share artifact publik,
+              BTW
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Agent groups</td>
+            <td>
+              2–12 agen, brief, <code>@handle</code>/<code>@all</code>, thread
+              privat, file & memory grup, nama · peran pembicara
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>A2A</td>
+            <td>
+              <code>send_to_bot</code>
+              otomatis di setiap turn; cocok nama fleksibel; depth 3
+            </td>
+            <td><span class="badge b-new">Baru</span></td>
+          </tr>
+          <tr>
+            <td>Laporan HTML</td>
+            <td>
+              Template terkunci: Executive summary → KPI → chart → tabel; ikut
+              tema
+            </td>
+            <td><span class="badge b-new">Baru</span></td>
+          </tr>
+          <tr>
+            <td>HR Indonesia</td>
+            <td>
+              Skill <code>hr-uu-ketenagakerjaan</code> (UU 13/2003, UU 6/2023,
+              PP 35 & 36/2021)
+            </td>
+            <td><span class="badge b-new">Baru</span></td>
+          </tr>
+          <tr>
+            <td>Automations</td>
+            <td>
+              Cron / runAt, webhook bertanda tangan, runs history, tools agen
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Tools</td>
+            <td>
+              13 builtin + bash, sub_agent, browser, image gen, session tools,
+              custom JS/Python
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Skills</td>
+            <td>
+              Bundled + opt-in + paket laundry (12 skill), proposals, curator,
+              review pasca-turn
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>MCP</td>
+            <td>HTTP + stdio, OAuth, Exa + Firecrawl bawaan</td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Composio</td>
+            <td>Toolkit, OAuth per user, assignment per profil</td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Plugins</td>
+            <td>
+              Workflows, Supermemory, Google Meet, Data View (Google Sheet)
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Memory</td>
+            <td>Org MEMORY.md + facts, profile MEMORY.md (4096 B) + arsip</td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Providers</td>
+            <td>
+              Multi provider, device OAuth, vision/transcribe/image routing,
+              kuota org
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Channels</td>
+            <td>
+              Telegram, WhatsApp, Discord, Slack (DM pairing), Teams (tanpa
+              file)
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Landing</td>
+            <td>
+              Landing <code>/</code> ID/EN, industri, form waitlist, daftar
+              waitlist untuk admin
+            </td>
+            <td><span class="badge b-new">Baru</span></td>
+          </tr>
+          <tr>
+            <td>Ops</td>
+            <td>
+              Workers, status/upgrade, backup terenkripsi, export/import, audit,
+              metrics, health, OpenAPI, PWA, i18n EN/ID
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+          <tr>
+            <td>Deploy</td>
+            <td>
+              Docker, Bun, PM2, desktop (macOS), managed hosting, produksi
+              useairin.id
+            </td>
+            <td><span class="badge b-done">Ada</span></td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- ============ PRD / SPRINT ============ -->
+      <h2 id="prd">PRD — Status sprint P0 (Laundry Innovation Summit)</h2>
+
+      <div aria-label="P0 status" class="bar">
+        <div style="width:42.9%;background:var(--done)" title="Done 6"></div>
+        <div
+          style="width:21.4%;background:var(--partial)"
+          title="Partial 3"
+        ></div>
+        <div
+          style="width:28.6%;background:var(--open)"
+          title="Not verified 4"
+        ></div>
+        <div
+          style="width:7.1%;background:var(--spec)"
+          title="Spec only 1"
+        ></div>
+      </div>
+      <div class="legend">
+        <span><i style="background:var(--done)"></i>Done 6</span>
+        <span><i style="background:var(--partial)"></i>Partial 3</span>
+        <span><i style="background:var(--open)"></i>Not verified 4</span>
+        <span><i style="background:var(--spec)"></i>Spec only 1</span>
+      </div>
+
+      <div class="tbl" style="margin-top:1rem">
+        <table>
+          <tr>
+            <th>ID</th>
+            <th>Item</th>
+            <th>Status</th>
+            <th>Bukti / gap</th>
+          </tr>
+          <tr>
+            <td>P0-0</td>
+            <td>Demo environment</td>
+            <td><span class="badge b-done">Done</span></td>
+            <td>useairin.id, health ok. Default bahasa Indonesia (bukan EN)</td>
+          </tr>
+          <tr>
+            <td>P0-1</td>
+            <td>Laundry pack (6 agen)</td>
+            <td><span class="badge b-partial">Partial</span></td>
+            <td>Ada di katalog; waktu re-import belum diukur</td>
+          </tr>
+          <tr>
+            <td>P0-2</td>
+            <td>Social media (Sari)</td>
+            <td><span class="badge b-open">Not verified</span></td>
+            <td>Skill ada</td>
+          </tr>
+          <tr>
+            <td>P0-3</td>
+            <td>WhatsApp support (Rina)</td>
+            <td><span class="badge b-open">Not verified</span></td>
+            <td>Bridge produksi belum diuji ulang</td>
+          </tr>
+          <tr>
+            <td>P0-4</td>
+            <td>Data analyst (Ardi)</td>
+            <td><span class="badge b-partial">Partial</span></td>
+            <td>Forecast dari sheet OK; API cuaca belum diuji</td>
+          </tr>
+          <tr>
+            <td>P0-5</td>
+            <td>Finance via Data View (Dimas)</td>
+            <td><span class="badge b-done">Done</span></td>
+            <td>Tab Transaksi terlalu besar</td>
+          </tr>
+          <tr>
+            <td>P0-6</td>
+            <td>Visibility / Apify (Gilang)</td>
+            <td><span class="badge b-open">Not verified</span></td>
+            <td>Key Apify belum dicek</td>
+          </tr>
+          <tr>
+            <td>P0-7</td>
+            <td>Operations (Toni)</td>
+            <td><span class="badge b-partial">Partial</span></td>
+            <td>Menjawab di grup Business</td>
+          </tr>
+          <tr>
+            <td>P0-8</td>
+            <td>Simple UI</td>
+            <td><span class="badge b-done">Done</span></td>
+            <td>Simple mode + lanjut chat terakhir</td>
+          </tr>
+          <tr>
+            <td>P0-9</td>
+            <td>Onboarding → vertical</td>
+            <td><span class="badge b-open">Not verified</span></td>
+            <td>Alur belum diuji ulang</td>
+          </tr>
+          <tr>
+            <td>P0-10</td>
+            <td>Demo script</td>
+            <td><span class="badge b-done">Done</span></td>
+            <td>Dokumen ada</td>
+          </tr>
+          <tr>
+            <td>P0-11</td>
+            <td>Landing + waitlist</td>
+            <td><span class="badge b-done">Done</span></td>
+            <td>Route publik + list admin</td>
+          </tr>
+          <tr>
+            <td>P0-12</td>
+            <td>Business profile</td>
+            <td><span class="badge b-spec">Spec only</span></td>
+            <td>Belum ada penyimpanan terstruktur</td>
+          </tr>
+          <tr>
+            <td>P0-13</td>
+            <td>Label peran di sidebar</td>
+            <td><span class="badge b-done">Done</span></td>
+            <td>Fallback “Agen”; juga di group chat</td>
+          </tr>
+          <tr>
+            <td>—</td>
+            <td>Jovan + A2A</td>
+            <td><span class="badge b-new">Baru</span></td>
+            <td>Di luar backlog awal</td>
+          </tr>
+          <tr>
+            <td>—</td>
+            <td>HR Indonesia (Alya)</td>
+            <td><span class="badge b-new">Baru</span></td>
+            <td>Skill UU ketenagakerjaan</td>
+          </tr>
+          <tr>
+            <td>—</td>
+            <td>Laporan HTML terkunci</td>
+            <td><span class="badge b-new">Baru</span></td>
+            <td>Wajib di grup</td>
+          </tr>
+        </table>
+      </div>
+
+      <!-- ============ ROADMAP ============ -->
+      <h2 id="roadmap">Product roadmap</h2>
+      <p class="muted">
+        Urutan dari sprint backlog dan gap BRD. Tanpa tanggal: estimasi ada di
+        <code>docs/sprint-backlog*.md</code>.
+      </p>
+
+      <div class="roadmap">
+        <div class="panel col now">
+          <h3>Now — selesaikan P0</h3>
+          <ul>
+            <li>
+              <strong>P0-12 Business profile</strong>: nama, alamat, layanan,
+              harga, jam, WA, Maps, tone — masuk ke prompt semua agen
+            </li>
+            <li>Uji ulang P0-2, P0-3, P0-6, P0-9 di produksi</li>
+            <li>P0-1: ukur re-import paket laundry (&lt;15 menit)</li>
+            <li>P0-4: hubungkan dan uji API cuaca</li>
+            <li>
+              <strong>P1-3</strong>: release tag + CHANGELOG setelah v0.4.74
+            </li>
+          </ul>
+        </div>
+        <div class="panel col next">
+          <h3>Next — hardening &amp; nilai bisnis</h3>
+          <ul>
+            <li>
+              <strong>Sheet besar</strong>: paging/filter Data View atau import
+              ke sqlite (Transaksi)
+            </li>
+            <li>
+              <strong>Routing orkestrator dinamis</strong>: Jovan baca roster +
+              peran org
+            </li>
+            <li><strong>Jejak delegasi A2A</strong> terlihat di UI</li>
+            <li>
+              <strong>Lanjut chat lintas device</strong>: simpan session
+              terakhir di server
+            </li>
+            <li>
+              P1-4 Production hardening (secrets, backup drill, RSS ≤512 MB)
+            </li>
+            <li>P1-6 Image generation untuk agen Social</li>
+            <li>P1-8 Finance: sync sheet berkala + template skenario</li>
+          </ul>
+        </div>
+        <div class="panel col later">
+          <h3>Later — komersial &amp; skala</h3>
+          <ul>
+            <li>P1-1 Pembayaran (Stripe / regional)</li>
+            <li>P1-2 Dashboard super admin</li>
+            <li>P1-5 Posting sosial + carousel</li>
+            <li>P1-7 Visibility: GBP / Maps first-class</li>
+            <li>P1-9 Router onboarding vertical (≥3 vertical)</li>
+            <li>
+              Gap: SSO/SAML, API key mesin, audit log untuk customer, plugin
+              sandbox, OCR
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- ============ LIMITS ============ -->
+      <h2 id="limits">Batas &amp; gap utama</h2>
+
+      <div class="grid2">
+        <div class="tbl">
+          <table>
+            <tr>
+              <th>Area</th>
+              <th>Batas</th>
+            </tr>
+            <tr>
+              <td>Lampiran chat</td>
+              <td>5 MB</td>
+            </tr>
+            <tr>
+              <td>KB zip</td>
+              <td>20 MB</td>
+            </tr>
+            <tr>
+              <td>Profile MEMORY.md</td>
+              <td>4096 byte</td>
+            </tr>
+            <tr>
+              <td>Child chat (<code>sub_agent</code>)</td>
+              <td>5, depth 1</td>
+            </tr>
+            <tr>
+              <td><code>send_to_bot</code></td>
+              <td>Depth 3, timeout 5 menit</td>
+            </tr>
+            <tr>
+              <td>Data View per tab</td>
+              <td>400 000 karakter; baca 200 baris/panggilan</td>
+            </tr>
+            <tr>
+              <td>Rate limit</td>
+              <td>600/menit; auth 10/menit</td>
+            </tr>
+            <tr>
+              <td>Core RSS</td>
+              <td>≤512 MB</td>
+            </tr>
+          </table>
+        </div>
+        <div class="tbl">
+          <table>
+            <tr>
+              <th>Tidak didukung (sengaja / belum)</th>
+            </tr>
+            <tr>
+              <td>Signup &amp; pembayaran dari landing</td>
+            </tr>
+            <tr>
+              <td>Role viewer (dihapus)</td>
+            </tr>
+            <tr>
+              <td>Nested teams, nested <code>sub_agent</code></td>
+            </tr>
+            <tr>
+              <td>File di Microsoft Teams; Slack hanya DM pairing</td>
+            </tr>
+            <tr>
+              <td>Email tool di channel messaging</td>
+            </tr>
+            <tr>
+              <td>OCR PDF hasil scan</td>
+            </tr>
+            <tr>
+              <td>Plugin sandbox (plugin = trusted code)</td>
+            </tr>
+            <tr>
+              <td>Lanjut chat lintas browser/device</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <footer>
+        Dibuat dari dokumen di repo <code>docs/</code>. Status “Not verified”
+        berarti belum dicek terhadap acceptance criteria. Detail lengkap:
+        <code>current-state-brd-prd.md</code>, <code>-model.md</code>,
+        <code>-catalog.md</code>, <code>-gaps.md</code>,
+        <code>sprint-backlog.md</code>.
+      </footer>
+    </div>
+  </body>
+</html>

@@ -97,6 +97,15 @@ export const queryKeys = {
   orgMemoryProposals: (orgId: string, status?: string) =>
     ["orgMemoryProposals", orgId, status ?? "all"] as const,
   orgParentMembers: (orgId: string) => ["orgParentMembers", orgId] as const,
+  orgs: {
+    planUsage: (orgId: string) => ["orgs", orgId, "planUsage"] as const,
+  },
+  orgVaultGraph: (orgId: string) => ["orgVault", orgId, "graph"] as const,
+  orgVaultNote: (orgId: string, noteId: string) =>
+    ["orgVault", orgId, "note", noteId] as const,
+  orgVaultNotes: (orgId: string, query: string) =>
+    ["orgVault", orgId, "notes", query] as const,
+  orgVaultRoot: (orgId: string) => ["orgVault", orgId] as const,
   plugins: {
     all: (orgId: string) => ["plugins", orgId] as const,
     detail: (orgId: string, pluginId: string) =>

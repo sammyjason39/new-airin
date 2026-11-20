@@ -16,7 +16,7 @@
 **Cara pakai (gambaran):**
 1. Identitas & aturan selalu-on tetap di soul / system prompt.
 2. Skill menambah prosedur spesifik.
-3. Tool dan MCP menentukan aksi yang boleh dilakukan — skill memberi petunjuk kapan/bagaimana memakai tool.
+3. Tool dan connectors menentukan aksi yang boleh dilakukan — skill memberi petunjuk kapan/bagaimana memakai tool.
 
 **Batas / catatan:**
 - Skill menyimpan **prosedur**, bukan fakta pengguna (fakta → memori; lihat [07. Memori dan pengetahuan](./07-memori-dan-pengetahuan.md)).

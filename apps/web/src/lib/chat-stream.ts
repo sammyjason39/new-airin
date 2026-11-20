@@ -542,6 +542,37 @@ function basename(value: string): string {
   return parts[parts.length - 1] || normalized;
 }
 
+/** MCP meta-tools and ids from the Airin Library connector (Tapinall backend). */
+function isAirinLibraryTool(tool: string | undefined): boolean {
+  if (!tool) {
+    return false;
+  }
+
+  const bare = tool.replace(/^[^_]+__/, "").toLowerCase();
+
+  return (
+    bare === "call" ||
+    bare === "catalog_get" ||
+    bare === "catalog_search" ||
+    bare.startsWith("tap.") ||
+    tool.toLowerCase().includes("tapinall")
+  );
+}
+
+function airinLibraryActionLabel(tool: string | undefined): string {
+  const bare = tool?.replace(/^[^_]+__/, "").toLowerCase() ?? "";
+
+  if (bare === "catalog_search") {
+    return "Searching Airin Library";
+  }
+
+  if (bare === "catalog_get") {
+    return "Reading connector";
+  }
+
+  return "Using Airin Library";
+}
+
 export function formatToolActionLabel(
   tool: string | undefined,
   // oxlint-disable-next-line anti-slop/no-unsafe-dictionary-type -- This dictionary holds external JSON keys until the boundary parser validates each value.
@@ -549,6 +580,10 @@ export function formatToolActionLabel(
   // oxlint-disable-next-line anti-slop/no-unknown-parameters -- Tool results are untrusted JSON and are narrowed below.
   result?: unknown
 ): string {
+  if (isAirinLibraryTool(tool)) {
+    return airinLibraryActionLabel(tool);
+  }
+
   const summary = formatToolSummary(tool, input);
 
   if (isSubAgentTool(tool)) {
@@ -622,6 +657,11 @@ export function formatToolActionLabel(
 
   if (summary) {
     const firstLine = summary.split("\n")[0] ?? summary;
+
+    // Never surface Tapinall tool ids (tap.*) in the chat work stream.
+    if (/^tap\./i.test(firstLine) || /tapinall/i.test(firstLine)) {
+      return "Using Airin Library";
+    }
 
     if (
       /^(npm|pnpm|yarn|bun|node|python|cd|curl|git|tail|cat|grep|ls)\b/.test(

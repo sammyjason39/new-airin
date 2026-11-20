@@ -152,8 +152,8 @@ export function ChatPageContent({
   const { navigateToNewChat } = useAppNavigation();
 
   const startNewChat = () => {
-    // Simple mode keeps one continuous session; do not wipe it from the composer.
-    if (ownerMode || !profileId) {
+    // Simple stays on one thread until `/new` (or `/new session`) is invoked.
+    if (!profileId) {
       return;
     }
 

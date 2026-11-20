@@ -2,6 +2,7 @@
 
 > Panduan lengkap untuk pemilik usaha, admin organisasi, dan anggota tim.
 > Bahasa: Indonesia. Versi produk: 0.4.74. Produksi contoh: [useairin.id](https://useairin.id)
+> Terakhir dipetakan ulang: **20 Nov 2026** (hub Accio Plugins \| Skills \| Connectors; Airin Library).
 
 **Mulai cepat:** buka [Peta halaman](/guide/00-peta-halaman) (klik di mana) · tanya **Airin** di chat · atau buka [Pengaturan](/settings/preferences).
 
@@ -29,7 +30,7 @@ Setiap bab berisi: **siapa yang bisa**, **cara pakai** (langkah UI + tautan), **
 | [08. Skills](./08-skills.md) | Skill bawaan, assign, buat, self-improving | Admin |
 | [09. File dan artifacts](./09-file-dan-artifacts.md) | Files, laporan HTML, share publik, PDF | Semua |
 | [10. Otomasi dan workflow](./10-otomasi-dan-workflow.md) | Jadwal, webhook, Workflows plugin | Admin |
-| [11. Integrasi dan tools](./11-integrasi-dan-tools.md) | Builtin tools, Composio, MCP, Data View, Meet | Admin |
+| [11. Integrasi dan tools](./11-integrasi-dan-tools.md) | Builtin tools, Connectors (Composio + Airin Library + custom), Data View, Meet | Admin |
 | [12. Channel](./12-channel.md) | Telegram, WhatsApp, Discord, Slack, Teams, CLI, Desktop | Admin |
 | [13. Admin platform](./13-admin-platform.md) | Provider, workers, backup, audit, deploy | Platform admin |
 | [14. Batas, FAQ, istilah](./14-batas-faq-dan-istilah.md) | Limit, FAQ, glosarium | Semua |
@@ -41,7 +42,7 @@ Setiap bab berisi: **siapa yang bisa**, **cara pakai** (langkah UI + tautan), **
 | Mode UI | Untuk | Yang terlihat |
 |---|---|---|
 | **Simple** | Pemilik usaha (default) | [Tim Anda](/chat) (termasuk **Airin**), Grup, [Marketplace](/marketplace), [Panduan](/guide), [Pengaturan](/settings/preferences). Chat terakhir dibuka otomatis |
-| **Advanced** | Admin / operator | Semua menu: [Profiles](/profiles), [Tools](/settings/tools), [MCP](/settings/mcp), [Skills](/settings/skills), [Usage](/settings/usage) |
+| **Advanced** | Admin / operator | [Profiles](/profiles), hub [Plugins](/settings/plugins) \| [Skills](/settings/skills) \| [Connectors](/connectors), [Tools](/settings/tools), [Usage](/settings/usage) |
 
 | Cara kerja sama agen | Kapan |
 |---|---|
@@ -66,5 +67,5 @@ Setiap bab berisi: **siapa yang bisa**, **cara pakai** (langkah UI + tautan), **
 - Salin agen: tombol UI **Duplicate**, dialog **Clone profile?** → **Clone**.
 - Grup: ubah anggota lewat **Edit group**; hentikan hand-off dengan **Stop after this reply**.
 - Backup dashboard: **Download backup** (bukan “Export ZIP”).
-- Kunci API **Composio**: platform admin. Tiap user menghubungkan akun SaaS sendiri di [Connections](/connectors).
+- Kunci API **Composio**: platform admin. Tiap user menghubungkan akun SaaS sendiri di [Connectors](/connectors).
 - Audit: API platform saja; belum ada menu Audit di sidebar.

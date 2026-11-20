@@ -17,6 +17,11 @@ import { useId } from "react";
 import { McpServerTools } from "@/components/soul-tools/mcp-tab/McpServerTools";
 import { mcpServerDeleteBlockReason } from "./shared";
 
+/** User-facing label — keep Tapinall as an install-only backend name. */
+function displayMcpServerName(name: string): string {
+  return name.trim().toLowerCase() === "tapinall" ? "Airin Library" : name;
+}
+
 export function McpPageState({
   message,
   embedded = false,
@@ -184,7 +189,7 @@ export function McpServersSection({
         <div className="min-w-0 flex-1">
           <p className="type-body text-muted-foreground text-xs">
             {servers.length === 0
-              ? "No MCP servers registered yet"
+              ? "No custom connectors yet"
               : `${servers.length} registered`}
           </p>
         </div>
@@ -192,7 +197,7 @@ export function McpServersSection({
         <div className="flex shrink-0 items-center gap-1">
           <Button onClick={onAddServer} type="button">
             <Add01Icon aria-hidden className="size-4" />
-            Add server
+            Add connector
           </Button>
         </div>
       </div>
@@ -201,7 +206,7 @@ export function McpServersSection({
         <CardContent className="p-0">
           {servers.length === 0 ? (
             <div className="p-6 text-muted-foreground text-sm">
-              Register MCP servers here, then assign them to profiles on the
+              Add a custom connector here, then assign it to agents on the
               Profiles page.
             </div>
           ) : (
@@ -232,7 +237,7 @@ export function McpServersSection({
                       <span className="min-w-0 flex-1 space-y-1">
                         <span className="flex flex-wrap items-center gap-2">
                           <span className="break-all text-foreground text-sm">
-                            {server.name}
+                            {displayMcpServerName(server.name)}
                           </span>
                           {assignedProfileCount > 0 ? (
                             <span className="rounded-full border border-border bg-muted px-2 py-0.5 text-muted-foreground text-xs">

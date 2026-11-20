@@ -566,7 +566,8 @@ function failedStep(run: WorkflowRunRecord) {
   return run.steps?.find((step) => step.status === "failed");
 }
 
-const WORKFLOW_DOCS = "https://ahmadrosid.github.io/airin/workflows";
+const WORKFLOW_DOCS =
+  "https://github.com/Conextlab-MIT/new-airin/blob/main/docs/website/content/docs/workflows.mdx";
 
 const DISMISSED_KEY = "airin:workflows:dismissed-runs";
 

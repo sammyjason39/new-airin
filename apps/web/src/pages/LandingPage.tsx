@@ -9,6 +9,7 @@ import { ComparisonSection } from "./landing-section-comparison";
 import { FeatureSection } from "./landing-section-features";
 import { LandingFooter } from "./landing-section-footer";
 import { GroupsOnboardingSections } from "./landing-section-groups";
+import { PricingSection } from "./landing-section-pricing";
 import { RosterSection } from "./landing-section-roster";
 import { WaitlistSection } from "./landing-section-waitlist";
 import { useLandingCopy } from "./use-landing-copy";
@@ -73,6 +74,7 @@ export function LandingPage() {
         <IndustryExamples />
         <ComparisonSection />
         <GroupsOnboardingSections />
+        <PricingSection />
         <WaitlistSection />
       </main>
       <LandingFooter />

@@ -1,6 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { createInMemoryDatabaseAdapter } from "@airin/db";
 import { OrgMemoryService } from "../../services/org-memory-service";
+import { OrgVaultService } from "../../services/org-vault-service";
 import { setupTestConfigDir } from "../../test-config-dir";
 import { createMinimalHonoApp } from "../test-app-helpers";
 import {
@@ -417,5 +418,51 @@ describe("org memory routes (v1)", () => {
     );
 
     expect(otherOrgResp.status).toBe(404);
+  });
+
+  test("approve proposal captures fact into company vault when vault service is wired", async () => {
+    const databaseAdapter = createInMemoryDatabaseAdapter();
+    const orgMemoryService = new OrgMemoryService(databaseAdapter);
+    const orgVaultService = new OrgVaultService();
+    const { app } = createMinimalHonoApp({
+      databaseAdapter,
+      orgMemoryService,
+      orgVaultService,
+    });
+
+    const adminSession = await setupFreshInstallSession(
+      app,
+      databaseAdapter,
+      "admin-vault@org.com"
+    );
+    const orgId = adminSession.orgId!;
+
+    const proposed = await orgMemoryService.propose(orgId, {
+      bullet: "vault route capture fact",
+      profileId: "profile_vault",
+    });
+    expect(proposed.outcome).toBe("created");
+
+    const approveResp = await app.fetch(
+      new Request(
+        `${BASE}/v1/orgs/${orgId}/memory/proposals/${proposed.proposalId}/approve`,
+        {
+          body: JSON.stringify({ pin: true }),
+          headers: adminSession.headers(
+            { "X-CSRF-Token": adminSession.csrfToken },
+            orgId
+          ),
+          method: "POST",
+        }
+      )
+    );
+
+    expect(approveResp.status).toBe(200);
+
+    const notes = await orgVaultService.listNotes(orgId);
+    expect(
+      notes.some((n) => n.content.includes("vault route capture fact"))
+    ).toBe(true);
+    expect(notes.some((n) => n.slug === "org-memory")).toBe(true);
   });
 });

@@ -73,7 +73,7 @@ test("shows the newer release with its upgrade command and checks again on click
 
   expect(
     [...container.querySelectorAll("a")].some((link) =>
-      link.href.endsWith("/docker#upgrade-a-docker-run-install")
+      link.href.includes("docs/website/content/docs/docker.mdx")
     )
   ).toBe(true);
 

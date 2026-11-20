@@ -594,8 +594,8 @@ export function useChatPage() {
       nextProfileId: string,
       options?: {
         /**
-         * Simple mode keeps one continuous session like Grok. Only clear the
-         * stored id when starting Cognito or recovering from a deleted chat.
+         * Simple mode keeps one continuous session until `/new`. Clear the
+         * stored id on explicit New chat, Cognito switch, or a deleted chat.
          */
         clearStoredSession?: boolean;
       }
@@ -1172,22 +1172,9 @@ export function useChatPage() {
       }));
     }
 
-    // Simple mode: keep one continuous thread. Resume the last chat instead of
-    // wiping it when something opens ?new=1 (composer slash, history, deep link).
-    if (uiMode === "owner" && !cognitoRef.current) {
-      const storedSessionId = readStoredSessionId(targetProfileId);
-
-      if (storedSessionId) {
-        navigate(buildChatPath(targetProfileId, storedSessionId), {
-          replace: true,
-        });
-
-        return;
-      }
-    }
-
-    // ?new=1 is always on /chat, so enterDraftChat does not navigate here.
-    enterDraftChat(targetProfileId);
+    // Explicit `/new` (or New chat): wipe the continuous Simple thread and start
+    // blank. Opening an agent without ?new=1 still resumes the last session.
+    enterDraftChat(targetProfileId, { clearStoredSession: true });
 
     navigate(buildChatBasePath(), { replace: true });
   }, [
@@ -1200,7 +1187,6 @@ export function useChatPage() {
     profileId,
     user?.id,
     activeOrg?.id,
-    uiMode,
   ]);
 
   useEffect(() => {

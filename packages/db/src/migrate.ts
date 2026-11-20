@@ -129,6 +129,7 @@ export function migrateDatabase(db: Database): void {
   atomic((database) =>
     addNullableTextColumnIfMissing(database, "automation_runs", "input")
   );
+  atomic(migrateBillingTables);
 }
 
 /**
@@ -2718,4 +2719,129 @@ CREATE TABLE IF NOT EXISTS regression_case_runs (
 CREATE INDEX IF NOT EXISTS regression_case_runs_case_created
   ON regression_case_runs (case_id, created_at DESC);
   `);
+}
+
+/** SaaS billing: install trial setting, org subscription, invoices, payments. */
+function migrateBillingTables(db: Database): void {
+  db.exec(`
+CREATE TABLE IF NOT EXISTS platform_billing_settings (
+  id INTEGER PRIMARY KEY NOT NULL CHECK (id = 1),
+  trial_days INTEGER NOT NULL DEFAULT 14 CHECK (trial_days >= 0 AND trial_days <= 365),
+  updated_at TEXT NOT NULL
+);
+
+INSERT OR IGNORE INTO platform_billing_settings (id, trial_days, updated_at)
+VALUES (1, 14, '1970-01-01T00:00:00.000Z');
+
+CREATE TABLE IF NOT EXISTS billing_subscriptions (
+  org_id TEXT PRIMARY KEY NOT NULL,
+  plan_id TEXT NOT NULL CHECK (plan_id IN ('lite', 'plus', 'pro', 'enterprise')),
+  status TEXT NOT NULL CHECK (status IN ('trial', 'active', 'past_due', 'suspended', 'cancelled')),
+  interval TEXT NOT NULL CHECK (interval IN ('month', 'quarter', 'year')),
+  seat_count INTEGER NOT NULL CHECK (seat_count >= 1),
+  included_seats INTEGER NOT NULL CHECK (included_seats >= 1),
+  trial_ends_at TEXT,
+  current_period_start TEXT,
+  current_period_end TEXT,
+  cancel_at_period_end INTEGER NOT NULL DEFAULT 0,
+  pending_plan_id TEXT CHECK (pending_plan_id IS NULL OR pending_plan_id IN ('lite', 'plus', 'pro', 'enterprise')),
+  pending_seat_count INTEGER CHECK (pending_seat_count IS NULL OR pending_seat_count >= 1),
+  pending_interval TEXT CHECK (pending_interval IS NULL OR pending_interval IN ('month', 'quarter', 'year')),
+  setup_hours_entitled REAL NOT NULL DEFAULT 0,
+  setup_hours_used REAL NOT NULL DEFAULT 0,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (org_id) REFERENCES organizations (id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS billing_subscriptions_status
+  ON billing_subscriptions (status, current_period_end);
+
+CREATE TABLE IF NOT EXISTS billing_invoices (
+  id TEXT PRIMARY KEY NOT NULL,
+  org_id TEXT NOT NULL,
+  number TEXT NOT NULL UNIQUE,
+  kind TEXT NOT NULL CHECK (kind IN ('initial', 'renewal', 'change', 'manual')),
+  status TEXT NOT NULL CHECK (status IN ('draft', 'open', 'paid', 'void', 'uncollectible')),
+  currency TEXT NOT NULL DEFAULT 'IDR',
+  subtotal_idr INTEGER NOT NULL CHECK (subtotal_idr >= 0),
+  total_idr INTEGER NOT NULL CHECK (total_idr >= 0),
+  period_start TEXT,
+  period_end TEXT,
+  due_at TEXT,
+  paid_at TEXT,
+  doku_reference TEXT,
+  doku_checkout_url TEXT,
+  doku_expires_at TEXT,
+  created_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL,
+  FOREIGN KEY (org_id) REFERENCES organizations (id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS billing_invoices_org_created
+  ON billing_invoices (org_id, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS billing_invoices_doku_reference
+  ON billing_invoices (doku_reference);
+
+CREATE TABLE IF NOT EXISTS billing_invoice_lines (
+  id TEXT PRIMARY KEY NOT NULL,
+  invoice_id TEXT NOT NULL,
+  description TEXT NOT NULL,
+  plan_id TEXT,
+  quantity INTEGER NOT NULL CHECK (quantity >= 1),
+  unit_amount_idr INTEGER NOT NULL,
+  amount_idr INTEGER NOT NULL,
+  proration INTEGER NOT NULL DEFAULT 0,
+  sort_order INTEGER NOT NULL DEFAULT 0,
+  FOREIGN KEY (invoice_id) REFERENCES billing_invoices (id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS billing_invoice_lines_invoice
+  ON billing_invoice_lines (invoice_id, sort_order);
+
+CREATE TABLE IF NOT EXISTS billing_payments (
+  id TEXT PRIMARY KEY NOT NULL,
+  invoice_id TEXT NOT NULL,
+  provider TEXT NOT NULL DEFAULT 'doku',
+  provider_request_id TEXT,
+  amount_idr INTEGER NOT NULL CHECK (amount_idr >= 0),
+  status TEXT NOT NULL,
+  raw_status TEXT,
+  paid_at TEXT,
+  created_at TEXT NOT NULL,
+  FOREIGN KEY (invoice_id) REFERENCES billing_invoices (id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS billing_payments_invoice
+  ON billing_payments (invoice_id, created_at DESC);
+  `);
+
+  addNullableIntegerColumnIfMissing(
+    db,
+    "organizations",
+    "monthly_llm_cost_limit_usd_cents"
+  );
+}
+
+function addNullableIntegerColumnIfMissing(
+  db: Database,
+  tableName: string,
+  columnName: string
+): void {
+  const columns = db
+    .prepare<{ name: string }, SQLQueryBindings[]>(
+      `PRAGMA table_info(${quoteSqliteIdentifier(tableName)})`
+    )
+    .all();
+
+  if (columns.length === 0) {
+    return;
+  }
+
+  if (!columns.some((column) => column.name === columnName)) {
+    db.exec(
+      `ALTER TABLE ${quoteSqliteIdentifier(tableName)} ADD COLUMN ${quoteSqliteIdentifier(columnName)} INTEGER;`
+    );
+  }
 }

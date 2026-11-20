@@ -77,14 +77,14 @@ describe("chat-stream-web-fetch", () => {
   test("parseExaWebFetchTextResult handles markdown crawl blocks", () => {
     const text = [
       "# Airin Docs",
-      "URL: https://ahmadrosid.github.io/airin/getting-started.md",
+      "URL: https://github.com/Conextlab-MIT/new-airin/blob/main/docs/website/content/docs/quickstart.mdx",
       "Published: 2026-01-01",
       "Author: Airin",
       "",
       "Getting started content…",
       "",
       "# Telegram",
-      "URL: https://ahmadrosid.github.io/airin/telegram.md",
+      "URL: https://github.com/Conextlab-MIT/new-airin/blob/main/docs/website/content/docs/telegram/index.mdx",
       "",
       "Telegram setup content…",
     ].join("\n");
@@ -93,7 +93,7 @@ describe("chat-stream-web-fetch", () => {
 
     expect(sources).toHaveLength(2);
     expect(sources[0]).toMatchObject({
-      href: "https://ahmadrosid.github.io/airin/getting-started.md",
+      href: "https://github.com/Conextlab-MIT/new-airin/blob/main/docs/website/content/docs/quickstart.mdx",
       title: "Airin Docs",
     });
     expect(sources[1]?.title).toBe("Telegram");

@@ -259,7 +259,7 @@ export async function buildSetupChecklist(
 }
 
 /**
- * Always put missing Gmail / Drive / Sheets connect steps first so Tapinall
+ * Always put missing Gmail / Drive / Sheets connect steps first so Airin Library
  * research can land in the owner's workbook.
  */
 export function mergeRequiredGoogleSetupItems(

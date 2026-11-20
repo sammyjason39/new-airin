@@ -11,6 +11,7 @@ import {
 } from "@airin/ui/dialog";
 import { Spinner } from "@airin/ui/spinner";
 import { useEffect, useState } from "react";
+import { LibraryHubFrame } from "@/components/library-hub/LibraryHubTabs";
 import { McpServerAuthorizeDialog } from "@/components/soul-tools/mcp-tab/McpServerAuthorizeDialog";
 import { McpServerDialog } from "@/components/soul-tools/mcp-tab/McpServerDialog";
 import {
@@ -31,6 +32,7 @@ import { client, formatError } from "@/lib/client";
 /** The callback connects the server on its own, so the list is re-read until it lands. */
 const AUTHORIZATION_POLL_INTERVAL_MS = 3000;
 
+// oxlint-disable-next-line react-doctor/no-high-complexity-react-function -- Custom connector list, auth poll, and dialogs share one tab.
 export function McpTab({ embedded = false }: { embedded?: boolean } = {}) {
   const [pendingAuth, setPendingAuth] = useState<{
     name: string;
@@ -186,18 +188,20 @@ export function McpTab({ embedded = false }: { embedded?: boolean } = {}) {
   }
 
   if (loading) {
-    return <McpPageState embedded={embedded} message="Loading MCP servers…" />;
+    return (
+      <McpPageState embedded={embedded} message="Loading custom connectors…" />
+    );
   }
 
-  return (
+  const content = (
     <>
       {errorMessage ? (
-        <p className="mx-auto mb-4 max-w-3xl rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-destructive text-sm">
+        <p className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 px-4 py-3 text-destructive text-sm">
           {errorMessage}
         </p>
       ) : null}
       {actionNotice ? (
-        <p className="mx-auto mb-4 max-w-3xl rounded-md border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-emerald-700 text-sm dark:text-emerald-300">
+        <p className="mb-4 rounded-md border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-emerald-700 text-sm dark:text-emerald-300">
           {actionNotice}
         </p>
       ) : null}
@@ -213,7 +217,7 @@ export function McpTab({ embedded = false }: { embedded?: boolean } = {}) {
         serverName={pendingAuth?.name ?? ""}
       />
 
-      <TapinallCatalogPanel embedded={embedded} />
+      {embedded ? <TapinallCatalogPanel embedded /> : null}
 
       <McpServersSection
         busy={busy}
@@ -314,6 +318,20 @@ export function McpTab({ embedded = false }: { embedded?: boolean } = {}) {
       />
     </>
   );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <LibraryHubFrame
+      toolbar={
+        <p className="text-muted-foreground text-sm">Custom connectors</p>
+      }
+    >
+      {content}
+    </LibraryHubFrame>
+  );
 }
 
 function DeleteMcpServerDialog({
@@ -338,12 +356,12 @@ function DeleteMcpServerDialog({
     >
       <DialogContent className="gap-6 p-6 sm:max-w-md">
         <DialogHeader className="gap-3">
-          <DialogTitle>Delete MCP server?</DialogTitle>
+          <DialogTitle>Delete custom connector?</DialogTitle>
           <DialogDescription>
-            Remove {target?.name ? `"${target.name}"` : "this MCP server"}. This
-            cannot be undone.
+            Remove {target?.name ? `"${target.name}"` : "this custom connector"}
+            . This cannot be undone.
             {(target?.assignedProfileCount ?? 0) > 0
-              ? ` It will also unassign this server from ${target?.assignedProfileCount} profile${target?.assignedProfileCount === 1 ? "" : "s"}.`
+              ? ` It will also unassign this connector from ${target?.assignedProfileCount} profile${target?.assignedProfileCount === 1 ? "" : "s"}.`
               : null}
           </DialogDescription>
         </DialogHeader>

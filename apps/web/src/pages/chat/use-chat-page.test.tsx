@@ -1822,7 +1822,7 @@ test("Simple mode opens the last stored chat on /chat", async () => {
   }
 });
 
-test("Simple mode ?new=1 resumes the continuous session instead of wiping it", async () => {
+test("Simple mode ?new=1 clears the continuous session and starts a blank chat", async () => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false } },
   });
@@ -1931,8 +1931,8 @@ test("Simple mode ?new=1 resumes the continuous session instead of wiping it", a
       await Bun.sleep(40);
     });
 
-    expect(pathname).toBe("/chat/default/last-session");
-    expect(stored.get("airin:session:default")).toBe("last-session");
+    expect(pathname).toBe("/chat");
+    expect(stored.get("airin:session:default")).toBeUndefined();
     expect(createSession).not.toHaveBeenCalled();
   } finally {
     await act(async () => root.unmount());

@@ -1,81 +1,72 @@
 ---
 name: tapinall-research
 description: >-
-  Live SEO, GEO, lead, outreach, hiring scout, competitor, and market research
-  with Tapinall (catalog_search → catalog_get → call), then write every row into
-  the owner's Google Sheet. Require Gmail, Google Drive, and Google Sheets first.
+  Live SEO, GEO, lead, outreach, hiring scout, competitor research via the
+  Airin Library connector → Google Sheet. Drive required; Sheets preferred for
+  named sheets; Gmail only for send. For tidy multi-sheet layout, use
+  research-sheet-manager.
 ---
 
-# Tapinall research → Google Sheets
+# Research → Google Sheets (Airin Library)
 
-## Gate (mandatory)
+## User-facing voice (hard rules)
 
-Before any Tapinall `call`:
+1. Never say Tapinall, MCP, catalog_search, catalog_get, tool ids, routers, Apollo, or other vendor/tool names to the user.
+2. Never quote per-call prices, `$0.0…`, micro-USD, or maxCost. Usage dollars belong only on the Connectors / Airin Library settings screen.
+3. Do not list tool options or ask which backend to use. Pick the best connector quietly and deliver the result.
+4. If you must name the capability, say **Airin Library** or **Airin Connector** — never a third-party brand.
+5. Speak in plain product language: “cari lead”, “simpan ke sheet Leads”, not “tab.” jargon unless the user already used that word.
+6. Same rules in **group chat** and 1:1 — research skills and Google writes work in both.
 
-1. Confirm Composio **gmail**, **googledrive**, and **googlesheets** are connected for this user. If any is missing, call `composio__connect_account` for that slug and stop until the user connects.
-2. Find or create the workbook **Airin Research Data** in their Drive (Sheets). Keep one spreadsheet per org when possible.
-3. Ensure tabs exist: `Leads`, `Competitors`, `Enrichment`, `SEO`, `Candidates`, `Outreach`, `Runs`. Create missing tabs.
-4. Write the spreadsheet URL into org memory under Pinned as `Research sheet: <url>` so later turns reuse it.
+## Gate
 
-## Tapinall tool order
+1. Confirm **googledrive** is connected. Call `composio__connect_account` if not.
+2. Prefer **googlesheets** connected for named sheets. If Sheets is missing or `oauth_in_progress`, call `composio__connect_account` for `googlesheets` once, then continue with Drive spreadsheet value tools on workbook **Airin Research Data**. If only `Sheet1` exists, append under a clear labeled header for that dataset and note that **research-sheet-manager** tidy is required after Sheets connects.
+3. **gmail** is required only for send/outreach. Do not block SEO/GEO/leads/scout research writes on Gmail.
+4. `load_skill` **research-sheet-manager** when creating or renaming sheets (needs Sheets connected).
+5. Pin `Research sheet: <url>` in org memory when you find or create the workbook.
 
-1. `catalog_search` with a short query (for example `tiktok profile`, `company enrich`, `google maps`, `serp`, `linkedin`).
-2. `catalog_get` on the chosen tool id — check price and required params.
-3. `call` with `maxCostMicro` when the user set a budget.
-4. Append results to the matching sheet tab via **googlesheets** (never invent rows).
+## Hard rules for writes
 
-## Which tab?
+1. Prefer named sheets: `Leads`, `Competitors`, `Enrichment`, `SEO`, `Candidates`, `Outreach`, `Runs`.
+2. A1 ranges should include the sheet name when it exists (`Competitors!A2:K`).
+3. Never invent emails, phones, ratings, volumes, or difficulty scores.
+4. Log every run in `Runs` (or a Runs block on Sheet1 until tidy).
 
-| Work | Tab |
+## Connector order (internal only — never narrate to the user)
+
+1. Search the Airin Library catalog with a short query (for example `google maps`, `serp`, `linkedin`).
+2. Inspect the chosen tool id — check params; set `maxCostMicro` only when the user set a budget (do not report that number).
+3. Call the tool.
+4. Append results to the matching sheet (or labeled Sheet1 block if named sheets are not available yet).
+
+## Which sheet?
+
+| Work | Sheet |
 |---|---|
 | B2B / local leads | `Leads` |
-| Competitor / brand map | `Competitors` |
-| Field fill after enrich | `Enrichment` (+ patch source tab) |
+| Competitor / brand / GEO map | `Competitors` |
+| Field fill after enrich | `Enrichment` (+ patch source sheet) |
 | Keyword / SERP / backlink (SEO) | `SEO` |
 | Hiring / candidate scout | `Candidates` |
 | Outreach drafts / sequence rows | `Outreach` |
 | Every run summary | `Runs` |
 
-## Sheet columns (minimum)
-
-### Leads
-
-`fetched_at | source_tool | company | name | title | email | phone | city | country | website | notes | raw_json`
-
-### Competitors
-
-`fetched_at | source_tool | brand | website | city | category | rating | reviews | pricing_signal | notes | raw_json`
-
-### Enrichment
-
-`fetched_at | source_tool | input_key | field | value | notes | raw_json`
-
-### SEO
-
-`fetched_at | source_tool | keyword | locale | volume | difficulty | rank_url | rank_position | serp_feature | backlink_domain | notes | raw_json`
-
-### Candidates
-
-`fetched_at | source_tool | full_name | headline | location | profile_url | skills | years_signal | email | phone | notes | raw_json`
-
-### Outreach
-
-`fetched_at | channel | persona | to_name | to_email | company | subject | body | status | sheet_row_ref | notes`
-
-### Runs
-
-`fetched_at | agent | test_case | query | tools_used | rows_written | sheet_url | cost_note`
+Column lists live in **research-sheet-manager** → `references/workbook-schema.md`.
 
 ## Outreach note
 
-Draft rows in **Outreach** first. Send via Gmail only when the owner confirms. Never invent emails.
+Draft rows in **Outreach** first. Send via Gmail only when the owner confirms. Never invent emails. Connect Gmail before send.
 
-## Output to the user
+## Output to the user (embed in chat)
 
-1. Short summary of what was found.
-2. How many rows were written, and to which tab.
-3. Clickable link to the Google Sheet.
-4. Offer the next test case if useful.
+Always put the result **in the chat message itself** — do not only point at the sheet:
+
+1. One short summary sentence (no vendor or cost talk).
+2. A markdown table of the key rows (top 5–10 is enough when many).
+3. Counts: rows written + sheet name (plain words).
+4. Clickable Google Sheet URL.
+5. If Sheets is still not connected, remind the owner to finish Connect so the workbook can be tidied into real sheets.
 
 ## Test cases (examples)
 

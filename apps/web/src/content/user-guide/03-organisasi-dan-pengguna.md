@@ -9,7 +9,7 @@
 **Kenapa:** Organisasi adalah batas utama data. Satu tim tidak boleh melihat data tim lain.
 
 **Manfaat:**
-- Memisahkan anggota, agen, sesi, tools, skills, MCP, usage, dan memori organisasi.
+- Memisahkan anggota, agen, sesi, tools, skills, connectors, usage, dan memori organisasi.
 - Satu instalasi Airin bisa melayani banyak organisasi atau team di bawah parent.
 
 **Cara pakai:**

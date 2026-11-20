@@ -211,7 +211,7 @@ Teams can read explicitly published parent resources. Their memory, files, and s
 Each profile also sees the default Airin documentation source in **Browse Files → Knowledge**:
 
 ```text
-https://ahmadrosid.github.io/airin/llms.txt
+In-app [Panduan](/guide) and the `airin-guide` skill. Optional published docs: set `AIRIN_DOCS_SITE_URL` (serves `llms.txt`). Source repo: https://github.com/Conextlab-MIT/new-airin
 ```
 
 When a user asks about Airin setup, profiles, tools, orgs, integrations, API, or troubleshooting, the agent should `web_fetch` that index first, then `web_fetch` the matching `.md` page (for example `telegram.md` for Telegram setup). Do not use `knowledge_base_search` for inherited documentation — that tool only searches uploaded files.

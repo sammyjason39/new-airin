@@ -9,12 +9,14 @@ import type {
   OrgInviteCreatedResponse,
   OrgLlmQuotaStatusResponse,
   OrgMemberResponse,
+  OrgPlanUsageResponse,
   OrgSharedResourceResponse,
   OrgUsageLeader,
   OrgUsageSummaryResponse,
   ProfileResponse,
 } from "@airin/core/contract";
 import { createRoute, z } from "@hono/zod-openapi";
+import { OrgPlanUsageService } from "../../services/org-plan-usage-service";
 import { OrgUsageQuotaService } from "../../services/org-usage-quota-service";
 import type { ServerOptions } from "../context";
 import {
@@ -998,6 +1000,26 @@ export function registerOrgMemberRoutes(
     ).getStatus(orgId);
 
     return json<OrgLlmQuotaStatusResponse>(quota);
+  });
+
+  app.get("/v1/orgs/:orgId/plan-usage", async (c) => {
+    const auth = requireOrgMemberFromContext(c);
+    const orgId = decodeURIComponent(c.req.param("orgId"));
+
+    if (auth.activeOrgId !== orgId) {
+      return errorResponse("Not found", 404);
+    }
+
+    if (!options.databaseAdapter) {
+      return errorResponse("Database not configured", 500);
+    }
+
+    const usage = await new OrgPlanUsageService(
+      options.databaseAdapter,
+      async (id) => options.agent.getLlmUsageDailyStats(id)
+    ).getStatus(orgId);
+
+    return json<OrgPlanUsageResponse>(usage);
   });
 
   app.get("/v1/orgs/:orgId/usage-summary", async (c) => {

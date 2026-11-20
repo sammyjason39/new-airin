@@ -10,6 +10,7 @@ export const DEFAULT_BUNDLED_SKILL_NAMES = [
   "airin-guide",
   "grounded-research",
   "tapinall-research",
+  "research-sheet-manager",
 ] as const;
 
 export const SUPER_AIRIN_BUNDLED_SKILL_NAMES = [

@@ -2303,3 +2303,43 @@ describe("generate_image default-on migration", () => {
     }
   });
 });
+
+test("billing tables and default trial days exist after migrate", () => {
+  const db = new Database(":memory:");
+
+  try {
+    migrateDatabase(db);
+
+    expect(
+      db
+        .query("SELECT trial_days FROM platform_billing_settings WHERE id = 1")
+        .get()
+    ).toEqual({ trial_days: 14 });
+
+    for (const table of [
+      "billing_subscriptions",
+      "billing_invoices",
+      "billing_invoice_lines",
+      "billing_payments",
+    ]) {
+      expect(
+        db
+          .query<{ name: string }, SQLQueryBindings[]>(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = ?"
+          )
+          .get(table)?.name
+      ).toBe(table);
+    }
+
+    const orgColumns = db
+      .query<{ name: string }, SQLQueryBindings[]>(
+        "PRAGMA table_info(organizations)"
+      )
+      .all()
+      .map((column) => column.name);
+
+    expect(orgColumns).toContain("monthly_llm_cost_limit_usd_cents");
+  } finally {
+    db.close();
+  }
+});

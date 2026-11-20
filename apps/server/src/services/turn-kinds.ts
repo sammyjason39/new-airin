@@ -178,6 +178,8 @@ export const READ_ONLY_TOOL_NAMES: ReadonlySet<string> = new Set([
   "org_memory_search",
   "read_file",
   "search_files",
+  "vault_list",
+  "vault_search",
   "web_search",
 ]);
 

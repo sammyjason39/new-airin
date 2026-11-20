@@ -1,5 +1,5 @@
 /**
- * Google apps every research / Tapinall data workflow needs before scrape
+ * Google apps every research / Airin Library data workflow needs before scrape
  * results can land in the owner's sheet.
  */
 export const REQUIRED_GOOGLE_TOOLKIT_SLUGS = [

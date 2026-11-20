@@ -1,3 +1,10 @@
+import {
+  billingWhatsAppHref,
+  ENTERPRISE_CONTACT,
+  PAID_PLANS,
+  type PaidPlanId,
+  paidPlanWhatsAppTemplate,
+} from "@airin/core/billing";
 import { Button } from "@airin/ui/button";
 import { Input } from "@airin/ui/input";
 import {
@@ -13,6 +20,42 @@ import { Link } from "react-router-dom";
 import { useTheme } from "@/context/use-theme";
 import { submitLaundryInnovationSummitWaitlist } from "@/lib/laundry-innovation-summit-waitlist";
 import { markLogoSrc } from "@/lib/theme";
+
+const IDR = new Intl.NumberFormat("id-ID", {
+  currency: "IDR",
+  maximumFractionDigits: 0,
+  style: "currency",
+});
+
+function formatIdr(amount: number): string {
+  return IDR.format(amount).replace(/\s/g, "");
+}
+
+const SUMMIT_PLANS: Array<{
+  detail: string;
+  id: PaidPlanId;
+  name: string;
+  price: string;
+}> = [
+  {
+    detail: "1 akun · 2 perangkat · token ≈ $10",
+    id: "lite",
+    name: PAID_PLANS.lite.name,
+    price: formatIdr(PAID_PLANS.lite.priceIdrPerMonth),
+  },
+  {
+    detail: "3 akun · token ≈ $60 · setup dari 3 bulan",
+    id: "plus",
+    name: PAID_PLANS.plus.name,
+    price: formatIdr(PAID_PLANS.plus.priceIdrPerMonth),
+  },
+  {
+    detail: "10 akun · token ≈ $150 · dedicated support",
+    id: "pro",
+    name: PAID_PLANS.pro.name,
+    price: formatIdr(PAID_PLANS.pro.priceIdrPerMonth),
+  },
+];
 
 type Capability = {
   description: string;
@@ -154,6 +197,70 @@ export function LaundryInnovationSummitPage() {
               </li>
             ))}
           </ul>
+        </section>
+
+        <section
+          aria-labelledby="summit-pricing-heading"
+          className="mt-14 space-y-5"
+          id="harga"
+        >
+          <div className="space-y-2 text-center">
+            <h2
+              className="font-medium text-foreground text-lg"
+              id="summit-pricing-heading"
+            >
+              Harga
+            </h2>
+            <p className="text-muted-foreground text-sm">
+              Pembayaran sementara lewat WhatsApp. Trial 14 hari.
+            </p>
+          </div>
+          <ul className="grid gap-3 sm:grid-cols-3">
+            {SUMMIT_PLANS.map((plan) => (
+              <li
+                className="rounded-2xl border border-border/80 bg-card p-4 text-left shadow-none"
+                key={plan.id}
+              >
+                <p className="font-medium text-sm">{plan.name}</p>
+                <p className="mt-1 font-semibold text-base tabular-nums">
+                  {plan.price}
+                  <span className="font-normal text-muted-foreground text-xs">
+                    {" "}
+                    / bulan
+                  </span>
+                </p>
+                <p className="mt-2 text-muted-foreground text-xs leading-relaxed">
+                  {plan.detail}
+                </p>
+                <a
+                  className="mt-3 inline-block text-foreground text-xs underline underline-offset-4"
+                  href={billingWhatsAppHref(paidPlanWhatsAppTemplate(plan.id))}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  Chat WhatsApp
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="text-center text-muted-foreground text-xs">
+            Enterprise:{" "}
+            <a
+              className="underline underline-offset-4 hover:text-foreground"
+              href={billingWhatsAppHref(ENTERPRISE_CONTACT.template)}
+              rel="noreferrer"
+              target="_blank"
+            >
+              chat WhatsApp
+            </a>
+            {" · "}
+            <Link
+              className="underline underline-offset-4 hover:text-foreground"
+              to="/#harga"
+            >
+              detail lengkap
+            </Link>
+          </p>
         </section>
 
         <section

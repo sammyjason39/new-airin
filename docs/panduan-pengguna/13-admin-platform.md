@@ -84,7 +84,7 @@ Platform admin memasang plugin dari npm lokal / release resmi. Org admin meng-en
 | Secrets | `AIRIN_SECRETS_KEY` di env file (izin ketat) |
 | Produksi contoh | https://useairin.id (nginx + Let's Encrypt) |
 
-Lean: jaga RSS core ≤ **512 MB**; fitur berat lewat plugin/skill/MCP.
+Lean: jaga RSS core ≤ **512 MB**; fitur berat lewat plugin/skill/custom connector.
 
 Panduan lebih dalam: docs *Docker*, *Deployment hardening*, *Secret managers*, *Supported deployments*.
 
@@ -110,7 +110,9 @@ Panduan lebih dalam: docs *Docker*, *Deployment hardening*, *Secret managers*, *
 - [Usage](/settings/usage)
 - [Workers](/workers)
 - [Skills](/settings/skills)
-- [MCP](/settings/mcp)
+- [Custom connectors](/settings/mcp)
+- [Connectors](/connectors)
+- [Plugins](/settings/plugins)
 - [Plugins](/settings/plugins)
 - [Preferences](/settings/preferences) (backup / instance)
 - [00. Peta halaman](./00-peta-halaman.md)

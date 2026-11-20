@@ -130,9 +130,33 @@ export function formatToolActivityLabel(
     }
   }
 
+  const bare = tool?.replace(/^[^_]+__/, "").toLowerCase() ?? "";
+
+  if (
+    bare === "call" ||
+    bare === "catalog_get" ||
+    bare === "catalog_search" ||
+    bare.startsWith("tap.") ||
+    (tool?.toLowerCase().includes("tapinall") ?? false)
+  ) {
+    if (bare === "catalog_search") {
+      return "Searching Airin Library";
+    }
+
+    if (bare === "catalog_get") {
+      return "Reading connector";
+    }
+
+    return "Using Airin Library";
+  }
+
   const query = readString(details, "query");
 
   if (query) {
+    if (/^tap\./i.test(query) || /tapinall/i.test(query)) {
+      return "Using Airin Library";
+    }
+
     return truncateDisplay(query, 72);
   }
 

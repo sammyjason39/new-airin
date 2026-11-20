@@ -1,6 +1,6 @@
-# Tapinall research — example test cases
+# Airin Library research — example test cases
 
-Use these as demos and regression scripts. Each case assumes Gmail, Google Drive, and Google Sheets are connected, and Tapinall MCP is assigned.
+Use these as demos and regression scripts. Each case assumes Gmail, Google Drive, and Google Sheets are connected, Airin Library is assigned, and **research-sheet-manager** creates real sheets (`Leads`, `Competitors`, …) before writes. Never leave results as labeled blocks on `Sheet1`. Never say Tapinall or quote per-call $ in replies.
 
 ## Quick copy prompts (Bahasa Indonesia)
 
@@ -8,7 +8,7 @@ Use these as demos and regression scripts. Each case assumes Gmail, Google Drive
 |---|---|---|
 | TC-SALES-01 | Sales (Fajar) | Saya jual POS laundry di Jakarta Selatan. Buatkan peta kompetisi: 15 kompetitor lokal (nama, alamat, rating, jumlah review). Simpan ke sheet Competitors. |
 | TC-SALES-02 | Sales (Fajar) | Cari 20 leads pemilik laundry / usaha laundry di Bandung (nama bisnis, kota, website/telepon jika ada). Simpan ke sheet Leads. |
-| TC-SALES-03 | Sales (Fajar) | Enrich 5 leads di sheet Leads yang belum punya website/email. Pakai company enrichment Tapinall. Tulis hasil ke Enrichment dan update kolom Leads jika ketemu. |
+| TC-SALES-03 | Sales (Fajar) | Enrich 5 leads di sheet Leads yang belum punya website/email. Pakai company enrichment. Tulis hasil ke Enrichment dan update kolom Leads jika ketemu. |
 | TC-LEADS-01 | Sales (Fajar) | Cari 25 leads B2B: pemilik / manajer laundry di Surabaya (nama bisnis, kontak jika publik, website). Simpan ke Leads. Jangan mengarang email. |
 | TC-GEO-01 | Sales / Analyst | GEO lokal: mapping 20 tempat "laundry kiloan" dalam radius 5 km dari Blok M, Jakarta. Simpan ke Competitors (kolom city/rating). |
 | TC-SEO-01 | Sales / Social (Kezia) | SEO: riset keyword "software pos laundry" untuk Indonesia — volume, difficulty, 10 URL ranking. Simpan ke sheet SEO + Runs. |

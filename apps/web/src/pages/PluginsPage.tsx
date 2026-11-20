@@ -9,8 +9,9 @@ import { Input } from "@airin/ui/input";
 import { Add01Icon, ArrowDown01Icon, Search01Icon } from "hugeicons-react";
 import { useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { IntegrationsTabs } from "@/components/IntegrationsTabs";
+import { LibraryHubFrame } from "@/components/library-hub/LibraryHubTabs";
 import { useAuth } from "@/context/use-auth";
+
 import {
   isNewerPluginVersion,
   isPluginLifecycleBusy,
@@ -30,6 +31,7 @@ import {
   usePluginManagement,
 } from "@/pages/plugins/use-plugin-management";
 
+// oxlint-disable-next-line react-doctor/no-high-complexity-react-function -- Plugin list, detail, and install actions share one page.
 export function PluginsPage() {
   const { pluginId: selectedPluginId } = useParams<{ pluginId: string }>();
   const { user, activeOrg } = useAuth();
@@ -214,22 +216,25 @@ export function PluginsPage() {
     ? [{ ids: visiblePluginIds, title: null }]
     : groupPluginIds(visiblePluginIds, official, releases);
 
-  return (
-    <div className="mx-auto min-w-0 max-w-3xl space-y-6">
-      <PluginPageHeader
-        busy={busy}
-        canInstall={canInstallHere}
-        detail={Boolean(selectedPluginId)}
-        error={dialog ? null : errorMessage}
-        onInstall={(target) => {
-          rememberFocus(target);
-          setActionError(null);
-          setDialog({ type: "package-entry" });
-        }}
-        onInstallFromFolder={() => setFolderOpen(true)}
-        onQueryChange={setQuery}
-        query={query}
-      />
+  const header = (
+    <PluginPageHeader
+      busy={busy}
+      canInstall={canInstallHere}
+      detail={Boolean(selectedPluginId)}
+      error={dialog ? null : errorMessage}
+      onInstall={(target) => {
+        rememberFocus(target);
+        setActionError(null);
+        setDialog({ type: "package-entry" });
+      }}
+      onInstallFromFolder={() => setFolderOpen(true)}
+      onQueryChange={setQuery}
+      query={query}
+    />
+  );
+
+  const body = (
+    <>
       {canInstallHere ? (
         <LocalPluginInstaller
           key={orgId}
@@ -249,7 +254,7 @@ export function PluginsPage() {
         groups.map((group) => (
           <section className="space-y-3" key={group.title ?? "all"}>
             {group.title ? (
-              <h2 className="type-section-title font-medium text-muted-foreground">
+              <h2 className="font-medium text-muted-foreground text-sm">
                 {group.title}
               </h2>
             ) : null}
@@ -257,7 +262,7 @@ export function PluginsPage() {
               className={
                 selectedPluginId
                   ? "min-w-0"
-                  : "divide-y divide-border overflow-hidden rounded-xl border border-border bg-card text-card-foreground"
+                  : "grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
               }
             >
               {group.ids.map(renderRow)}
@@ -281,8 +286,19 @@ export function PluginsPage() {
         onConfirm={() => void confirmDialog()}
         onPreview={(source) => void previewNpmPackage(source)}
       />
-    </div>
+    </>
   );
+
+  if (selectedPluginId) {
+    return (
+      <div className="mx-auto min-w-0 max-w-3xl space-y-6">
+        {header}
+        {body}
+      </div>
+    );
+  }
+
+  return <LibraryHubFrame toolbar={header}>{body}</LibraryHubFrame>;
 }
 
 function PluginEmptyState({
@@ -330,52 +346,64 @@ function PluginPageHeader({
 }) {
   const installRef = useRef<HTMLButtonElement | null>(null);
 
-  return (
-    <div className="space-y-3">
-      {detail ? (
+  if (detail) {
+    return (
+      <div className="space-y-3">
         <Link
           className="block w-fit text-muted-foreground text-sm hover:text-foreground"
           to="/settings/plugins"
         >
           ← Back to plugins
         </Link>
-      ) : (
-        <IntegrationsTabs>
-          <div className="relative w-full sm:w-72">
-            <Search01Icon
-              aria-hidden="true"
-              className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
-            />
-            <Input
-              aria-label="Search plugins"
-              className="pl-9"
-              onChange={(event) => onQueryChange(event.target.value)}
-              placeholder="Search plugins"
-              type="search"
-              value={query}
-            />
-          </div>
-          {canInstall ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger
-                render={<Button disabled={busy} ref={installRef} />}
-              >
-                <Add01Icon aria-hidden="true" className="size-4" />
-                Install plugin
-                <ArrowDown01Icon aria-hidden="true" className="size-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-52">
-                <DropdownMenuItem onClick={onInstallFromFolder}>
-                  Made by an agent
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => onInstall(installRef.current)}>
-                  From npm package
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : null}
-        </IntegrationsTabs>
-      )}
+        {error ? (
+          <p
+            className="w-full rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-destructive text-sm"
+            role="alert"
+          >
+            {error}
+          </p>
+        ) : null}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex flex-wrap items-center gap-3">
+        <div className="relative w-full sm:w-72">
+          <Search01Icon
+            aria-hidden="true"
+            className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+          />
+          <Input
+            aria-label="Search plugins"
+            className="pl-9"
+            onChange={(event) => onQueryChange(event.target.value)}
+            placeholder="Search plugins"
+            type="search"
+            value={query}
+          />
+        </div>
+        {canInstall ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger
+              render={<Button disabled={busy} ref={installRef} />}
+            >
+              <Add01Icon aria-hidden="true" className="size-4" />
+              Add plugin
+              <ArrowDown01Icon aria-hidden="true" className="size-4" />
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuItem onClick={onInstallFromFolder}>
+                Made by an agent
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onInstall(installRef.current)}>
+                From npm package
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : null}
+      </div>
       {error ? (
         <p
           className="w-full rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-destructive text-sm"

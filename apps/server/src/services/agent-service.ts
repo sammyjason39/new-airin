@@ -139,6 +139,7 @@ import {
   AirinApiError,
   apiKeyEnvVarForProvider,
   appendOrgMemorySection,
+  appendVaultSection,
   applyChatgptOAuthToInstance,
   applyXaiOAuthToInstance,
   buildErrorReport,
@@ -313,6 +314,7 @@ import {
   createOrgMemoryTools,
   PROPOSE_ORG_MEMORY_TOOL_NAME,
 } from "../tools/org-memory-tools";
+import { createOrgVaultTools } from "../tools/org-vault-tools";
 import { SAVE_ARTIFACT_TOOL_NAME } from "../tools/save-artifact-tool";
 import {
   createSendDiscordArtifactTools,
@@ -395,6 +397,7 @@ import { MemoryBackendService } from "./memory-backend-service";
 import { OrgMemoryService } from "./org-memory-service";
 import type { OrgService } from "./org-service";
 import { OrgUsageQuotaService } from "./org-usage-quota-service";
+import { OrgVaultService } from "./org-vault-service";
 import type { PluginService } from "./plugin-service";
 import type { ProfileChangeMeta } from "./profile-change-history";
 import {
@@ -563,6 +566,7 @@ export class AgentService {
   private readonly agentQuestionnaireState: AgentQuestionnaireState;
   private readonly superAirinTools: ToolDefinition[];
   private readonly orgMemoryTools: ToolDefinition[];
+  private orgVaultTools: ToolDefinition[] = [];
   private automationTools: ToolDefinition[] = [];
   private automationRunHistoryTools: ToolDefinition[] = [];
   private questionTools: ToolDefinition[] = [];
@@ -585,6 +589,7 @@ export class AgentService {
   private skillProposalService: SkillProposalService | null = null;
   private skillSuggestionService: SkillSuggestionService | null = null;
   private orgMemoryService: OrgMemoryService | null = null;
+  private orgVaultService: OrgVaultService | null = null;
   private orgService: OrgService | null = null;
   private readonly memoryBackend: MemoryBackendService;
   readonly sessions = new SessionRuntime({
@@ -687,8 +692,14 @@ export class AgentService {
       }
     );
     this.orgMemoryTools = createOrgMemoryTools(this.getOrgMemoryService());
+    this.orgVaultTools = createOrgVaultTools(this.getOrgVaultService());
     this._providerConfigured =
       isProviderConfigured(userConfig) && provider !== null;
+  }
+
+  setOrgVaultService(service: OrgVaultService): void {
+    this.orgVaultService = service;
+    this.orgVaultTools = createOrgVaultTools(service);
   }
 
   private llmTurnQuotaCheckerFor(orgId: string | undefined) {
@@ -737,6 +748,14 @@ export class AgentService {
     }
 
     return this.orgMemoryService;
+  }
+
+  private getOrgVaultService(): OrgVaultService {
+    if (!this.orgVaultService) {
+      this.orgVaultService = new OrgVaultService();
+    }
+
+    return this.orgVaultService;
   }
 
   private async resolveSessionAccess(
@@ -6647,9 +6666,9 @@ export class AgentService {
     }
 
     if (hasOwnTools && !limit) {
-      resolved = [...resolved, ...this.orgMemoryTools];
+      resolved = [...resolved, ...this.orgMemoryTools, ...this.orgVaultTools];
 
-      for (const tool of this.orgMemoryTools) {
+      for (const tool of [...this.orgMemoryTools, ...this.orgVaultTools]) {
         if (READ_ONLY_TOOL_NAMES.has(tool.name)) {
           readOnlyTools.add(tool);
         }
@@ -6658,7 +6677,9 @@ export class AgentService {
 
     if (!policy.memoryWrite) {
       resolved = resolved.filter(
-        (tool) => tool.name !== PROPOSE_ORG_MEMORY_TOOL_NAME
+        (tool) =>
+          tool.name !== PROPOSE_ORG_MEMORY_TOOL_NAME &&
+          tool.name !== "vault_write"
       );
     }
 
@@ -7335,6 +7356,9 @@ export class AgentService {
 
     const orgMemorySummary = await this.getOrgMemoryService().getSummary(orgId);
     systemPrompt = appendOrgMemorySection(systemPrompt, orgMemorySummary);
+
+    const vaultCatalog = await this.getOrgVaultService().getCatalog(orgId);
+    systemPrompt = appendVaultSection(systemPrompt, vaultCatalog);
 
     return {
       soulActive: Boolean(stack),

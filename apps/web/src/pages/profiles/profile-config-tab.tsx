@@ -187,7 +187,7 @@ function buildProfileSections({
     },
     {
       hint: String(detail.mcpServers.length),
-      label: "MCP",
+      label: "Connectors",
       value: "mcp",
     },
     {

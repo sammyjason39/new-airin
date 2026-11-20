@@ -129,8 +129,14 @@ export function PluginRow({
   updateVersion,
 }: PluginRowProps) {
   return (
-    <li className={detail ? "min-w-0" : "min-w-0 px-4 py-3.5"}>
-      <div className="flex flex-wrap items-center gap-3">
+    <li
+      className={
+        detail
+          ? "min-w-0"
+          : "flex min-w-0 flex-col gap-3 rounded-2xl border border-border bg-card p-4"
+      }
+    >
+      <div className="flex flex-wrap items-start gap-3">
         <PluginIdentity
           catalogDescription={catalogDescription}
           detail={detail}
@@ -236,7 +242,7 @@ function PluginIdentity({
         {detail ? (
           <PluginStatusLine official={official} plugin={plugin} />
         ) : (
-          <p className="mt-0.5 line-clamp-1 break-words pr-6 text-muted-foreground text-sm">
+          <p className="mt-0.5 line-clamp-3 break-words pr-6 text-muted-foreground text-xs leading-relaxed">
             {PLUGIN_DESCRIPTIONS.get(pluginId) ||
               plugin?.description ||
               catalogDescription ||

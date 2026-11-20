@@ -4,9 +4,10 @@ import { Button } from "@airin/ui/button";
 import { Card, CardContent } from "@airin/ui/card";
 import { Input } from "@airin/ui/input";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight01Icon } from "hugeicons-react";
-import { useState } from "react";
+import { Add01Icon, ArrowRight01Icon, File01Icon } from "hugeicons-react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { LibraryHubFrame } from "@/components/library-hub/LibraryHubTabs";
 import { ProfileAvatar } from "@/components/ProfileAvatar";
 import { useAuth } from "@/context/use-auth";
 import { useOrgPlugins } from "@/hooks/use-plugins";
@@ -69,7 +70,7 @@ export function CustomizePage() {
       title: "Workspace",
     },
     {
-      pages: ["providers", "tools", "skills", "mcp", "plugin-management"],
+      pages: ["providers", "tools", "composio"],
       title: "Agent tools",
     },
   ].map(({ title, pages }) => ({
@@ -234,15 +235,36 @@ export function SkillsPage() {
         left.name.localeCompare(right.name)
     );
 
+  const groups = useMemo(() => {
+    const bySource = new Map<string, typeof filtered>();
+
+    for (const skill of filtered) {
+      const source = skillSourceLabel(skill);
+      const list = bySource.get(source) ?? [];
+      list.push(skill);
+      bySource.set(source, list);
+    }
+
+    return [...bySource.entries()].sort(
+      (left, right) =>
+        (skillSourceOrder.get(left[0]) ?? 3) -
+        (skillSourceOrder.get(right[0]) ?? 3)
+    );
+  }, [filtered]);
+
   return (
-    <div className="mx-auto max-w-3xl space-y-4">
-      <Input
-        aria-label="Search skills"
-        onChange={(event) => setSearch(event.target.value)}
-        placeholder="Search skills"
-        type="search"
-        value={search}
-      />
+    <LibraryHubFrame
+      toolbar={
+        <Input
+          aria-label="Search skills"
+          className="w-full sm:w-72"
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search skills"
+          type="search"
+          value={search}
+        />
+      }
+    >
       {isLoading && <p role="status">Loading skills…</p>}
       {error && (
         <div className="space-y-2" role="alert">
@@ -257,83 +279,86 @@ export function SkillsPage() {
           {query ? "No matching skills." : "No skills available."}
         </p>
       )}
-      {filtered.length > 0 && (
-        <Card className="overflow-hidden shadow-none">
-          <CardContent className="divide-y divide-border p-0">
-            {filtered.map((skill) => (
-              <div
-                className="relative flex items-center gap-3 py-3 pr-10 pl-4 hover:bg-accent/50"
+      {groups.map(([source, items]) => (
+        <section className="space-y-3" key={source}>
+          <h2 className="font-medium text-muted-foreground text-sm">
+            {source} ({items.length})
+          </h2>
+          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {items.map((skill) => (
+              <li
+                className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4"
                 key={skill.id}
               >
-                <Link
-                  className="min-w-0 flex-1 focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2"
-                  to={`${skillDetailPath(skill.id)}?from=skills`}
-                >
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="break-words font-medium">
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex min-w-0 items-start gap-3">
+                    <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-border bg-background">
+                      <File01Icon
+                        aria-hidden
+                        className="size-5 text-muted-foreground"
+                      />
+                    </span>
+                    <div className="min-w-0 space-y-1">
+                      <Link
+                        className="block font-semibold text-foreground text-sm hover:underline"
+                        to={`${skillDetailPath(skill.id)}?from=skills`}
+                      >
                         {skill.name}
-                      </span>
-                      {!skill.enabled && (
-                        <span className="text-muted-foreground text-xs">
-                          Disabled
-                        </span>
-                      )}
+                      </Link>
+                      <p className="line-clamp-2 text-muted-foreground text-xs leading-relaxed">
+                        {skill.description || "No description."}
+                      </p>
                     </div>
                   </div>
-                  <ArrowRight01Icon
-                    aria-hidden
-                    className="absolute top-1/2 right-4 size-4 -translate-y-1/2 text-muted-foreground"
-                  />
-                </Link>
-                <div className="flex max-w-1/2 flex-wrap items-center justify-end gap-2 text-xs">
-                  <span className="rounded-md bg-muted px-2 py-0.5 text-muted-foreground text-xs">
-                    {skillSourceLabel(skill)}
-                  </span>
+                  <Button
+                    aria-label={`Open ${skill.name}`}
+                    className="shrink-0"
+                    nativeButton={false}
+                    render={
+                      <Link to={`${skillDetailPath(skill.id)}?from=skills`} />
+                    }
+                    size="icon-sm"
+                    type="button"
+                    variant="ghost"
+                  >
+                    <Add01Icon aria-hidden className="size-4" />
+                  </Button>
+                </div>
+                <div className="mt-auto flex flex-wrap items-center gap-2 text-xs">
+                  {skill.enabled ? null : (
+                    <span className="text-muted-foreground">Disabled</span>
+                  )}
                   {profilesError ? (
                     <button
                       className="text-destructive underline"
                       onClick={() => void refetchProfiles()}
                       type="button"
                     >
-                      Couldn’t load profile assignments. Retry
+                      Retry assignments
                     </button>
+                  ) : profilesBySkill.has(skill.id) ? (
+                    <div className="flex -space-x-2">
+                      {(profilesBySkill.get(skill.id) ?? []).map((profile) => (
+                        <Link
+                          aria-label={`Open ${profile.name}`}
+                          className="relative rounded-full ring-2 ring-card hover:z-10 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ring"
+                          key={profile.id}
+                          title={profile.name}
+                          to={profilePath(profile.id)}
+                        >
+                          <ProfileAvatar profile={profile} size="xxs" />
+                        </Link>
+                      ))}
+                    </div>
                   ) : profiles ? (
-                    <>
-                      {profilesBySkill.has(skill.id) && (
-                        <div className="order-first flex -space-x-2">
-                          {(profilesBySkill.get(skill.id) ?? []).map(
-                            (profile) => (
-                              <Link
-                                aria-label={`Open ${profile.name}`}
-                                className="relative rounded-full ring-2 ring-card hover:z-10 focus-visible:z-10 focus-visible:outline-2 focus-visible:outline-ring"
-                                key={profile.id}
-                                title={profile.name}
-                                to={profilePath(profile.id)}
-                              >
-                                <ProfileAvatar profile={profile} size="xxs" />
-                              </Link>
-                            )
-                          )}
-                        </div>
-                      )}
-                      {!profilesBySkill.has(skill.id) && (
-                        <span className="text-muted-foreground">
-                          Not assigned to any profile
-                        </span>
-                      )}
-                    </>
-                  ) : (
-                    <span className="text-muted-foreground" role="status">
-                      Loading profile assignments…
-                    </span>
-                  )}
+                    <span className="text-muted-foreground">Not assigned</span>
+                  ) : null}
                 </div>
-              </div>
+              </li>
             ))}
-          </CardContent>
-        </Card>
-      )}
-    </div>
+          </ul>
+        </section>
+      ))}
+    </LibraryHubFrame>
   );
 }

@@ -346,10 +346,12 @@ function TapinallCatalogHeader({
   return (
     <CardHeader className="gap-3 space-y-0 border-border border-b pb-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <CardTitle className="text-base">Tapinall data</CardTitle>
+        <CardTitle className="text-base">Airin Library</CardTitle>
         <div className="flex items-center gap-2">
           {balance ? (
-            <span className="text-muted-foreground text-xs">{balance}</span>
+            <span className="text-muted-foreground text-xs">
+              Usage {balance}
+            </span>
           ) : null}
           <StatusPill
             label={configured ? "Connected" : "Not connected"}
@@ -363,11 +365,11 @@ function TapinallCatalogHeader({
           className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
         />
         <Input
-          aria-label="Search Tapinall apps and tools"
+          aria-label="Search Airin Library connectors"
           className="pl-9"
           disabled={!configured}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="Search apps or tools"
+          placeholder="Search connectors"
           value={query}
         />
       </div>
@@ -409,7 +411,7 @@ function TapinallCatalogBody({
       {loadingStatus ? (
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <Spinner className="size-4" />
-          Loading Tapinall…
+          Loading Airin Library…
         </div>
       ) : null}
 
@@ -427,7 +429,7 @@ function TapinallCatalogBody({
 
       {loadingStatus || configured ? null : (
         <p className="text-muted-foreground text-sm">
-          Connect the Tapinall MCP server to browse 3,200+ data tools.
+          Connect Airin Library to browse built-in data connectors.
         </p>
       )}
 
@@ -514,7 +516,6 @@ function AppsList({ apps }: { apps: TapinallCatalogApp[] }) {
           key={app.id}
         >
           <div className="font-medium">{app.label}</div>
-          <div className="text-muted-foreground text-xs">{app.id}</div>
         </li>
       ))}
     </ul>
@@ -596,9 +597,6 @@ function ToolsList({
           </div>
           <p className="mt-1 text-muted-foreground text-xs">
             {tool.description}
-          </p>
-          <p className="mt-1 font-mono text-[11px] text-muted-foreground">
-            {tool.id}
           </p>
         </li>
       ))}

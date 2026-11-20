@@ -16,7 +16,7 @@ import { queryKeys } from "@/lib/query-keys";
 type UpgradeStatus = AirinUpgradeResponse["status"];
 
 const UPGRADE_DOCS_URL =
-  "https://ahmadrosid.github.io/airin/docker#upgrade-a-docker-run-install";
+  "https://github.com/Conextlab-MIT/new-airin/blob/main/docs/website/content/docs/docker.mdx";
 
 function VersionStatus({
   query,

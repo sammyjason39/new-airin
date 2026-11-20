@@ -237,7 +237,11 @@ function McpCreateBody({
       : [];
 
   async function connectApp(item: PopularServer) {
-    if (!offered.some((toolkit) => toolkit.slug === item.toolkit)) {
+    const toolkitSlug = "toolkit" in item ? item.toolkit : null;
+
+    if (
+      !(toolkitSlug && offered.some((toolkit) => toolkit.slug === toolkitSlug))
+    ) {
       // No Composio for this app here: sign in to its own MCP server.
       if ("url" in item) {
         state.selectKind("signin");
@@ -260,7 +264,7 @@ function McpCreateBody({
         isOrgAdmin,
         profileId,
         returnTo: `${window.location.pathname}${window.location.search}`,
-        toolkitSlug: item.toolkit,
+        toolkitSlug,
         toolkits: composio,
       });
 

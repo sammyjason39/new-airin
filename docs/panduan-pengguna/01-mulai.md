@@ -162,7 +162,7 @@
 
 **Manfaat:**
 - **Simple**: fokus tim agen, grup, marketplace.
-- **Advanced**: pengaturan, tools, MCP, skills, usage.
+- **Advanced**: pengaturan, hub Plugins \| Skills \| Connectors, tools, usage.
 
 **Cara pakai:**
 1. Di bawah sidebar, buka menu akun (avatar).
@@ -172,7 +172,7 @@
 | Mode | Untuk siapa | Yang terlihat |
 |---|---|---|
 | **Simple** (kode internal `owner`; default install baru) | Pemilik usaha | **Tim Anda** (agen + peran di bawah nama), **Grup** (Groups), **Marketplace** ([/marketplace](/marketplace)), **Pengaturan** ([/settings/preferences](/settings/preferences)) ([Settings / Preferences](/settings/preferences)). Detail tool dilipat. Membuka chat mengembalikan percakapan terakhir agen itu (disimpan per browser). |
-| **Advanced** | Admin / operator | Rail profil penuh, **Settings**, Tools, MCP, Skills, **Usage**, switcher organisasi |
+| **Advanced** | Admin / operator | Rail profil penuh, **Settings**, sidebar **Plugins** (hub Plugins \| Skills \| Connectors), Tools, **Usage**, switcher organisasi |
 
 **Batas / catatan:**
 - Di Simple, pilih **Chat baru** (New chat) atau jalur `/new` untuk percakapan kosong.
@@ -195,7 +195,7 @@
 5. Sembunyikan/tampilkan sidebar lewat kontrol sidebar jika tersedia (**Sembunyikan sidebar** / **Tampilkan sidebar**).
 
 **Cara pakai (Advanced):**
-1. Pakai rail profil dan sidebar aplikasi untuk halaman **Organization**, **Usage**, Tools, MCP, Skills, dan pengaturan lain.
+1. Pakai rail profil dan sidebar aplikasi untuk halaman **Organization**, **Usage**, Tools, hub **Plugins** (Plugins \| Skills \| Connectors), dan pengaturan lain.
 2. Ganti organisasi lewat **Org switcher** di sidebar (lihat bab organisasi).
 
 **Batas / catatan:**

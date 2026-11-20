@@ -7,6 +7,7 @@ import {
   Coins01Icon,
   DashboardSquare01Icon,
   Folder01Icon,
+  Image01Icon,
   LayoutGridIcon,
   Notification01Icon,
   PackageIcon,
@@ -30,6 +31,7 @@ export type PageId =
   | "chat"
   | "composio"
   | "customize"
+  | "design"
   | "usage"
   | "files"
   | "profiles"
@@ -40,6 +42,7 @@ export type PageId =
   | "marketplace"
   | "automations"
   | "organization"
+  | "vault"
   | "settings"
   | "providers"
   | "notifications"
@@ -102,12 +105,17 @@ const NAV_GROUPS: NavGroup[] = [
         "Capture and read meeting transcripts",
         SharedWifiIcon
       ),
-      navItem("plugin-management", "Plugins", "Manage plugins", PackageIcon),
       navItem(
         "composio",
-        "Connections",
-        "Connect apps and manage plugins",
+        "Plugins",
+        "Plugins, skills, and connectors",
         PuzzleIcon
+      ),
+      navItem(
+        "design",
+        "Design",
+        "Generate images and videos from prompts",
+        Image01Icon
       ),
     ],
     label: "Chat",
@@ -139,6 +147,12 @@ const NAV_GROUPS: NavGroup[] = [
         "Members, memory, and org settings",
         Building03Icon
       ),
+      navItem(
+        "vault",
+        "Company Vault",
+        "Second brain — notes, wikilinks, and graph",
+        BookOpen01Icon
+      ),
     ],
     label: "Organization",
   },
@@ -160,8 +174,6 @@ const NAV_GROUPS: NavGroup[] = [
         DashboardSquare01Icon
       ),
       navItem("tools", "Tools", "Manage agent tools", LayoutGridIcon),
-      navItem("skills", "Skills", "Browse organization skills", BrainIcon),
-      navItem("mcp", "MCP", "Manage MCP servers", Plug01Icon),
       navItem(
         "providers",
         "AI Providers",
@@ -185,14 +197,27 @@ export const SIDEBAR_PAGE_IDS: readonly PageId[] = [
   "chat",
   "profiles",
   "groups",
+  "design",
   "composio",
   "automations",
   "customize",
 ];
 
-/** Plugins is a tab of Connections, so it lights up the Connections item. */
+/**
+ * Plugins hub tabs (Plugins / Skills / Connectors / custom connectors) share
+ * one sidebar item.
+ */
 export function sidebarPageId(page: PageId): PageId {
-  return page === "plugin-management" ? "composio" : page;
+  if (
+    page === "plugin-management" ||
+    page === "skills" ||
+    page === "mcp" ||
+    page === "composio"
+  ) {
+    return "composio";
+  }
+
+  return page;
 }
 
 export const STANDALONE_PAGES: Partial<Record<PageId, NavItem>> = {
@@ -215,9 +240,7 @@ export const SETUP_PATH = "/setup";
 
 const PLATFORM_ADMIN_PAGE_IDS: ReadonlySet<PageId> = new Set([
   "soul",
-  "mcp",
   "providers",
-  "skills",
 ]);
 
 export function canAccessSystemPage(
@@ -256,7 +279,8 @@ export function canOpenPage(pageId: PageId, access: PageAccess): boolean {
   if (
     pageId === "google-meet" ||
     pageId === "groups" ||
-    pageId === "marketplace"
+    pageId === "marketplace" ||
+    pageId === "design"
   ) {
     return canAccessIntegrationsPage(access.orgRole);
   }
@@ -265,16 +289,18 @@ export function canOpenPage(pageId: PageId, access: PageAccess): boolean {
     return access.isPlatformAdmin || canAccessIntegrationsPage(access.orgRole);
   }
 
-  if (pageId === "organization" || pageId === "files") {
+  if (pageId === "organization" || pageId === "files" || pageId === "vault") {
     return canAccessOrganizationPage(access.isPlatformAdmin, access.orgRole);
   }
 
   if (
     pageId === "usage" ||
     pageId === "plugin-management" ||
+    pageId === "skills" ||
     pageId === "tools" ||
     pageId === "soul" ||
-    pageId === "workers"
+    pageId === "workers" ||
+    pageId === "mcp"
   ) {
     return canAccessSystemPage(access.isPlatformAdmin, access.orgRole);
   }
@@ -505,6 +531,7 @@ export const PAGE_PATHS: Record<PageId, string> = {
   chat: "/chat",
   composio: "/connectors",
   customize: "/settings",
+  design: "/design",
   files: "/files",
   "google-meet": "/google-meet",
   groups: "/groups",
@@ -522,6 +549,7 @@ export const PAGE_PATHS: Record<PageId, string> = {
   soul: "/system",
   tools: "/settings/tools",
   usage: "/settings/usage",
+  vault: "/vault",
   workers: "/workers",
 };
 
@@ -531,9 +559,11 @@ const PREFIX_PAGE_IDS: readonly [string, PageId][] = [
   [PAGE_PATHS["plugin-management"], "plugin-management"],
   [PAGE_PATHS.chat, "chat"],
   [PAGE_PATHS.groups, "groups"],
+  [PAGE_PATHS.design, "design"],
   [PAGE_PATHS.guide, "guide"],
   [PAGE_PATHS.marketplace, "marketplace"],
   [PAGE_PATHS.organization, "organization"],
+  [PAGE_PATHS.vault, "vault"],
   [PAGE_PATHS.soul, "soul"],
   [PAGE_PATHS.profiles, "profiles"],
   [PAGE_PATHS.files, "files"],
@@ -633,7 +663,7 @@ const INTEGRATION_SECTIONS = [
   {
     icon: Plug01Icon,
     id: "composio",
-    label: "Composio",
+    label: "Connectors",
   },
   {
     icon: CodeIcon,

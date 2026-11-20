@@ -29,7 +29,7 @@ function formatFieldLabel(field: ProfileChangeEvent["field"]): string {
     case "skills":
       return "Skills";
     case "mcp":
-      return "MCP";
+      return "Connectors";
     case "pack_import":
       return "Pack import";
     default:

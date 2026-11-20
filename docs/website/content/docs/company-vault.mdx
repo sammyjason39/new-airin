@@ -1,0 +1,48 @@
+---
+title: "Company Vault"
+description: "Org-wide second brain — notes with [[wikilinks]], a force graph, and agent capture into durable company knowledge."
+---
+
+**Company Vault** is the organization’s second brain.
+
+Agents and members write linked markdown notes (SOPs, MOM, docs). Wikilinks `[[Note Title]]` become graph edges. The vault catalog is injected into agent prompts; agents use `vault_search` / `vault_write` for detail.
+
+Org memory stays for short pinned facts. Prefer the vault for multi-paragraph documents and connected knowledge.
+
+## Open the vault
+
+**Organization → Company Vault** (`/vault`).
+
+| View | Purpose |
+|---|---|
+| **Split** | Edit markdown and preview side by side |
+| **Read** | Preview only |
+| **Write** | Editor only |
+| **Graph** | Force-layout map of notes and links |
+
+Use `[[Other Note]]` in the body to connect notes. The side panel shows backlinks and outgoing links.
+
+## On disk
+
+```text
+~/.airin/orgs/{orgId}/vault/notes/{slug}.md
+~/.airin/orgs/{orgId}/vault/links.json
+```
+
+Each note is markdown with YAML frontmatter (`id`, `title`, `slug`, `noteType`, `tags`, timestamps). Caps: **200** notes, **32 KB** per note.
+
+## Agent tools
+
+When a profile has tools, these vault tools are available (same gate as org memory):
+
+| Tool | Purpose |
+|---|---|
+| `vault_search` | Keyword search + excerpts |
+| `vault_list` | Titles, types, tags |
+| `vault_write` | Create or update a note (respects memory-write policy) |
+
+Approved **org memory** proposals are also captured into the vault as notes linked to an **Org Memory** hub note.
+
+## Prompt injection
+
+After org memory, Airin appends a short **Company Vault** catalog (titles + types, size-capped). Agents call `vault_search` when they need body text.

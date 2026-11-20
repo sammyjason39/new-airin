@@ -801,6 +801,22 @@ export function registerOrgMemoryRoutes(
         }
       );
 
+      // Capture approved facts into the company vault graph (best-effort).
+      if (options.orgVaultService) {
+        try {
+          await options.orgVaultService.captureFromOrgMemoryFact(
+            orgId,
+            proposal.bullet,
+            {
+              pin: proposal.pinned,
+              sourceProposalId: proposal.id,
+            }
+          );
+        } catch {
+          // Vault capture must not block memory approval.
+        }
+      }
+
       const content = await service.getMemory(orgId);
 
       return json({ content, proposal });

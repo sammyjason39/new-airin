@@ -2,4 +2,5 @@ User-agent: *
 Allow: /
 
 Sitemap: https://ahmadrosid.github.io/airin/sitemap.xml
-LLMS: https://ahmadrosid.github.io/airin/llms.txt
+# Set AIRIN_DOCS_SITE_URL when publishing docs; agents default to in-app Panduan.
+# LLMS: https://example.com/llms.txt

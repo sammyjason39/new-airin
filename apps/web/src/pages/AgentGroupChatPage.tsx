@@ -14,7 +14,7 @@ import { toast } from "@airin/ui/toast";
 import { cn } from "@airin/ui/utils";
 import { useQueryClient } from "@tanstack/react-query";
 import { MessageAdd01Icon } from "hugeicons-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   Link,
@@ -44,6 +44,11 @@ import {
 } from "@/hooks/use-agent-groups";
 import { useProfilesQuery } from "@/hooks/use-app-queries";
 import { type PANELS, withPanel } from "@/lib/agent-group-panels";
+import {
+  clearStoredGroupSessionId,
+  readStoredGroupSessionId,
+  writeStoredGroupSessionId,
+} from "@/lib/chat-history";
 import { client, formatError } from "@/lib/client";
 import { groupPath, PAGE_PATHS } from "@/lib/navigation";
 import { queryKeys } from "@/lib/query-keys";
@@ -54,6 +59,8 @@ const NO_THREAD_RUNS: number[] = [];
 /** `/groups/:groupId` is a new chat in the group; with `:sessionId` one of its chats. */
 export function AgentGroupChatPage() {
   const { groupId = "", sessionId } = useParams();
+  const navigate = useNavigate();
+  const { uiMode } = useUiMode();
   const { data: group, error, isLoading } = useAgentGroupQuery(groupId);
   const { data: profiles = [] } = useProfilesQuery();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -63,6 +70,43 @@ export function AgentGroupChatPage() {
   const files = searchParams.get("files");
   const filesOpen = files !== null;
   const memoryOpen = searchParams.get("memory") === "1";
+  const forceNew = searchParams.get("new") === "1";
+
+  // Simple: one continuous group session until explicit new chat (?new=1).
+  useEffect(() => {
+    if (!(groupId && uiMode === "owner")) {
+      return;
+    }
+
+    if (forceNew) {
+      clearStoredGroupSessionId(groupId);
+      const next = new URLSearchParams(searchParams);
+      next.delete("new");
+      setSearchParams(next, { replace: true });
+
+      return;
+    }
+
+    if (sessionId) {
+      writeStoredGroupSessionId(groupId, sessionId);
+
+      return;
+    }
+
+    const stored = readStoredGroupSessionId(groupId);
+
+    if (stored) {
+      navigate(groupPath(groupId, stored), { replace: true });
+    }
+  }, [
+    forceNew,
+    groupId,
+    navigate,
+    searchParams,
+    sessionId,
+    setSearchParams,
+    uiMode,
+  ]);
 
   // The thread, the live view, the files and the memory share one side panel; opening one closes the others.
   function setPanel(panel: (typeof PANELS)[number], value: string | null) {

@@ -40,6 +40,7 @@ import {
   registerDemoWaitlistRoutes,
   registerPlatformWaitlistRoutes,
 } from "./routes/demo-waitlist";
+import { registerDesignRoutes } from "./routes/design";
 import { registerGoogleMeetRoutes } from "./routes/google-meet";
 import { registerInternalAutomationRoutes } from "./routes/internal-automations";
 import { registerInternalCuratorRoutes } from "./routes/internal-curator";
@@ -50,6 +51,8 @@ import { registerNotificationWebhookRoutes } from "./routes/notification-webhook
 import { registerOrgCuratorRoutes } from "./routes/org-curator";
 import { registerOrgMemberRoutes } from "./routes/org-members";
 import { registerOrgMemoryRoutes } from "./routes/org-memory";
+import { registerOrgVaultRoutes } from "./routes/org-vault";
+import { registerPlatformBillingRoutes } from "./routes/platform-billing";
 import { registerPlatformOrgRoutes } from "./routes/platform-orgs";
 import { registerPluginRoutes } from "./routes/plugins";
 import { registerProfilePortabilityRoutes } from "./routes/profile-portability";
@@ -295,7 +298,7 @@ export function createHonoApp(options: ServerOptions) {
         "Content-Security-Policy",
         isArtifactDocument
           ? ARTIFACT_FRAME_CSP
-          : `default-src 'self'; script-src 'self' '${THEME_BOOTSTRAP_SCRIPT_HASH}'${docsScripts}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://logos.composio.dev; media-src 'self' blob:; object-src blob:; worker-src 'self' blob:; frame-src 'self' blob: https://*.kernel.sh:* https://*.onkernel.com:*; font-src 'self' data:${docsFonts}; connect-src 'self'${docsConnections};`
+          : `default-src 'self'; script-src 'self' '${THEME_BOOTSTRAP_SCRIPT_HASH}'${docsScripts}; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https://logos.composio.dev https://res-a.generateprompt.net https://*.higgsfield.ai https://cdn.higgsfield.ai https://*.cloudfront.net; media-src 'self' blob: https://*.higgsfield.ai https://cdn.higgsfield.ai https://*.cloudfront.net; object-src blob:; worker-src 'self' blob:; frame-src 'self' blob: https://*.kernel.sh:* https://*.onkernel.com:*; font-src 'self' data:${docsFonts}; connect-src 'self'${docsConnections};`
       );
 
       // Also true behind a TLS terminator, which is where HSTS matters most.
@@ -474,6 +477,7 @@ export function createHonoApp(options: ServerOptions) {
   registerToolRoutes(app, options);
   registerPluginRoutes(app, options);
   registerGoogleMeetRoutes(app, options);
+  registerDesignRoutes(app, options);
   registerAgentGroupRoutes(app, options);
   registerAgentMarketplaceRoutes(app, options);
   registerAutomationRoutes(app, options);
@@ -483,9 +487,11 @@ export function createHonoApp(options: ServerOptions) {
   registerCodingHarnessSettingsRoutes(app, options);
   registerComposioRoutes(app, options);
   registerPlatformOrgRoutes(app, options);
+  registerPlatformBillingRoutes(app, options);
   registerDataPortabilityRoutes(app, options);
   registerOrgMemberRoutes(app, options);
   registerOrgMemoryRoutes(app, options);
+  registerOrgVaultRoutes(app, options);
   registerOrgCuratorRoutes(app, options);
   registerSkillProposalRoutes(app, options);
   registerSkillSuggestionRoutes(app, options);
