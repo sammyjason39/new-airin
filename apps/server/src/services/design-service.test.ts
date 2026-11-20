@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test } from "bun:test";
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { JsonValue } from "@airin/core";
@@ -231,7 +231,7 @@ describe("DesignService results store", () => {
         if (name === "generate_image") {
           return {
             cost: 1,
-            id: "job_1",
+            id: "job_ready_1",
             result_url: "https://cdn.higgsfield.ai/out.png",
             status: "succeeded",
           };
@@ -287,12 +287,198 @@ describe("DesignService results store", () => {
       prompt: "A blue mug",
     });
 
-    expect(output.result?.id).toBe("job_1");
+    expect(output.result?.id).toBe("job_ready_1");
     expect(output.result?.resultUrl).toBe("https://cdn.higgsfield.ai/out.png");
 
     const stored = await service.listResults("org_1");
     expect(stored).toHaveLength(1);
     expect(stored[0]?.resultUrl).toBe("https://cdn.higgsfield.ai/out.png");
+  });
+
+  test("generate polls job_status when Higgsfield returns pending without a URL", async () => {
+    const jobId = "11111111-1111-4111-a111-111111111111";
+    const calls: string[] = [];
+
+    const mcpService = {
+      async callTool(
+        _server: StoredMcpServerRecord,
+        name: string,
+        input: McpToolArguments
+      ): Promise<JsonValue> {
+        calls.push(name);
+
+        if (name === "generate_image") {
+          return {
+            results: [
+              {
+                id: jobId,
+                status: "pending",
+              },
+            ],
+          };
+        }
+
+        if (name === "job_status") {
+          expect(input.jobId).toBe(jobId);
+
+          return {
+            id: jobId,
+            poll_after_seconds: 0,
+            result_url: "https://cdn.higgsfield.ai/ready.png",
+            status: "completed",
+          };
+        }
+
+        throw new Error(`unexpected tool ${name}`);
+      },
+      async getServer() {
+        return {
+          server: {
+            enabled: true,
+            id: "mcp_hf",
+            name: "Higgsfield",
+            status: "connected",
+            toolCount: 3,
+          },
+        };
+      },
+      async listServers() {
+        return { servers: [] };
+      },
+    };
+
+    const db = {
+      async getProfile() {
+        return null;
+      },
+      async listMcpServers() {
+        return [
+          {
+            config: { url: "https://mcp.higgsfield.ai/mcp" },
+            enabled: true,
+            id: "mcp_hf",
+            name: "Higgsfield",
+            status: "connected",
+          },
+        ];
+      },
+      async listProfiles() {
+        return [{ id: "profile_1", orgId: "org_1" }];
+      },
+    };
+
+    // SAFETY: This mock implements only the database methods DesignService calls in this test.
+    const service = new DesignService(
+      db as DatabaseAdapter,
+      mcpService as McpService
+    );
+
+    const output = await service.generate("org_1", {
+      kind: "image",
+      model: "nano_banana",
+      prompt: "Pending then ready",
+    });
+
+    expect(output.result?.id).toBe(jobId);
+    expect(output.result?.jobId).toBe(jobId);
+    expect(output.result?.resultUrl).toBe(
+      "https://cdn.higgsfield.ai/ready.png"
+    );
+    expect(output.result?.status).toBe("completed");
+    expect(calls).toEqual(["generate_image", "job_status"]);
+  });
+
+  test("listResults refreshes a stored pending job without a preview URL", async () => {
+    const jobId = "22222222-2222-4222-a222-222222222222";
+
+    await mkdir(join(configDir, "orgs", "org_1", "design"), {
+      recursive: true,
+    });
+    await writeFile(
+      join(configDir, "orgs", "org_1", "design", "results.json"),
+      `${JSON.stringify(
+        [
+          {
+            createdAt: "2026-01-01T00:00:00.000Z",
+            id: jobId,
+            jobId,
+            kind: "image",
+            model: "nano_banana",
+            prompt: "Old pending",
+            resultUrl: null,
+            status: "pending",
+          },
+        ],
+        null,
+        2
+      )}\n`
+    );
+
+    const mcpService = {
+      async callTool(
+        _server: StoredMcpServerRecord,
+        name: string,
+        input: McpToolArguments
+      ): Promise<JsonValue> {
+        expect(name).toBe("job_status");
+        expect(input.jobId).toBe(jobId);
+        expect(input.sync).toBe(false);
+
+        return {
+          id: jobId,
+          result_url: "https://cdn.higgsfield.ai/refreshed.png",
+          status: "completed",
+        };
+      },
+      async getServer() {
+        return {
+          server: {
+            enabled: true,
+            id: "mcp_hf",
+            name: "Higgsfield",
+            status: "connected",
+            toolCount: 3,
+          },
+        };
+      },
+      async listServers() {
+        return { servers: [] };
+      },
+    };
+
+    const db = {
+      async getProfile() {
+        return null;
+      },
+      async listMcpServers() {
+        return [
+          {
+            config: { url: "https://mcp.higgsfield.ai/mcp" },
+            enabled: true,
+            id: "mcp_hf",
+            name: "Higgsfield",
+            status: "connected",
+          },
+        ];
+      },
+      async listProfiles() {
+        return [{ id: "profile_1", orgId: "org_1" }];
+      },
+    };
+
+    // SAFETY: This mock implements only the database methods DesignService calls in this test.
+    const service = new DesignService(
+      db as DatabaseAdapter,
+      mcpService as McpService
+    );
+
+    const stored = await service.listResults("org_1");
+
+    expect(stored).toHaveLength(1);
+    expect(stored[0]?.resultUrl).toBe(
+      "https://cdn.higgsfield.ai/refreshed.png"
+    );
+    expect(stored[0]?.status).toBe("completed");
   });
 
   test("status reports a connected Higgsfield server", async () => {

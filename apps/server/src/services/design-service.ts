@@ -1,330 +1,45 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { join } from "node:path";
-import { AirinApiError, getOrgConfigDir, type JsonValue } from "@airin/core";
+import { AirinApiError, type JsonValue } from "@airin/core";
 import type { DatabaseAdapter, StoredMcpServerRecord } from "@airin/db";
+import {
+  decodeSourceFileBytes,
+  extractCost,
+  extractJobId,
+  extractResultUrl,
+  isHiggsfieldServer,
+  isTerminalFailure,
+  isTerminalSuccess,
+  mediaConfirmType,
+  normalizeStatus,
+  readMediaId,
+  readPollAfterMs,
+  readToolStatus,
+  readUploadTarget,
+} from "./design-higgsfield-parse";
+import { readResults, writeResults } from "./design-results-store";
+import {
+  type DesignEstimate,
+  type DesignGenerateInput,
+  type DesignResultRecord,
+  type DesignSourceFileInput,
+  type DesignStatus,
+  GENERATE_DEADLINE_MS,
+  MAX_PENDING_REFRESH,
+  MAX_PROMPT_CHARS,
+  MAX_SOURCE_FILES,
+  MAX_SOURCE_URLS,
+  UPLOAD_DEADLINE_MS,
+} from "./design-types";
 import type { McpToolArguments } from "./mcp-client-manager";
 import type { McpService } from "./mcp-service";
 
-const RESULTS_FILE = "results.json";
-
-const MAX_RESULTS = 100;
-
-const MAX_PROMPT_CHARS = 16_000;
-
-const MAX_SOURCE_URLS = 8;
-
-const MAX_SOURCE_FILES = 4;
-
-const MAX_SOURCE_FILE_BYTES = Math.floor(1.5 * 1024 * 1024);
-
-const GENERATE_DEADLINE_MS = 180_000;
-
-const UPLOAD_DEADLINE_MS = 60_000;
-
-export type DesignOutputKind = "image" | "video";
-
-export type DesignEstimate = JsonValue;
-
-export type DesignResultRecord = {
-  id: string;
-  kind: DesignOutputKind;
-  model: string;
-  prompt: string;
-  createdAt: string;
-  cost?: number | string | null;
-  jobId?: string | null;
-  resultUrl?: string | null;
-  status?: string | null;
-  raw?: JsonValue;
-};
-
-export type DesignSourceFileInput = {
-  data: string;
-  filename: string;
-  mediaType: string;
-};
-
-export type DesignGenerateInput = {
-  aspectRatio?: string;
-  count?: number;
-  duration?: number;
-  estimateOnly?: boolean;
-  kind: DesignOutputKind;
-  model: string;
-  params?: McpToolArguments;
-  profileId?: string;
-  prompt: string;
-  sourceFiles?: DesignSourceFileInput[];
-  sourceMediaUrls?: string[];
-};
-
-export type DesignStatus = {
-  connected: boolean;
-  needsAuth: boolean;
-  serverId: string | null;
-  serverName: string | null;
-  toolCount: number;
-};
-
-function readUnknownRecord<Value>(
-  value: Value
-): Map<string, unknown> | undefined {
-  if (!(value instanceof Object) || Array.isArray(value)) {
-    return;
-  }
-
-  return new Map(Object.entries(value));
-}
-
-function readString<Value>(value: Value): (Value & string) | undefined {
-  // SAFETY: The object tag check confirms the input uses the string representation.
-  return Object.prototype.toString.call(value) === "[object String]"
-    ? (value as Value & string)
-    : undefined;
-}
-
-function readNumber<Value>(value: Value): (Value & number) | undefined {
-  // SAFETY: The object tag check confirms the input uses the number representation.
-  return Object.prototype.toString.call(value) === "[object Number]"
-    ? (value as Value & number)
-    : undefined;
-}
-
-function isNodeEnoent<Value>(error: Value): boolean {
-  const record = readUnknownRecord(error);
-
-  return record?.get("code") === "ENOENT";
-}
-
-function isDesignResultRecord(value: unknown): value is DesignResultRecord {
-  const record = readUnknownRecord(value);
-
-  if (!record) {
-    return false;
-  }
-
-  return (
-    readString(record.get("id")) !== undefined &&
-    readString(record.get("prompt")) !== undefined
-  );
-}
-
-function isHiggsfieldServer(server: {
-  config?: unknown;
-  name: string;
-}): boolean {
-  if (server.name.trim().toLowerCase() === "higgsfield") {
-    return true;
-  }
-
-  const config = readUnknownRecord(server.config);
-
-  if (!config) {
-    return false;
-  }
-
-  const url = readString(config.get("url")) ?? "";
-
-  return /higgsfield\.ai/i.test(url);
-}
-
-function designDir(orgId: string): string {
-  return join(getOrgConfigDir(orgId), "design");
-}
-
-async function readResults(orgId: string): Promise<DesignResultRecord[]> {
-  try {
-    const raw = await readFile(join(designDir(orgId), RESULTS_FILE), "utf8");
-    const parsed: unknown = JSON.parse(raw);
-
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed.filter(isDesignResultRecord);
-  } catch (error) {
-    if (isNodeEnoent(error)) {
-      return [];
-    }
-
-    throw error;
-  }
-}
-
-async function writeResults(
-  orgId: string,
-  results: DesignResultRecord[]
-): Promise<void> {
-  const dir = designDir(orgId);
-  await mkdir(dir, { recursive: true });
-  await writeFile(
-    join(dir, RESULTS_FILE),
-    `${JSON.stringify(results.slice(0, MAX_RESULTS), null, 2)}\n`,
-    "utf8"
-  );
-}
-
-function extractResultUrl<Value>(value: Value): string | null {
-  const record = readUnknownRecord(value);
-
-  if (!record) {
-    return null;
-  }
-
-  for (const key of ["result_url", "resultUrl", "url"]) {
-    const candidate = readString(record.get(key));
-
-    if (candidate && /^https?:\/\//i.test(candidate)) {
-      return candidate;
-    }
-  }
-
-  const results = record.get("results");
-
-  if (Array.isArray(results)) {
-    for (const item of results) {
-      const nested = extractResultUrl(item);
-
-      if (nested) {
-        return nested;
-      }
-    }
-  }
-
-  return null;
-}
-
-function extractJobId<Value>(value: Value): string | null {
-  const record = readUnknownRecord(value);
-
-  if (!record) {
-    return null;
-  }
-
-  return readString(record.get("id")) ?? null;
-}
-
-function extractCost<Value>(value: Value): number | string | null {
-  const record = readUnknownRecord(value);
-
-  if (!record) {
-    return null;
-  }
-
-  const cost = record.get("cost");
-  const asNumber = readNumber(cost);
-  const asString = readString(cost);
-
-  if (asNumber !== undefined) {
-    return asNumber;
-  }
-
-  if (asString !== undefined) {
-    return asString;
-  }
-
-  return null;
-}
-
-function readMediaId<Value>(imported: Value): string | null {
-  const record = readUnknownRecord(imported);
-
-  if (!record) {
-    return null;
-  }
-
-  return (
-    readString(record.get("media_id")) ?? readString(record.get("id")) ?? null
-  );
-}
-
-function readUploadTarget<Value>(
-  raw: Value
-): { mediaId: string; uploadUrl: string } | null {
-  const record = readUnknownRecord(raw);
-
-  if (!record) {
-    return null;
-  }
-
-  const uploadUrl =
-    readString(record.get("upload_url")) ?? readString(record.get("uploadUrl"));
-
-  const mediaId =
-    readString(record.get("media_id")) ?? readString(record.get("id"));
-
-  if (uploadUrl && mediaId && /^https:\/\//i.test(uploadUrl)) {
-    return { mediaId, uploadUrl };
-  }
-
-  for (const key of ["files", "uploads", "data", "result"]) {
-    const nested = record.get(key);
-
-    if (Array.isArray(nested)) {
-      for (const item of nested) {
-        const found = readUploadTarget(item);
-
-        if (found) {
-          return found;
-        }
-      }
-    } else if (nested != null) {
-      const found = readUploadTarget(nested);
-
-      if (found) {
-        return found;
-      }
-    }
-  }
-
-  return null;
-}
-
-function decodeSourceFileBytes(file: DesignSourceFileInput): Buffer {
-  const trimmed = file.data.trim();
-  const dataUrl = trimmed.match(/^data:([^;]+);base64,(.+)$/s);
-  const base64 = dataUrl ? dataUrl[2] : trimmed;
-  const mediaType = dataUrl?.[1]?.trim() || file.mediaType.trim();
-
-  if (!(mediaType.startsWith("image/") || mediaType.startsWith("video/"))) {
-    throw new AirinApiError("Source files must be images or videos.", 400);
-  }
-
-  let bytes: Buffer;
-
-  try {
-    bytes = Buffer.from(base64 ?? "", "base64");
-  } catch {
-    throw new AirinApiError("Source file data must be valid base64.", 400);
-  }
-
-  if (bytes.byteLength === 0) {
-    throw new AirinApiError("Source file is empty.", 400);
-  }
-
-  if (bytes.byteLength > MAX_SOURCE_FILE_BYTES) {
-    throw new AirinApiError("Each source file must be 1.5 MB or smaller.", 400);
-  }
-
-  return bytes;
-}
-
-function mediaConfirmType(mediaType: string): "image" | "video" {
-  return mediaType.startsWith("video/") ? "video" : "image";
-}
-
-function readToolStatus<Value>(raw: Value): string | null {
-  const record = readUnknownRecord(raw);
-
-  if (!record) {
-    return null;
-  }
-
-  const status = record.get("status");
-  const asString = readString(status);
-
-  return asString ?? (status == null ? null : String(status));
-}
+export type {
+  DesignEstimate,
+  DesignGenerateInput,
+  DesignOutputKind,
+  DesignResultRecord,
+  DesignSourceFileInput,
+  DesignStatus,
+} from "./design-types";
 
 export class DesignService {
   constructor(
@@ -358,7 +73,81 @@ export class DesignService {
   }
 
   async listResults(orgId: string): Promise<DesignResultRecord[]> {
-    return readResults(orgId);
+    const results = await readResults(orgId);
+    const pending = results
+      .filter(
+        (item) =>
+          !item.resultUrl &&
+          Boolean(item.jobId?.trim()) &&
+          !isTerminalFailure(normalizeStatus(item.status))
+      )
+      .slice(0, MAX_PENDING_REFRESH);
+
+    if (pending.length === 0) {
+      return results;
+    }
+
+    let server: StoredMcpServerRecord;
+    let profileId: string;
+
+    try {
+      server = await this.resolveHiggsfieldServer();
+      profileId = await this.resolveProfileId(orgId);
+    } catch {
+      return results;
+    }
+
+    let changed = false;
+    const next = [...results];
+
+    await Promise.all(
+      pending.map(async (item) => {
+        const jobId = item.jobId?.trim();
+
+        if (!jobId) {
+          return;
+        }
+
+        try {
+          const polled = await this.mcpService.callTool(
+            server,
+            "job_status",
+            { jobId, sync: false },
+            orgId,
+            profileId
+          );
+
+          const resultUrl = extractResultUrl(polled);
+          const status = readToolStatus(polled) ?? item.status ?? null;
+          const index = next.findIndex((row) => row.id === item.id);
+
+          if (index < 0) {
+            return;
+          }
+
+          if (!resultUrl && status === item.status) {
+            return;
+          }
+
+          next[index] = {
+            ...next[index]!,
+            jobId,
+            raw: polled,
+            resultUrl: resultUrl ?? next[index]!.resultUrl ?? null,
+            status,
+          };
+          changed = true;
+        } catch {
+          // Keep the stored row when Higgsfield is briefly unreachable.
+        }
+      })
+    );
+
+    if (changed) {
+      await writeResults(orgId, next);
+    }
+
+    return next;
   }
 
   async resolveHiggsfieldServer(): Promise<StoredMcpServerRecord> {
@@ -486,6 +275,98 @@ export class DesignService {
     return first.id;
   }
 
+  private async sleep(ms: number): Promise<void> {
+    if (ms <= 0) {
+      return;
+    }
+
+    await new Promise<void>((resolve) => {
+      setTimeout(resolve, ms);
+    });
+  }
+
+  private async awaitJobResult(
+    server: StoredMcpServerRecord,
+    orgId: string,
+    profileId: string,
+    jobId: string,
+    initial: {
+      raw: JsonValue;
+      resultUrl: string | null;
+      status: string | null;
+    },
+    deadlineAt: number
+  ): Promise<{
+    raw: JsonValue;
+    resultUrl: string | null;
+    status: string | null;
+  }> {
+    let raw = initial.raw;
+    let resultUrl = initial.resultUrl;
+    let status = normalizeStatus(initial.status);
+
+    if (resultUrl || isTerminalFailure(status)) {
+      return { raw, resultUrl, status };
+    }
+
+    while (Date.now() < deadlineAt) {
+      const remainingMs = deadlineAt - Date.now();
+
+      if (remainingMs <= 0) {
+        break;
+      }
+
+      const polled = await this.mcpService.callTool(
+        server,
+        "job_status",
+        {
+          jobId,
+          sync: remainingMs >= 5000,
+        },
+        orgId,
+        profileId
+      );
+
+      raw = polled;
+      resultUrl = extractResultUrl(polled) ?? resultUrl;
+      status = readToolStatus(polled) ?? status;
+
+      if (resultUrl || isTerminalFailure(status)) {
+        return { raw, resultUrl, status };
+      }
+
+      if (isTerminalSuccess(status)) {
+        // Terminal without a URL — stop; a later Results refresh can retry.
+        return { raw, resultUrl, status };
+      }
+
+      const waitMs = Math.min(
+        readPollAfterMs(polled),
+        Math.max(0, deadlineAt - Date.now())
+      );
+
+      await this.sleep(waitMs);
+    }
+
+    try {
+      const polled = await this.mcpService.callTool(
+        server,
+        "job_status",
+        { jobId, sync: false },
+        orgId,
+        profileId
+      );
+
+      return {
+        raw: polled,
+        resultUrl: extractResultUrl(polled) ?? resultUrl,
+        status: readToolStatus(polled) ?? status,
+      };
+    } catch {
+      return { raw, resultUrl, status };
+    }
+  }
+
   async generate(
     orgId: string,
     input: DesignGenerateInput
@@ -607,6 +488,7 @@ export class DesignService {
     }
 
     const tool = input.kind === "video" ? "generate_video" : "generate_image";
+    const deadlineAt = Date.now() + GENERATE_DEADLINE_MS;
 
     const raw = await Promise.race([
       this.mcpService.callTool(
@@ -620,28 +502,51 @@ export class DesignService {
         profileId
       ),
       new Promise<never>((_, reject) => {
-        setTimeout(() => {
-          reject(
-            new AirinApiError(
-              "Higgsfield generation timed out. Try again.",
-              504
-            )
-          );
-        }, GENERATE_DEADLINE_MS);
+        setTimeout(
+          () => {
+            reject(
+              new AirinApiError(
+                "Higgsfield generation timed out. Try again.",
+                504
+              )
+            );
+          },
+          Math.max(1000, deadlineAt - Date.now())
+        );
       }),
     ]);
 
+    const jobId = extractJobId(raw);
+    const settled = jobId
+      ? await this.awaitJobResult(
+          server,
+          orgId,
+          profileId,
+          jobId,
+          {
+            raw,
+            resultUrl: extractResultUrl(raw),
+            status: readToolStatus(raw),
+          },
+          deadlineAt
+        )
+      : {
+          raw,
+          resultUrl: extractResultUrl(raw),
+          status: readToolStatus(raw),
+        };
+
     const result: DesignResultRecord = {
-      cost: extractCost(raw),
+      cost: extractCost(settled.raw) ?? extractCost(raw),
       createdAt: new Date().toISOString(),
-      id: extractJobId(raw) ?? `design_${Date.now()}`,
-      jobId: extractJobId(raw),
+      id: jobId ?? `design_${Date.now()}`,
+      jobId,
       kind: input.kind,
       model,
       prompt,
-      raw,
-      resultUrl: extractResultUrl(raw),
-      status: readToolStatus(raw),
+      raw: settled.raw,
+      resultUrl: settled.resultUrl,
+      status: settled.status,
     };
 
     const existing = await readResults(orgId);
