@@ -119,7 +119,7 @@ export function registerDesignRoutes(
       const orgId = requireActiveOrgIdFromContext(c);
 
       try {
-        const body = await readJson(c, generateBodySchema);
+        const body = await readJson(c.req.raw, generateBodySchema);
         const output = await design.generate(orgId, body);
 
         return json(output);
