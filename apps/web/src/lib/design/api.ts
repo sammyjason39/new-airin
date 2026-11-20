@@ -30,6 +30,7 @@ function toBody(request: DesignGenerateRequest, estimateOnly?: boolean) {
     model: request.model,
     params: request.parameters,
     prompt: request.prompt,
+    sourceFiles: request.sourceFiles,
     sourceMediaUrls: request.sourceMediaUrls,
   };
 }

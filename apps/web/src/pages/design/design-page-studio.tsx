@@ -1,5 +1,6 @@
 import type { RefObject } from "react";
 import type {
+  DesignLocalSource,
   DesignModel,
   DesignOutputKind,
   DesignPrompt,
@@ -20,14 +21,18 @@ export function DesignStudioPanel({
   extraParameters,
   fileInputRef,
   kind,
+  localFileInputRef,
+  localSources,
   modelId,
   models,
   onEstimate,
   onGenerate,
   onKindChange,
+  onLocalFilesSelected,
   onModelChange,
   onPickPrompt,
   onPromptChange,
+  onRemoveLocalSource,
   onToggleAdvanced,
   paramValues,
   prompt,
@@ -54,14 +59,18 @@ export function DesignStudioPanel({
   extraParameters: DesignModel["parameters"];
   fileInputRef: RefObject<HTMLInputElement | null>;
   kind: DesignOutputKind;
+  localFileInputRef: RefObject<HTMLInputElement | null>;
+  localSources: DesignLocalSource[];
   modelId: string;
   models: DesignModel[];
   onEstimate: () => void;
   onGenerate: () => void;
   onKindChange: (kind: DesignOutputKind) => void;
+  onLocalFilesSelected: (files: FileList | null) => void;
   onModelChange: (modelId: string) => void;
   onPickPrompt: (item: DesignPrompt) => void;
   onPromptChange: (value: string) => void;
+  onRemoveLocalSource: (id: string) => void;
   onToggleAdvanced: () => void;
   paramValues: Record<string, string>;
   prompt: string;
@@ -100,15 +109,18 @@ export function DesignStudioPanel({
 
       <DesignStudioComposer
         busy={busy}
-        fileInputRef={fileInputRef}
         kind={kind}
+        localFileInputRef={localFileInputRef}
+        localSources={localSources}
         modelId={modelId}
         models={models}
         onEstimate={onEstimate}
         onGenerate={onGenerate}
         onKindChange={onKindChange}
+        onLocalFilesSelected={onLocalFilesSelected}
         onModelChange={onModelChange}
         onPromptChange={onPromptChange}
+        onRemoveLocalSource={onRemoveLocalSource}
         onToggleAdvanced={onToggleAdvanced}
         prompt={prompt}
         selectedModelLabel={selectedModelLabel}

@@ -114,7 +114,7 @@ export function DesignStudioAdvanced({
             <input
               id={sourceInputId}
               onChange={(event) => setSourceUrls(event.target.value)}
-              placeholder="https://… (comma-separated)"
+              placeholder="https://… (optional, with local uploads)"
               ref={fileInputRef}
               value={sourceUrls}
             />

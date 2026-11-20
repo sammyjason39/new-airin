@@ -53,6 +53,20 @@ export interface DesignResult {
   videoUrl?: string;
 }
 
+export interface DesignSourceFile {
+  data: string;
+  filename: string;
+  mediaType: string;
+}
+
+export interface DesignLocalSource {
+  file: File;
+  id: string;
+  mediaType: string;
+  name: string;
+  previewUrl: string;
+}
+
 export interface DesignGenerateRequest {
   aspectRatio?: string;
   count?: number;
@@ -61,6 +75,7 @@ export interface DesignGenerateRequest {
   model: string;
   parameters?: Record<string, string | number>;
   prompt: string;
+  sourceFiles?: DesignSourceFile[];
   sourceMediaUrls?: string[];
 }
 

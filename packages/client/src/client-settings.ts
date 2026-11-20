@@ -403,6 +403,11 @@ export class SettingsClient extends SystemClient {
     params?: Record<string, JsonValue>;
     profileId?: string;
     prompt: string;
+    sourceFiles?: Array<{
+      data: string;
+      filename: string;
+      mediaType: string;
+    }>;
     sourceMediaUrls?: string[];
   }): Promise<{
     estimate?: JsonValue;

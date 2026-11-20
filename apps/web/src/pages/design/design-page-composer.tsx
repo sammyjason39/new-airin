@@ -6,47 +6,108 @@ import {
 import {
   Add01Icon,
   ArrowUp02Icon,
+  Cancel01Icon,
   Image01Icon,
   Mic01Icon,
   PuzzleIcon,
 } from "hugeicons-react";
-import type { RefObject } from "react";
-import type { DesignModel, DesignOutputKind } from "@/lib/design/types";
+import type { ChangeEvent, RefObject } from "react";
+import type {
+  DesignLocalSource,
+  DesignModel,
+  DesignOutputKind,
+} from "@/lib/design/types";
 import { DESIGN_PROMPT_PLACEHOLDER } from "@/pages/design/design-page-helpers";
 
 export function DesignStudioComposer({
   busy,
-  fileInputRef,
   kind,
+  localFileInputRef,
+  localSources,
   modelId,
   models,
   onEstimate,
   onGenerate,
   onKindChange,
+  onLocalFilesSelected,
   onModelChange,
   onPromptChange,
+  onRemoveLocalSource,
   onToggleAdvanced,
   prompt,
   selectedModelLabel,
   setShowAdvanced,
 }: {
   busy: "estimate" | "generate" | null;
-  fileInputRef: RefObject<HTMLInputElement | null>;
   kind: DesignOutputKind;
+  localFileInputRef: RefObject<HTMLInputElement | null>;
+  localSources: DesignLocalSource[];
   modelId: string;
   models: DesignModel[];
   onEstimate: () => void;
   onGenerate: () => void;
   onKindChange: (kind: DesignOutputKind) => void;
+  onLocalFilesSelected: (files: FileList | null) => void;
   onModelChange: (modelId: string) => void;
   onPromptChange: (value: string) => void;
+  onRemoveLocalSource: (id: string) => void;
   onToggleAdvanced: () => void;
   prompt: string;
   selectedModelLabel: string;
   setShowAdvanced: (value: boolean) => void;
 }) {
+  const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    onLocalFilesSelected(event.target.files);
+    event.target.value = "";
+  };
+
   return (
     <div className="design-page__composer">
+      <input
+        accept="image/*,video/*"
+        aria-label="Upload image or video from folder"
+        className="sr-only"
+        multiple
+        onChange={onFileChange}
+        ref={localFileInputRef}
+        type="file"
+      />
+
+      {localSources.length > 0 ? (
+        <ul aria-label="Attached files" className="design-page__attachments">
+          {localSources.map((source) => (
+            <li className="design-page__attachment" key={source.id}>
+              {source.mediaType.startsWith("video/") ? (
+                <video
+                  aria-hidden
+                  className="design-page__attachment-thumb"
+                  muted
+                  preload="metadata"
+                  src={source.previewUrl}
+                />
+              ) : (
+                <img
+                  alt=""
+                  className="design-page__attachment-thumb"
+                  src={source.previewUrl}
+                />
+              )}
+              <span className="design-page__attachment-name">
+                {source.name}
+              </span>
+              <button
+                aria-label={`Remove ${source.name}`}
+                className="design-page__attachment-remove"
+                onClick={() => onRemoveLocalSource(source.id)}
+                type="button"
+              >
+                <Cancel01Icon aria-hidden className="size-3.5" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
       <textarea
         aria-label="Prompt"
         className="design-page__textarea"
@@ -63,9 +124,9 @@ export function DesignStudioComposer({
 
       <div className="design-page__toolbar">
         <button
-          aria-label="Add source image URL"
+          aria-label="Upload image or video"
           className="design-page__tool"
-          onClick={() => fileInputRef.current?.focus()}
+          onClick={() => localFileInputRef.current?.click()}
           type="button"
         >
           <Image01Icon aria-hidden className="size-4" />

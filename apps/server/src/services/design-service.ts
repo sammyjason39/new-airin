@@ -13,7 +13,13 @@ const MAX_PROMPT_CHARS = 16_000;
 
 const MAX_SOURCE_URLS = 8;
 
+const MAX_SOURCE_FILES = 4;
+
+const MAX_SOURCE_FILE_BYTES = Math.floor(1.5 * 1024 * 1024);
+
 const GENERATE_DEADLINE_MS = 180_000;
+
+const UPLOAD_DEADLINE_MS = 60_000;
 
 export type DesignOutputKind = "image" | "video";
 
@@ -32,6 +38,12 @@ export type DesignResultRecord = {
   raw?: JsonValue;
 };
 
+export type DesignSourceFileInput = {
+  data: string;
+  filename: string;
+  mediaType: string;
+};
+
 export type DesignGenerateInput = {
   aspectRatio?: string;
   count?: number;
@@ -42,6 +54,7 @@ export type DesignGenerateInput = {
   params?: McpToolArguments;
   profileId?: string;
   prompt: string;
+  sourceFiles?: DesignSourceFileInput[];
   sourceMediaUrls?: string[];
 };
 
@@ -225,6 +238,81 @@ function readMediaId<Value>(imported: Value): string | null {
   );
 }
 
+function readUploadTarget<Value>(
+  raw: Value
+): { mediaId: string; uploadUrl: string } | null {
+  const record = readUnknownRecord(raw);
+
+  if (!record) {
+    return null;
+  }
+
+  const uploadUrl =
+    readString(record.get("upload_url")) ?? readString(record.get("uploadUrl"));
+
+  const mediaId =
+    readString(record.get("media_id")) ?? readString(record.get("id"));
+
+  if (uploadUrl && mediaId && /^https:\/\//i.test(uploadUrl)) {
+    return { mediaId, uploadUrl };
+  }
+
+  for (const key of ["files", "uploads", "data", "result"]) {
+    const nested = record.get(key);
+
+    if (Array.isArray(nested)) {
+      for (const item of nested) {
+        const found = readUploadTarget(item);
+
+        if (found) {
+          return found;
+        }
+      }
+    } else if (nested != null) {
+      const found = readUploadTarget(nested);
+
+      if (found) {
+        return found;
+      }
+    }
+  }
+
+  return null;
+}
+
+function decodeSourceFileBytes(file: DesignSourceFileInput): Buffer {
+  const trimmed = file.data.trim();
+  const dataUrl = trimmed.match(/^data:([^;]+);base64,(.+)$/s);
+  const base64 = dataUrl ? dataUrl[2] : trimmed;
+  const mediaType = dataUrl?.[1]?.trim() || file.mediaType.trim();
+
+  if (!(mediaType.startsWith("image/") || mediaType.startsWith("video/"))) {
+    throw new AirinApiError("Source files must be images or videos.", 400);
+  }
+
+  let bytes: Buffer;
+
+  try {
+    bytes = Buffer.from(base64 ?? "", "base64");
+  } catch {
+    throw new AirinApiError("Source file data must be valid base64.", 400);
+  }
+
+  if (bytes.byteLength === 0) {
+    throw new AirinApiError("Source file is empty.", 400);
+  }
+
+  if (bytes.byteLength > MAX_SOURCE_FILE_BYTES) {
+    throw new AirinApiError("Each source file must be 1.5 MB or smaller.", 400);
+  }
+
+  return bytes;
+}
+
+function mediaConfirmType(mediaType: string): "image" | "video" {
+  return mediaType.startsWith("video/") ? "video" : "image";
+}
+
 function readToolStatus<Value>(raw: Value): string | null {
   const record = readUnknownRecord(raw);
 
@@ -298,6 +386,76 @@ export class DesignService {
     return server;
   }
 
+  private async uploadLocalSourceFile(
+    server: StoredMcpServerRecord,
+    orgId: string,
+    profileId: string,
+    file: DesignSourceFileInput
+  ): Promise<string> {
+    const filename = file.filename.trim() || "source.bin";
+    const mediaType = file.mediaType.trim();
+    const bytes = decodeSourceFileBytes(file);
+
+    const prepared = await this.mcpService.callTool(
+      server,
+      "media_upload",
+      {
+        content_type: mediaType,
+        filename,
+        method: "upload_url",
+      },
+      orgId,
+      profileId
+    );
+
+    const target = readUploadTarget(prepared);
+
+    if (!target) {
+      throw new AirinApiError(
+        "Higgsfield did not return an upload URL for the source file.",
+        502
+      );
+    }
+
+    const uploaded = await Promise.race([
+      fetch(target.uploadUrl, {
+        body: bytes,
+        headers: { "Content-Type": mediaType },
+        method: "PUT",
+      }),
+      new Promise<never>((_, reject) => {
+        setTimeout(() => {
+          reject(
+            new AirinApiError(
+              "Source file upload to Higgsfield timed out.",
+              504
+            )
+          );
+        }, UPLOAD_DEADLINE_MS);
+      }),
+    ]);
+
+    if (!uploaded.ok) {
+      throw new AirinApiError(
+        "Higgsfield rejected the source file upload.",
+        502
+      );
+    }
+
+    await this.mcpService.callTool(
+      server,
+      "media_confirm",
+      {
+        media_id: target.mediaId,
+        type: mediaConfirmType(mediaType),
+      },
+      orgId,
+      profileId
+    );
+
+    return target.mediaId;
+  }
+
   private async resolveProfileId(
     orgId: string,
     preferred?: string
@@ -356,6 +514,15 @@ export class DesignService {
       .filter(Boolean)
       .slice(0, MAX_SOURCE_URLS);
 
+    const sourceFiles = (input.sourceFiles ?? []).slice(0, MAX_SOURCE_FILES);
+
+    if (sourceMediaUrls.length + sourceFiles.length > MAX_SOURCE_URLS) {
+      throw new AirinApiError(
+        `Attach at most ${MAX_SOURCE_URLS} source files and URLs total.`,
+        400
+      );
+    }
+
     for (const url of sourceMediaUrls) {
       if (!/^https:\/\//i.test(url)) {
         throw new AirinApiError(
@@ -368,6 +535,18 @@ export class DesignService {
     const server = await this.resolveHiggsfieldServer();
     const profileId = await this.resolveProfileId(orgId, input.profileId);
     const medias: Array<{ role: string; value: string }> = [];
+    const mediaRole = input.kind === "video" ? "start_image" : "image";
+
+    for (const file of sourceFiles) {
+      const mediaId = await this.uploadLocalSourceFile(
+        server,
+        orgId,
+        profileId,
+        file
+      );
+
+      medias.push({ role: mediaRole, value: mediaId });
+    }
 
     for (const url of sourceMediaUrls) {
       const imported = await this.mcpService.callTool(
@@ -388,7 +567,7 @@ export class DesignService {
       }
 
       medias.push({
-        role: input.kind === "video" ? "start_image" : "image",
+        role: mediaRole,
         value: mediaId,
       });
     }

@@ -102,6 +102,125 @@ describe("DesignService results store", () => {
     ).rejects.toMatchObject({ code: "ENOENT" });
   });
 
+  test("generate uploads local source files before image generation", async () => {
+    const calls: string[] = [];
+    const originalFetch = globalThis.fetch;
+
+    globalThis.fetch = (async (input, init) => {
+      expect(String(input)).toBe("https://upload.higgsfield.ai/put");
+      expect(init?.method).toBe("PUT");
+
+      return new Response(null, { status: 200 });
+    }) as typeof fetch;
+
+    try {
+      const mcpService = {
+        async callTool(
+          _server: StoredMcpServerRecord,
+          name: string,
+          input: McpToolArguments
+        ): Promise<JsonValue> {
+          calls.push(name);
+
+          if (name === "media_upload") {
+            expect(input.filename).toBe("mug.png");
+
+            return {
+              media_id: "media_local_1",
+              upload_url: "https://upload.higgsfield.ai/put",
+            };
+          }
+
+          if (name === "media_confirm") {
+            expect(input.media_id).toBe("media_local_1");
+            expect(input.type).toBe("image");
+
+            return { ok: true };
+          }
+
+          if (name === "generate_image") {
+            expect(input).toMatchObject({
+              params: {
+                medias: [{ role: "image", value: "media_local_1" }],
+              },
+            });
+
+            return {
+              cost: 1,
+              id: "job_local",
+              result_url: "https://cdn.higgsfield.ai/local.png",
+              status: "succeeded",
+            };
+          }
+
+          throw new Error(`unexpected tool ${name}`);
+        },
+        async getServer() {
+          return {
+            server: {
+              enabled: true,
+              id: "mcp_hf",
+              name: "Higgsfield",
+              status: "connected",
+              toolCount: 3,
+            },
+          };
+        },
+        async listServers() {
+          return { servers: [] };
+        },
+      };
+
+      const db = {
+        async getProfile() {
+          return null;
+        },
+        async listMcpServers() {
+          return [
+            {
+              config: { url: "https://mcp.higgsfield.ai/mcp" },
+              enabled: true,
+              id: "mcp_hf",
+              name: "Higgsfield",
+              status: "connected",
+            },
+          ];
+        },
+        async listProfiles() {
+          return [{ id: "profile_1", orgId: "org_1" }];
+        },
+      };
+
+      // SAFETY: This mock implements only the database methods DesignService calls in this test.
+      const service = new DesignService(
+        db as DatabaseAdapter,
+        mcpService as McpService
+      );
+
+      const output = await service.generate("org_1", {
+        kind: "image",
+        model: "nano_banana",
+        prompt: "Product shot",
+        sourceFiles: [
+          {
+            data: Buffer.from("fake-png").toString("base64"),
+            filename: "mug.png",
+            mediaType: "image/png",
+          },
+        ],
+      });
+
+      expect(output.result?.id).toBe("job_local");
+      expect(calls).toEqual([
+        "media_upload",
+        "media_confirm",
+        "generate_image",
+      ]);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
   test("generate stores a result after image generation", async () => {
     const mcpService = {
       async callTool(

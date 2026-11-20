@@ -20,6 +20,16 @@ const generateBodySchema = z
     params: z.record(z.string(), z.unknown()).optional(),
     profileId: z.string().trim().min(1).max(128).optional(),
     prompt: z.string().trim().min(1).max(16_000),
+    sourceFiles: z
+      .array(
+        z.object({
+          data: z.string().min(1).max(2_800_000),
+          filename: z.string().trim().min(1).max(255),
+          mediaType: z.string().trim().min(1).max(128),
+        })
+      )
+      .max(4)
+      .optional(),
     sourceMediaUrls: z.array(z.string().url().max(2048)).max(8).optional(),
   })
   .openapi("DesignGenerateRequest");
