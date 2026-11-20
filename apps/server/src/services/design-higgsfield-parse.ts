@@ -69,7 +69,21 @@ function isJobId(value: string): boolean {
   );
 }
 
+function extractHttpUrlFromText(value: string): string | null {
+  const match = value.match(/https?:\/\/[^\s"'<>\\]+/i);
+
+  if (!match?.[0]) {
+    return null;
+  }
+
+  return match[0].replace(/[),.;]+$/u, "");
+}
+
 export function extractResultUrl<Value>(value: Value): string | null {
+  if (typeof value === "string") {
+    return isHttpUrl(value) ? value : extractHttpUrlFromText(value);
+  }
+
   const record = readUnknownRecord(value);
 
   if (!record) {
@@ -83,6 +97,7 @@ export function extractResultUrl<Value>(value: Value): string | null {
     "imageUrl",
     "video_url",
     "videoUrl",
+    "uri",
     "url",
     "output_url",
     "outputUrl",
@@ -100,6 +115,7 @@ export function extractResultUrl<Value>(value: Value): string | null {
     "outputs",
     "images",
     "videos",
+    "content",
     "data",
   ]) {
     const nested = record.get(key);
@@ -118,6 +134,16 @@ export function extractResultUrl<Value>(value: Value): string | null {
       if (found) {
         return found;
       }
+    }
+  }
+
+  const text = readString(record.get("text"));
+
+  if (text) {
+    const fromText = extractHttpUrlFromText(text);
+
+    if (fromText) {
+      return fromText;
     }
   }
 
@@ -307,7 +333,19 @@ export function mediaConfirmType(mediaType: string): "image" | "video" {
   return mediaType.startsWith("video/") ? "video" : "image";
 }
 
+function statusFromText(value: string): string | null {
+  const match = value.match(
+    /(?:status\s*[:=]\s*|—\s*|–\s*|-\s*)(completed|done|ready|success|succeeded|cancelled|canceled|failed|ip_detected|nsfw|pending|running|processing|queued)\b/i
+  );
+
+  return match?.[1] ? normalizeStatus(match[1]) : null;
+}
+
 export function readToolStatus<Value>(raw: Value): string | null {
+  if (typeof raw === "string") {
+    return statusFromText(raw);
+  }
+
   const record = readUnknownRecord(raw);
 
   if (!record) {
@@ -322,7 +360,7 @@ export function readToolStatus<Value>(raw: Value): string | null {
     return normalizeStatus(top);
   }
 
-  for (const key of ["results", "jobs", "data"]) {
+  for (const key of ["results", "jobs", "content", "data"]) {
     const nested = record.get(key);
 
     if (Array.isArray(nested)) {
@@ -340,6 +378,12 @@ export function readToolStatus<Value>(raw: Value): string | null {
         return found;
       }
     }
+  }
+
+  const text = readString(record.get("text"));
+
+  if (text) {
+    return statusFromText(text);
   }
 
   return null;

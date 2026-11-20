@@ -321,11 +321,17 @@ describe("DesignService results store", () => {
         if (name === "job_status") {
           expect(input.jobId).toBe(jobId);
 
+          // Matches the MCP content wrapper Airin stores for Higgsfield tools.
           return {
-            id: jobId,
-            poll_after_seconds: 0,
-            result_url: "https://cdn.higgsfield.ai/ready.png",
-            status: "completed",
+            content: [
+              {
+                mimeType: "image/png",
+                name: "ready.png",
+                type: "resource_link",
+                uri: "https://cdn.higgsfield.ai/ready.png",
+              },
+            ],
+            text: `Job ${jobId} — completed\nhttps://cdn.higgsfield.ai/ready.png`,
           };
         }
 
