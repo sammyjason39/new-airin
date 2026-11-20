@@ -1,7 +1,43 @@
 import type { DesignResult } from "./types";
 
 const STORAGE_KEY = "airin-design-results";
+
 const MAX_RESULTS = 100;
+
+function readUnknownRecord<Value>(
+  value: Value
+): Map<string, unknown> | undefined {
+  if (!(value instanceof Object) || Array.isArray(value)) {
+    return;
+  }
+
+  return new Map(Object.entries(value));
+}
+
+function readString<Value>(value: Value): (Value & string) | undefined {
+  // SAFETY: The object tag check confirms the input uses the string representation.
+  return Object.prototype.toString.call(value) === "[object String]"
+    ? (value as Value & string)
+    : undefined;
+}
+
+function isDesignResult(value: unknown): value is DesignResult {
+  const record = readUnknownRecord(value);
+
+  if (!record) {
+    return false;
+  }
+
+  const kind = readString(record.get("kind"));
+
+  return (
+    readString(record.get("id")) !== undefined &&
+    (kind === "image" || kind === "video") &&
+    readString(record.get("prompt")) !== undefined &&
+    readString(record.get("model")) !== undefined &&
+    readString(record.get("createdAt")) !== undefined
+  );
+}
 
 function readRaw(): DesignResult[] {
   if (typeof localStorage === "undefined") {
@@ -21,20 +57,7 @@ function readRaw(): DesignResult[] {
       return [];
     }
 
-    return parsed.filter((entry): entry is DesignResult => {
-      if (!entry || typeof entry !== "object") {
-        return false;
-      }
-
-      const record = entry as DesignResult;
-      return (
-        typeof record.id === "string" &&
-        (record.kind === "image" || record.kind === "video") &&
-        typeof record.prompt === "string" &&
-        typeof record.model === "string" &&
-        typeof record.createdAt === "string"
-      );
-    });
+    return parsed.filter(isDesignResult);
   } catch {
     return [];
   }
@@ -58,6 +81,7 @@ export function listDesignResults(): DesignResult[] {
 export function addDesignResult(result: DesignResult): DesignResult[] {
   const next = [result, ...readRaw()].slice(0, MAX_RESULTS);
   writeRaw(next);
+
   return next;
 }
 

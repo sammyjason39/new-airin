@@ -22,11 +22,13 @@ const BASE = "http://localhost:4310";
 describe("org vault routes (v1)", () => {
   test("member can create, list, get, graph, search, update; admin deletes", async () => {
     const { app, databaseAdapter } = createApp();
+
     const adminSession = await setupFreshInstallSession(
       app,
       databaseAdapter,
       "vault-admin@org.com"
     );
+
     const orgId = adminSession.orgId!;
 
     const createResp = await app.fetch(
@@ -43,10 +45,14 @@ describe("org vault routes (v1)", () => {
         method: "POST",
       })
     );
+
     expect(createResp.status).toBe(200);
+
+    // SAFETY: A 200 create response matches the vault note JSON contract used in this test.
     const created = (await createResp.json()) as {
       note: { id: string; title: string };
     };
+
     expect(created.note.title).toBe("SOP Laundry");
 
     await app.fetch(
@@ -69,10 +75,14 @@ describe("org vault routes (v1)", () => {
         headers: adminSession.headers({}, orgId),
       })
     );
+
     expect(listResp.status).toBe(200);
+
+    // SAFETY: A 200 list response matches the vault notes summary JSON contract.
     const listBody = (await listResp.json()) as {
       notes: Array<{ title: string }>;
     };
+
     expect(listBody.notes.some((n) => n.title === "SOP Laundry")).toBe(true);
 
     const getResp = await app.fetch(
@@ -81,10 +91,14 @@ describe("org vault routes (v1)", () => {
         { headers: adminSession.headers({}, orgId) }
       )
     );
+
     expect(getResp.status).toBe(200);
+
+    // SAFETY: A 200 get response matches the vault note detail JSON contract.
     const detail = (await getResp.json()) as {
       note: { outboundLinks: Array<{ targetSlug: string }> };
     };
+
     expect(detail.note.outboundLinks.some((l) => l.targetSlug === "Hub")).toBe(
       true
     );
@@ -94,11 +108,15 @@ describe("org vault routes (v1)", () => {
         headers: adminSession.headers({}, orgId),
       })
     );
+
     expect(graphResp.status).toBe(200);
+
+    // SAFETY: A 200 graph response matches the vault graph JSON contract.
     const graph = (await graphResp.json()) as {
       edges: unknown[];
       nodes: unknown[];
     };
+
     expect(graph.nodes.length).toBeGreaterThanOrEqual(2);
     expect(graph.edges.length).toBeGreaterThanOrEqual(1);
 
@@ -112,7 +130,9 @@ describe("org vault routes (v1)", () => {
         method: "POST",
       })
     );
+
     expect(searchResp.status).toBe(200);
+    // SAFETY: A 200 search response matches the vault search JSON contract.
     const search = (await searchResp.json()) as { titles: string[] };
     expect(search.titles).toContain("SOP Laundry");
 
@@ -129,6 +149,7 @@ describe("org vault routes (v1)", () => {
         }
       )
     );
+
     expect(updateResp.status).toBe(200);
 
     const deleteResp = await app.fetch(
@@ -143,6 +164,7 @@ describe("org vault routes (v1)", () => {
         }
       )
     );
+
     expect(deleteResp.status).toBe(200);
   });
 });

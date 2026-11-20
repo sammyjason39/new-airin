@@ -89,6 +89,7 @@ describe("quotePaidPlan", () => {
       planId: "plus",
       seatCount: 5,
     });
+
     // base 2.5M × 3 + 200k × 2 extras × 3
     expect(quote.totalIdr).toBe(2_500_000 * 3 + 200_000 * 2 * 3);
     expect(quote.setupHours).toBe(1);

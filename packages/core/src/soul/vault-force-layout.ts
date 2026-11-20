@@ -25,6 +25,7 @@ export type ForceLayoutOptions = {
 };
 
 const SIM_WIDTH = 2400;
+
 const SIM_HEIGHT = 1700;
 
 function hashId(id: string): number {
@@ -65,9 +66,11 @@ function initialPosition(
   spread: number
 ) {
   const h = hashId(id);
+
   const angle =
     ((h % 360) / 360) * Math.PI * 2 +
     (index / Math.max(total, 1)) * Math.PI * 0.35;
+
   const radius = spread * (0.55 + (h % 100) / 120);
 
   return {
@@ -101,6 +104,7 @@ function resolveOverlaps(
         let dx = b.x - a.x;
         let dy = b.y - a.y;
         let dist = Math.hypot(dx, dy);
+
         const minDist =
           nodeCollisionRadius(a.linkCount, a.title) +
           nodeCollisionRadius(b.linkCount, b.title);
@@ -196,14 +200,17 @@ export function computeForceLayout(
 
   const sim: SimNode[] = nodes.map((n, i) => {
     const hasPos = Number.isFinite(n.x) && Number.isFinite(n.y);
+
     const init = hasPos
-      ? { x: n.x as number, y: n.y as number }
+      ? // SAFETY: hasPos requires finite numeric x and y on the layout node.
+        { x: n.x as number, y: n.y as number }
       : initialPosition(n.id, i, nodes.length, cx, cy, spread);
 
     return { ...n, vx: 0, vy: 0, x: init.x, y: init.y };
   });
 
   const byId = new Map(sim.map((n) => [n.id, n]));
+
   const edges = links.flatMap((l) => {
     const s = byId.get(l.source);
     const t = byId.get(l.target);
@@ -226,6 +233,7 @@ export function computeForceLayout(
         let dx = b.x - a.x;
         let dy = b.y - a.y;
         let distSq = dx * dx + dy * dy;
+
         const minDist =
           nodeCollisionRadius(a.linkCount, a.title) +
           nodeCollisionRadius(b.linkCount, b.title);
@@ -239,10 +247,12 @@ export function computeForceLayout(
 
         const dist = Math.sqrt(distSq);
         const overlap = minDist - dist;
+
         const repulse =
           overlap > 0
             ? (overlap * 0.35 + 40) * alpha
             : (charge * alpha) / Math.max(distSq, 900);
+
         const fx = (dx / dist) * repulse;
         const fy = (dy / dist) * repulse;
         a.vx -= fx;
@@ -256,11 +266,13 @@ export function computeForceLayout(
       let dx = t.x - s.x;
       let dy = t.y - s.y;
       const dist = Math.hypot(dx, dy) || 1;
+
       const target =
         linkDistance +
         (nodeCollisionRadius(s.linkCount, s.title) +
           nodeCollisionRadius(t.linkCount, t.title)) *
           0.15;
+
       const force = ((dist - target) / dist) * 0.06 * alpha;
       dx *= force;
       dy *= force;

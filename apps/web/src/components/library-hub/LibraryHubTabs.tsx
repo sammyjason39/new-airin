@@ -47,11 +47,13 @@ export function LibraryHubTabs({ children }: { children?: ReactNode }) {
   const pluginsExact = useMatch(PAGE_PATHS["plugin-management"]) !== null;
   const skills = useMatch(PAGE_PATHS.skills) !== null;
   const connectors = useMatch(PAGE_PATHS.composio) !== null;
+
   const active = activeHubPath({
     connectors,
     plugins: plugins || pluginsExact,
     skills,
   });
+
   const tabs = canManageHub ? ADMIN_HUB_TABS : MEMBER_HUB_TABS;
 
   if (!(canManageHub || canUseConnectors)) {

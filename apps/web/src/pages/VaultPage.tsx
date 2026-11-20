@@ -5,6 +5,7 @@ import { canAccessOrganizationPage, PAGE_PATHS } from "@/lib/navigation";
 
 export function VaultPage() {
   const { user, activeOrg } = useAuth();
+
   const allowed = canAccessOrganizationPage(
     user?.isPlatformAdmin === true,
     activeOrg?.role

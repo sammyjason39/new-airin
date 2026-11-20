@@ -31,6 +31,7 @@ describe("OrgVaultService", () => {
       noteType: "doc",
       title: "Org Memory",
     });
+
     const note = await vault.createNote(orgId, {
       content: "Pickup at 9am. See [[Org Memory]].",
       noteType: "sop",
@@ -57,6 +58,7 @@ describe("OrgVaultService", () => {
   test("captureFromOrgMemoryFact upserts and links Org Memory hub", async () => {
     const vault = await service();
     const orgId = "org_capture";
+
     const captured = await vault.captureFromOrgMemoryFact(
       orgId,
       "Support hours are 9am–6pm SGT",
@@ -92,6 +94,7 @@ describe("OrgVaultService", () => {
       slug: "alpha-note",
       title: "Alpha Note",
     });
+
     const notesDir = getOrgVaultNotesDir(orgId, configDir);
     const oldPath = join(notesDir, "alpha-note.md");
     const newPath = join(notesDir, "renamed-alpha.md");
@@ -116,6 +119,7 @@ describe("OrgVaultService", () => {
       slug: "note-a",
       title: "Note A",
     });
+
     await vault.createNote(orgId, { slug: "note-b", title: "Note B" });
 
     await expect(
@@ -134,6 +138,7 @@ describe("OrgVaultService", () => {
       content: "Hub",
       title: "Hub Note",
     });
+
     const leaf = await vault.createNote(orgId, {
       content: "See [[Hub Note]].",
       title: "Leaf Note",
@@ -163,6 +168,7 @@ describe("OrgVaultService", () => {
       content: "Track [[Ghost Target]] here.",
       title: "Broken Links Note",
     });
+
     const detail = await vault.getNote(orgId, note.id);
 
     expect(detail?.brokenLinks).toEqual(["Ghost Target"]);
@@ -221,6 +227,7 @@ describe("OrgVaultService", () => {
       pin: false,
       sourceProposalId: "prop_a",
     });
+
     const second = await vault.captureFromOrgMemoryFact(orgId, fact, {
       pin: true,
       sourceProposalId: "prop_b",
@@ -229,11 +236,13 @@ describe("OrgVaultService", () => {
     expect(second.id).toBe(first.id);
 
     const notes = await vault.listNotes(orgId);
+
     const factNotes = notes.filter(
       (n) =>
         n.title.toLowerCase() === first.title.toLowerCase() ||
         n.content.includes(fact)
     );
+
     expect(factNotes).toHaveLength(1);
   });
 });

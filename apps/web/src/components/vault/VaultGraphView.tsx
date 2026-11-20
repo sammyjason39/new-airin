@@ -18,11 +18,17 @@ type Props = {
 type LayoutNode = VaultGraphNodeResponse & { x: number; y: number };
 
 const GRAPH_BG = "hsl(var(--background))";
+
 const GRAPH_EDGE = "hsl(var(--border) / 0.8)";
+
 const GRAPH_EDGE_HI = "hsl(var(--primary) / 0.55)";
+
 const GRAPH_LABEL = "hsl(var(--muted-foreground))";
+
 const GRAPH_LABEL_HI = "hsl(var(--foreground))";
+
 const ZOOM_MIN = 0.35;
+
 const ZOOM_MAX = 4.2;
 
 const { width: CANVAS_W, height: CANVAS_H } = FORCE_LAYOUT_CANVAS;
@@ -31,12 +37,15 @@ const { width: CANVAS_W, height: CANVAS_H } = FORCE_LAYOUT_CANVAS;
 export function VaultGraphView({ onSelectNote }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+
   const [viewport, setViewport] = useState({
     height: CANVAS_H,
     width: CANVAS_W,
   });
+
   const [hoverId, setHoverId] = useState<string | null>(null);
   const [transform, setTransform] = useState({ k: 1, x: 0, y: 0 });
+
   const dragRef = useRef<{
     lastX: number;
     lastY: number;
@@ -59,6 +68,7 @@ export function VaultGraphView({ onSelectNote }: Props) {
         setViewport({ height, width });
       }
     });
+
     ro.observe(el);
 
     return () => ro.disconnect();
@@ -198,6 +208,7 @@ export function VaultGraphView({ onSelectNote }: Props) {
       return;
     }
 
+    // SAFETY: Pointer events on the graph surface originate from SVG subtree nodes.
     const tag = (e.target as SVGElement).tagName?.toLowerCase();
 
     if (tag === "circle" || tag === "text") {
@@ -302,6 +313,7 @@ export function VaultGraphView({ onSelectNote }: Props) {
               const highlighted =
                 hoverId !== null &&
                 (e.source === hoverId || e.target === hoverId);
+
               const dimmed = hoverId !== null && !highlighted;
 
               return (
@@ -324,6 +336,7 @@ export function VaultGraphView({ onSelectNote }: Props) {
               const neighbor = neighborSet.has(n.id);
               const dimmed = hoverId !== null && !active && !neighbor;
               const r = nodeRadius(n.linkCount, active);
+
               const label =
                 n.title.length > 28 ? `${n.title.slice(0, 26)}…` : n.title;
 

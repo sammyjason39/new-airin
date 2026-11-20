@@ -166,6 +166,7 @@ export function registerOrgVaultRoutes(
   app.post("/v1/orgs/:orgId/vault/notes", async (c) => {
     const auth = requireOrgMemberFromContext(c);
     const orgId = resolveOrgId(c, auth.activeOrgId ?? "");
+
     const body = await readJson<{
       content?: string;
       noteType?: string;
@@ -173,6 +174,7 @@ export function registerOrgVaultRoutes(
       tags?: string[];
       title: string;
     }>(c.req.raw);
+
     const note = await requireService().createNote(orgId, body);
 
     return json({ note });
@@ -214,6 +216,7 @@ export function registerOrgVaultRoutes(
     const auth = requireOrgMemberFromContext(c);
     const orgId = resolveOrgId(c, auth.activeOrgId ?? "");
     const noteId = decodeURIComponent(c.req.param("noteId"));
+
     const body = await readJson<{
       content?: string;
       noteType?: string;
@@ -221,6 +224,7 @@ export function registerOrgVaultRoutes(
       tags?: string[];
       title?: string;
     }>(c.req.raw);
+
     const note = await requireService().updateNote(orgId, noteId, body);
 
     return json({ note });

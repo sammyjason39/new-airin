@@ -45,8 +45,14 @@ export function ChatPlanUsageBand({ className }: { className?: string }) {
 
   const { data: usage } = useQuery({
     enabled: Boolean(orgId),
-    queryFn: () => client.getOrganizationPlanUsage(orgId as string),
-    queryKey: queryKeys.orgs.planUsage(orgId as string),
+    queryFn: () => {
+      // SAFETY: useQuery runs this only when enabled and orgId is set.
+      return client.getOrganizationPlanUsage(orgId as string);
+    },
+    queryKey: queryKeys.orgs.planUsage(
+      // SAFETY: The query is disabled until orgId is set; the key uses the same id.
+      orgId as string
+    ),
     refetchInterval: 60_000,
     staleTime: 30_000,
   });
@@ -56,6 +62,7 @@ export function ChatPlanUsageBand({ className }: { className?: string }) {
   }
 
   const ratio = usedRatio(usage);
+
   const label =
     usage.budgetUsd == null
       ? `${formatUsd(usage.spentUsd)} used`

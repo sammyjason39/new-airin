@@ -1,6 +1,7 @@
 import seedPrompts from "./prompt-library.seed.json";
 import type { DesignPrompt } from "./types";
 
+// SAFETY: prompt-library.seed.json is a committed seed list that matches DesignPrompt[].
 const library = seedPrompts as DesignPrompt[];
 
 export function listDesignPrompts(): DesignPrompt[] {

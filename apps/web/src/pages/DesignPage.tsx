@@ -52,11 +52,12 @@ function parseSourceUrls(value: string): string[] {
 
 function defaultParameterValues(modelId: string): Record<string, string> {
   const model = getDesignModel(modelId);
-  const values: Record<string, string> = {};
 
   if (!model) {
-    return values;
+    return {} satisfies Record<string, string>;
   }
+
+  const values: Record<string, string> = {};
 
   for (const parameter of selectableParameters(model)) {
     const fallback = parameter.default;
@@ -68,7 +69,8 @@ function defaultParameterValues(modelId: string): Record<string, string> {
     }
   }
 
-  return values;
+  // oxlint-disable-next-line anti-slop/no-known-value-widening -- Parameter names come from the model catalog schema.
+  return values satisfies Record<string, string>;
 }
 
 // oxlint-disable-next-line react-doctor/no-high-complexity-react-function, react-doctor/no-giant-component -- Studio controls, library, and results share one Design page.
@@ -79,9 +81,11 @@ export function DesignPage() {
   const [prompt, setPrompt] = useState("");
   const [aspectRatio, setAspectRatio] = useState("1:1");
   const [duration, setDuration] = useState("");
+
   const [paramValues, setParamValues] = useState<Record<string, string>>(() =>
     defaultParameterValues(defaultModelId("image"))
   );
+
   const [sourceUrls, setSourceUrls] = useState("");
   const [librarySearch, setLibrarySearch] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -187,6 +191,7 @@ export function DesignPage() {
 
     if (!request.prompt) {
       setError("Enter a prompt before estimating cost.");
+
       return;
     }
 
@@ -195,8 +200,8 @@ export function DesignPage() {
     try {
       const estimate = await estimateDesignCost(request);
       setEstimateNote(
-        typeof estimate === "string"
-          ? estimate
+        Object.prototype.toString.call(estimate) === "[object String]"
+          ? String(estimate)
           : JSON.stringify(estimate, null, 2)
       );
     } catch (failure) {
@@ -215,6 +220,7 @@ export function DesignPage() {
 
     if (!request.prompt) {
       setError("Enter a prompt before generating.");
+
       return;
     }
 
@@ -493,6 +499,7 @@ export function DesignPage() {
             <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {results.map((item) => {
                 const mediaUrl = item.videoUrl ?? item.imageUrl;
+
                 const modelName =
                   item.modelName ??
                   getDesignModel(item.model)?.name ??

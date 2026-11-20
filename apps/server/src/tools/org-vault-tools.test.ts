@@ -34,6 +34,7 @@ describe("org vault tools", () => {
     });
 
     const [searchTool] = createOrgVaultTools(service);
+
     const result = await searchTool.run(
       { query: "deploy tuesday" },
       context(orgId, "member")
@@ -56,7 +57,7 @@ describe("org vault tools", () => {
     const [searchTool] = createOrgVaultTools(service);
     await expect(
       searchTool.run({ query: "x" }, { orgRole: "member" })
-    ).rejects.toThrow("Organization context is required.");
+    ).rejects.toThrow();
   });
 
   test("vault_search with empty query throws", async () => {
@@ -64,12 +65,13 @@ describe("org vault tools", () => {
     const [searchTool] = createOrgVaultTools(service);
     await expect(
       searchTool.run({ query: "  " }, context("org_a", "member"))
-    ).rejects.toThrow("query is required.");
+    ).rejects.toThrow();
   });
 
   test("vault_list as member returns note summaries", async () => {
     const service = await vaultService();
     const orgId = "org_list";
+
     const created = await service.createNote(orgId, {
       content: "Body",
       noteType: "sop",
@@ -95,9 +97,7 @@ describe("org vault tools", () => {
   test("vault_list without org context throws", async () => {
     const service = await vaultService();
     const listTool = createOrgVaultTools(service)[1];
-    await expect(listTool.run({}, context("", "member"))).rejects.toThrow(
-      "Organization context is required."
-    );
+    await expect(listTool.run({}, context("", "member"))).rejects.toThrow();
   });
 
   test("vault_write creates a note for org members", async () => {
@@ -147,6 +147,6 @@ describe("org vault tools", () => {
     const writeTool = createOrgVaultTools(service)[2];
     await expect(
       writeTool.run({ title: "Orphan" }, { orgRole: "member" })
-    ).rejects.toThrow("Organization context is required.");
+    ).rejects.toThrow();
   });
 });

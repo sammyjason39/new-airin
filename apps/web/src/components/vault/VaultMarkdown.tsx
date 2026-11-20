@@ -30,6 +30,7 @@ export function VaultMarkdown({ content, notes, onWikilinkClick }: Props) {
     <div
       className="p-6"
       onClick={(event) => {
+        // SAFETY: Clicks inside MessageResponse bubble from rendered anchor descendants.
         const target = (event.target as HTMLElement).closest("a");
 
         if (!target) {
@@ -43,6 +44,7 @@ export function VaultMarkdown({ content, notes, onWikilinkClick }: Props) {
         }
 
         event.preventDefault();
+
         const raw = decodeURIComponent(
           href.replace(/^#vault-open-(?:title-)?/, "")
         );

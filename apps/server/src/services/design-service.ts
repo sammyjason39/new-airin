@@ -1,16 +1,23 @@
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { AirinApiError, getOrgConfigDir } from "@airin/core";
+import { AirinApiError, getOrgConfigDir, type JsonValue } from "@airin/core";
 import type { DatabaseAdapter, StoredMcpServerRecord } from "@airin/db";
+import type { McpToolArguments } from "./mcp-client-manager";
 import type { McpService } from "./mcp-service";
 
 const RESULTS_FILE = "results.json";
+
 const MAX_RESULTS = 100;
+
 const MAX_PROMPT_CHARS = 16_000;
+
 const MAX_SOURCE_URLS = 8;
+
 const GENERATE_DEADLINE_MS = 180_000;
 
 export type DesignOutputKind = "image" | "video";
+
+export type DesignEstimate = JsonValue;
 
 export type DesignResultRecord = {
   id: string;
@@ -22,7 +29,7 @@ export type DesignResultRecord = {
   jobId?: string | null;
   resultUrl?: string | null;
   status?: string | null;
-  raw?: unknown;
+  raw?: JsonValue;
 };
 
 export type DesignGenerateInput = {
@@ -32,7 +39,7 @@ export type DesignGenerateInput = {
   estimateOnly?: boolean;
   kind: DesignOutputKind;
   model: string;
-  params?: Record<string, unknown>;
+  params?: McpToolArguments;
   profileId?: string;
   prompt: string;
   sourceMediaUrls?: string[];
@@ -46,6 +53,49 @@ export type DesignStatus = {
   toolCount: number;
 };
 
+function readUnknownRecord<Value>(
+  value: Value
+): Map<string, unknown> | undefined {
+  if (!(value instanceof Object) || Array.isArray(value)) {
+    return;
+  }
+
+  return new Map(Object.entries(value));
+}
+
+function readString<Value>(value: Value): (Value & string) | undefined {
+  // SAFETY: The object tag check confirms the input uses the string representation.
+  return Object.prototype.toString.call(value) === "[object String]"
+    ? (value as Value & string)
+    : undefined;
+}
+
+function readNumber<Value>(value: Value): (Value & number) | undefined {
+  // SAFETY: The object tag check confirms the input uses the number representation.
+  return Object.prototype.toString.call(value) === "[object Number]"
+    ? (value as Value & number)
+    : undefined;
+}
+
+function isNodeEnoent<Value>(error: Value): boolean {
+  const record = readUnknownRecord(error);
+
+  return record?.get("code") === "ENOENT";
+}
+
+function isDesignResultRecord(value: unknown): value is DesignResultRecord {
+  const record = readUnknownRecord(value);
+
+  if (!record) {
+    return false;
+  }
+
+  return (
+    readString(record.get("id")) !== undefined &&
+    readString(record.get("prompt")) !== undefined
+  );
+}
+
 function isHiggsfieldServer(server: {
   config?: unknown;
   name: string;
@@ -54,13 +104,13 @@ function isHiggsfieldServer(server: {
     return true;
   }
 
-  const config = server.config;
+  const config = readUnknownRecord(server.config);
 
-  if (!config || typeof config !== "object") {
+  if (!config) {
     return false;
   }
 
-  const url = "url" in config ? String(config.url ?? "") : "";
+  const url = readString(config.get("url")) ?? "";
 
   return /higgsfield\.ai/i.test(url);
 }
@@ -72,26 +122,15 @@ function designDir(orgId: string): string {
 async function readResults(orgId: string): Promise<DesignResultRecord[]> {
   try {
     const raw = await readFile(join(designDir(orgId), RESULTS_FILE), "utf8");
-    const parsed = JSON.parse(raw) as unknown;
+    const parsed: unknown = JSON.parse(raw);
 
     if (!Array.isArray(parsed)) {
       return [];
     }
 
-    return parsed.filter(
-      (item): item is DesignResultRecord =>
-        !!item &&
-        typeof item === "object" &&
-        typeof (item as DesignResultRecord).id === "string" &&
-        typeof (item as DesignResultRecord).prompt === "string"
-    );
+    return parsed.filter(isDesignResultRecord);
   } catch (error) {
-    if (
-      error &&
-      typeof error === "object" &&
-      "code" in error &&
-      error.code === "ENOENT"
-    ) {
+    if (isNodeEnoent(error)) {
       return [];
     }
 
@@ -112,22 +151,22 @@ async function writeResults(
   );
 }
 
-function extractResultUrl(value: unknown): string | null {
-  if (!value || typeof value !== "object") {
+function extractResultUrl<Value>(value: Value): string | null {
+  const record = readUnknownRecord(value);
+
+  if (!record) {
     return null;
   }
 
-  const record = value as Record<string, unknown>;
-
   for (const key of ["result_url", "resultUrl", "url"]) {
-    const candidate = record[key];
+    const candidate = readString(record.get(key));
 
-    if (typeof candidate === "string" && /^https?:\/\//i.test(candidate)) {
+    if (candidate && /^https?:\/\//i.test(candidate)) {
       return candidate;
     }
   }
 
-  const results = record.results;
+  const results = record.get("results");
 
   if (Array.isArray(results)) {
     for (const item of results) {
@@ -142,28 +181,61 @@ function extractResultUrl(value: unknown): string | null {
   return null;
 }
 
-function extractJobId(value: unknown): string | null {
-  if (!value || typeof value !== "object") {
+function extractJobId<Value>(value: Value): string | null {
+  const record = readUnknownRecord(value);
+
+  if (!record) {
     return null;
   }
 
-  const id = (value as { id?: unknown }).id;
-
-  return typeof id === "string" ? id : null;
+  return readString(record.get("id")) ?? null;
 }
 
-function extractCost(value: unknown): number | string | null {
-  if (!value || typeof value !== "object") {
+function extractCost<Value>(value: Value): number | string | null {
+  const record = readUnknownRecord(value);
+
+  if (!record) {
     return null;
   }
 
-  const cost = (value as { cost?: unknown }).cost;
+  const cost = record.get("cost");
+  const asNumber = readNumber(cost);
+  const asString = readString(cost);
 
-  if (typeof cost === "number" || typeof cost === "string") {
-    return cost;
+  if (asNumber !== undefined) {
+    return asNumber;
+  }
+
+  if (asString !== undefined) {
+    return asString;
   }
 
   return null;
+}
+
+function readMediaId<Value>(imported: Value): string | null {
+  const record = readUnknownRecord(imported);
+
+  if (!record) {
+    return null;
+  }
+
+  return (
+    readString(record.get("media_id")) ?? readString(record.get("id")) ?? null
+  );
+}
+
+function readToolStatus<Value>(raw: Value): string | null {
+  const record = readUnknownRecord(raw);
+
+  if (!record) {
+    return null;
+  }
+
+  const status = record.get("status");
+  const asString = readString(status);
+
+  return asString ?? (status == null ? null : String(status));
 }
 
 export class DesignService {
@@ -243,6 +315,7 @@ export class DesignService {
     const profiles = (await this.db.listProfiles()).filter(
       (profile) => profile.orgId === orgId
     );
+
     const first = profiles[0];
 
     if (!first) {
@@ -259,7 +332,7 @@ export class DesignService {
     orgId: string,
     input: DesignGenerateInput
   ): Promise<{
-    estimate?: unknown;
+    estimate?: DesignEstimate;
     result?: DesignResultRecord;
   }> {
     const prompt = input.prompt.trim();
@@ -304,18 +377,8 @@ export class DesignService {
         orgId,
         profileId
       );
-      const mediaId =
-        imported &&
-        typeof imported === "object" &&
-        "media_id" in imported &&
-        typeof imported.media_id === "string"
-          ? imported.media_id
-          : imported &&
-              typeof imported === "object" &&
-              "id" in imported &&
-              typeof imported.id === "string"
-            ? imported.id
-            : null;
+
+      const mediaId = readMediaId(imported);
 
       if (!mediaId) {
         throw new AirinApiError(
@@ -330,12 +393,12 @@ export class DesignService {
       });
     }
 
-    const params: Record<string, unknown> = {
+    const params = {
       ...(input.params ?? {}),
       count: Math.min(Math.max(input.count ?? 1, 1), 4),
       model,
       prompt,
-    };
+    } satisfies McpToolArguments;
 
     if (input.aspectRatio?.trim()) {
       params.aspect_ratio = input.aspectRatio.trim();
@@ -352,6 +415,7 @@ export class DesignService {
     if (input.estimateOnly) {
       const tool =
         input.kind === "video" ? "estimate_video_cost" : "estimate_image_cost";
+
       const estimate = await this.mcpService.callTool(
         server,
         tool,
@@ -364,6 +428,7 @@ export class DesignService {
     }
 
     const tool = input.kind === "video" ? "generate_video" : "generate_image";
+
     const raw = await Promise.race([
       this.mcpService.callTool(
         server,
@@ -397,10 +462,7 @@ export class DesignService {
       prompt,
       raw,
       resultUrl: extractResultUrl(raw),
-      status:
-        raw && typeof raw === "object" && "status" in raw
-          ? String((raw as { status: unknown }).status)
-          : null,
+      status: readToolStatus(raw),
     };
 
     const existing = await readResults(orgId);

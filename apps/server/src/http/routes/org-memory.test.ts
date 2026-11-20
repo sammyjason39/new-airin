@@ -424,6 +424,7 @@ describe("org memory routes (v1)", () => {
     const databaseAdapter = createInMemoryDatabaseAdapter();
     const orgMemoryService = new OrgMemoryService(databaseAdapter);
     const orgVaultService = new OrgVaultService();
+
     const { app } = createMinimalHonoApp({
       databaseAdapter,
       orgMemoryService,
@@ -435,12 +436,14 @@ describe("org memory routes (v1)", () => {
       databaseAdapter,
       "admin-vault@org.com"
     );
+
     const orgId = adminSession.orgId!;
 
     const proposed = await orgMemoryService.propose(orgId, {
       bullet: "vault route capture fact",
       profileId: "profile_vault",
     });
+
     expect(proposed.outcome).toBe("created");
 
     const approveResp = await app.fetch(

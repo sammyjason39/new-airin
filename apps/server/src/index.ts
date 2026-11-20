@@ -503,7 +503,9 @@ skillsService.setPluginService(pluginService);
 agent.setPluginService(pluginService);
 
 const orgMemoryService = new OrgMemoryService(database.adapter);
+
 const orgVaultService = new OrgVaultService();
+
 agent.setOrgVaultService(orgVaultService);
 
 const skillProposalService = new SkillProposalService(

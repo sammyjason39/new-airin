@@ -21,8 +21,10 @@ function escapeYamlString(value: string): string {
   return JSON.stringify(value);
 }
 
-function parseFrontmatterBlock(block: string): Record<string, string> {
-  const result: Record<string, string> = {};
+type VaultFrontmatterFields = Record<string, string>;
+
+function parseFrontmatterBlock(block: string): VaultFrontmatterFields {
+  const result: VaultFrontmatterFields = {};
 
   for (const line of block.split(/\r?\n/)) {
     const trimmed = line.trim();
@@ -45,6 +47,7 @@ function parseFrontmatterBlock(block: string): Record<string, string> {
       (value.startsWith("'") && value.endsWith("'"))
     ) {
       try {
+        // SAFETY: YAML quoted strings are normalized to JSON string literals before parse.
         value = JSON.parse(
           value.replace(/^'/, '"').replace(/'$/, '"')
         ) as string;
@@ -56,7 +59,8 @@ function parseFrontmatterBlock(block: string): Record<string, string> {
     result[key] = value;
   }
 
-  return result;
+  // oxlint-disable-next-line anti-slop/no-known-value-widening -- Frontmatter keys are parsed from YAML lines into string fields.
+  return result satisfies VaultFrontmatterFields;
 }
 
 function parseTags(raw: string | undefined): string[] {
@@ -117,6 +121,7 @@ export function parseVaultNoteFile(
 
   const meta = parseFrontmatterBlock(match[1] ?? "");
   const content = (match[2] ?? "").replace(/^\n+/, "");
+
   const title = (meta.title ?? fallbackSlug)
     .trim()
     .slice(0, VAULT_MAX_TITLE_LENGTH);
@@ -126,9 +131,11 @@ export function parseVaultNoteFile(
   }
 
   const noteTypeRaw = (meta.noteType ?? "note").trim();
+
   const noteType: VaultNoteType = isVaultNoteType(noteTypeRaw)
     ? noteTypeRaw
     : "note";
+
   const now = new Date().toISOString();
 
   return {

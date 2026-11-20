@@ -29,6 +29,7 @@ export class OrgPlanUsageService {
     const now = this.now();
     const month = now.toISOString().slice(0, 7);
     const daily = await this.listDailyCosts(orgId);
+
     const spentUsd = daily
       .filter((row) => row.day.startsWith(month))
       .reduce((sum, row) => sum + row.estimatedCostUsd, 0);
@@ -38,6 +39,7 @@ export class OrgPlanUsageService {
 
     if (planId && isPaidPlanId(planId)) {
       const plan = getPaidPlan(planId);
+
       return finish(month, plan.id, plan.name, plan.tokenBudgetUsd, spentUsd);
     }
 

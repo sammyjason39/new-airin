@@ -4,12 +4,15 @@
  */
 
 export const BILLING_INTERVALS = ["month", "quarter", "year"] as const;
+
 export type BillingInterval = (typeof BILLING_INTERVALS)[number];
 
 export const PAID_PLAN_IDS = ["lite", "plus", "pro"] as const;
+
 export type PaidPlanId = (typeof PAID_PLAN_IDS)[number];
 
 export const PLAN_IDS = [...PAID_PLAN_IDS, "enterprise"] as const;
+
 export type PlanId = (typeof PLAN_IDS)[number];
 
 export const SUBSCRIPTION_STATUSES = [
@@ -19,9 +22,11 @@ export const SUBSCRIPTION_STATUSES = [
   "suspended",
   "cancelled",
 ] as const;
+
 export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
 
 export const DEFAULT_TRIAL_DAYS = 14;
+
 /** 3-month subscribe gets half the yearly setup hours. */
 export const QUARTER_SETUP_RATIO = 0.5;
 
@@ -136,10 +141,12 @@ export function paidPlanWhatsAppTemplate(planId: PaidPlanId): string {
 }
 
 export function isPaidPlanId(value: string): value is PaidPlanId {
+  // SAFETY: PaidPlanId is the union of PAID_PLAN_IDS; includes checks membership.
   return (PAID_PLAN_IDS as readonly string[]).includes(value);
 }
 
 export function isBillingInterval(value: string): value is BillingInterval {
+  // SAFETY: BillingInterval is the union of BILLING_INTERVALS; includes checks membership.
   return (BILLING_INTERVALS as readonly string[]).includes(value);
 }
 
@@ -182,6 +189,7 @@ export function setupHoursForInterval(
 
 export function extraSeatCount(planId: PaidPlanId, seatCount: number): number {
   const included = PAID_PLANS[planId].includedSeats;
+
   return Math.max(0, seatCount - included);
 }
 
@@ -215,6 +223,7 @@ export function quotePaidPlan(input: {
   seatCount?: number;
 }): BillingQuote {
   const plan = PAID_PLANS[input.planId];
+
   const seatCount = Math.max(
     plan.includedSeats,
     input.seatCount ?? plan.includedSeats
@@ -229,6 +238,7 @@ export function quotePaidPlan(input: {
   }
 
   const months = intervalMonthCount(input.interval);
+
   const lines: BillingQuoteLine[] = [
     {
       amountIdr: plan.priceIdrPerMonth * months,

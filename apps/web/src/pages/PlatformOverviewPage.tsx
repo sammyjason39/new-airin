@@ -113,11 +113,13 @@ export function PlatformOverviewPage() {
 
 function PlatformBillingSettings() {
   const queryClient = useQueryClient();
+
   const { data, error, isLoading } = useQuery({
     queryFn: () => client.getPlatformBillingSettings(),
     queryKey: ["platform", "billing", "settings"],
     staleTime: 30_000,
   });
+
   const [trialDays, setTrialDays] = useState("");
 
   useEffect(() => {

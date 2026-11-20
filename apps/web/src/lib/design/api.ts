@@ -1,9 +1,12 @@
+import type { JsonValue } from "@airin/core";
 import { client } from "@/lib/client";
 import type {
   DesignGenerateRequest,
   DesignResult,
   DesignStatusResponse,
 } from "./types";
+
+export type DesignCostEstimate = JsonValue;
 
 type DesignGenerateResponse = {
   estimate?: unknown;
@@ -88,7 +91,7 @@ export async function generateDesign(
 
 export async function estimateDesignCost(
   request: DesignGenerateRequest
-): Promise<unknown> {
+): Promise<DesignCostEstimate> {
   const payload = await client.generateDesign(toBody(request, true));
 
   return payload.estimate ?? payload;

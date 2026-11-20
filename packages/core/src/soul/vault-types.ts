@@ -10,6 +10,7 @@ export const VAULT_NOTE_TYPES: readonly VaultNoteType[] = [
 ] as const;
 
 export function isVaultNoteType(value: string): value is VaultNoteType {
+  // SAFETY: VaultNoteType is the union of VAULT_NOTE_TYPES; includes checks membership.
   return (VAULT_NOTE_TYPES as readonly string[]).includes(value);
 }
 
@@ -61,8 +62,13 @@ export type VaultGraph = {
 
 /** Hard caps so vault work stays within lean install budgets. */
 export const VAULT_MAX_NOTES = 200;
+
 export const VAULT_MAX_NOTE_BYTES = 32_768;
+
 export const VAULT_MAX_TITLE_LENGTH = 200;
+
 export const VAULT_MAX_TAGS = 20;
+
 export const VAULT_LINKS_INDEX_FILE = "links.json";
+
 export const VAULT_NOTES_DIR = "notes";

@@ -8,6 +8,7 @@ import type {
   GenerateImageResponse,
   ImageGenerationSettings,
   ImageGenerationSettingsResponse,
+  JsonValue,
   LanguageSettingsResponse,
   ListTimezonesResponse,
   SendEmailTestRequest,
@@ -399,7 +400,7 @@ export class SettingsClient extends SystemClient {
     estimateOnly?: boolean;
     kind: "image" | "video";
     model: string;
-    params?: Record<string, unknown>;
+    params?: Record<string, JsonValue>;
     profileId?: string;
     prompt: string;
     sourceMediaUrls?: string[];

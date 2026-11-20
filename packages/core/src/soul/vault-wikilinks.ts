@@ -43,7 +43,9 @@ export function matchVaultNoteByLinkTitle<
   );
 }
 
-function parseWikilink(raw: string): { label: string; title: string } {
+type WikilinkParts = { label: string; title: string };
+
+function parseWikilink(raw: string): WikilinkParts {
   const [targetPart, aliasPart] = raw.split("|");
   const title = (targetPart ?? "").split("#")[0]?.trim() ?? "";
 

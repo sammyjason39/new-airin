@@ -82,19 +82,24 @@ export function buildVaultGraph(
   return { edges, nodes };
 }
 
-export function linksForNote(
-  noteId: string,
-  links: VaultLink[]
-): {
+export type VaultNoteLinksBreakdown = {
   brokenLinks: string[];
   inboundLinks: VaultLink[];
   outboundLinks: VaultLink[];
-} {
+};
+
+export function linksForNote(
+  noteId: string,
+  links: VaultLink[]
+): VaultNoteLinksBreakdown {
   const outboundLinks = links.filter((l) => l.sourceId === noteId);
   const inboundLinks = links.filter((l) => l.targetId === noteId);
+
   const brokenLinks = outboundLinks
+    .values()
     .filter((l) => !l.targetId)
-    .map((l) => l.targetSlug);
+    .map((l) => l.targetSlug)
+    .toArray();
 
   return { brokenLinks, inboundLinks, outboundLinks };
 }

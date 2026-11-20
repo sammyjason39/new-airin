@@ -16,6 +16,7 @@ export function useVaultNotes(query?: string) {
     enabled: Boolean(orgId),
     queryFn: async () => {
       if (!orgId) {
+        // SAFETY: Missing orgId cannot call the API; an empty notes list matches listVaultNotes shape.
         return { notes: [] as VaultNoteResponse[] };
       }
 

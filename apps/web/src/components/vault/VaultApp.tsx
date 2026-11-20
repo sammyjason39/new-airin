@@ -49,10 +49,12 @@ const VIEW_TABS: {
 // oxlint-disable-next-line react-doctor/no-high-complexity-react-function, react-doctor/no-giant-component -- Note list, editor, preview, and graph share one vault shell.
 export function VaultApp() {
   const { user, activeOrg } = useAuth();
+
   const canWrite = canAccessOrganizationPage(
     user?.isPlatformAdmin === true,
     activeOrg?.role
   );
+
   const canDelete =
     user?.isPlatformAdmin === true || activeOrg?.role === "admin";
 
@@ -139,6 +141,7 @@ export function VaultApp() {
           noteId: activeId,
           request: { content, noteType, title },
         });
+
         setActiveId(note.id);
         toast("Saved");
       } else {
@@ -147,6 +150,7 @@ export function VaultApp() {
           noteType,
           title,
         });
+
         setActiveId(note.id);
         toast("Created");
       }
@@ -247,9 +251,10 @@ export function VaultApp() {
                 <select
                   aria-label="Note type"
                   className="rounded-lg border border-border bg-secondary px-2 py-1.5 text-xs"
-                  onChange={(e) =>
-                    setNoteType(e.target.value as VaultNoteTypeContract)
-                  }
+                  onChange={(e) => {
+                    // SAFETY: The select options are limited to VaultNoteTypeContract values.
+                    setNoteType(e.target.value as VaultNoteTypeContract);
+                  }}
                   value={noteType}
                 >
                   {NOTE_TYPES.map((t) => (
@@ -370,6 +375,7 @@ export function VaultApp() {
                       const source = (notes ?? []).find(
                         (n) => n.id === l.sourceId
                       );
+
                       const label = source?.title ?? l.targetSlug;
 
                       return (

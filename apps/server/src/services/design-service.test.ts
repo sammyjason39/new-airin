@@ -2,7 +2,11 @@ import { afterEach, beforeEach, describe, expect, test } from "bun:test";
 import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { JsonValue } from "@airin/core";
+import type { DatabaseAdapter, StoredMcpServerRecord } from "@airin/db";
 import { DesignService } from "./design-service";
+import type { McpToolArguments } from "./mcp-client-manager";
+import type { McpService } from "./mcp-service";
 
 describe("DesignService results store", () => {
   let configDir = "";
@@ -25,14 +29,16 @@ describe("DesignService results store", () => {
   });
 
   test("generate estimateOnly returns cost without writing results", async () => {
-    const calls: Array<{ name: string; input: unknown }> = [];
+    const calls: Array<{ input: McpToolArguments; name: string }> = [];
+
     const mcpService = {
       async callTool(
-        _server: unknown,
+        _server: StoredMcpServerRecord,
         name: string,
-        input: unknown
-      ): Promise<unknown> {
+        input: McpToolArguments
+      ): Promise<JsonValue> {
         calls.push({ input, name });
+
         return { cost: 1 };
       },
       async getServer() {
@@ -71,7 +77,12 @@ describe("DesignService results store", () => {
       },
     };
 
-    const service = new DesignService(db as never, mcpService as never);
+    // SAFETY: This mock implements only the database methods DesignService calls in this test.
+    const service = new DesignService(
+      db as DatabaseAdapter,
+      mcpService as McpService
+    );
+
     const output = await service.generate("org_1", {
       estimateOnly: true,
       kind: "image",
@@ -93,7 +104,10 @@ describe("DesignService results store", () => {
 
   test("generate stores a result after image generation", async () => {
     const mcpService = {
-      async callTool(_server: unknown, name: string): Promise<unknown> {
+      async callTool(
+        _server: StoredMcpServerRecord,
+        name: string
+      ): Promise<JsonValue> {
         if (name === "generate_image") {
           return {
             cost: 1,
@@ -141,7 +155,12 @@ describe("DesignService results store", () => {
       },
     };
 
-    const service = new DesignService(db as never, mcpService as never);
+    // SAFETY: This mock implements only the database methods DesignService calls in this test.
+    const service = new DesignService(
+      db as DatabaseAdapter,
+      mcpService as McpService
+    );
+
     const output = await service.generate("org_1", {
       kind: "image",
       model: "nano_banana",
@@ -197,7 +216,12 @@ describe("DesignService results store", () => {
       },
     };
 
-    const service = new DesignService(db as never, mcpService as never);
+    // SAFETY: This mock implements only the database methods DesignService calls in this test.
+    const service = new DesignService(
+      db as DatabaseAdapter,
+      mcpService as McpService
+    );
+
     await expect(service.status()).resolves.toEqual({
       connected: true,
       needsAuth: false,

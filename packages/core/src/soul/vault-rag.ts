@@ -113,6 +113,7 @@ function scoreChunk(
 
   const haystack =
     `${note.title}\n${note.tags.join(" ")}\n${chunk}`.toLowerCase();
+
   let score = 0;
   const hit: string[] = [];
 
@@ -253,6 +254,7 @@ export function composeVaultCatalog(
 
   while (kept.length > 0) {
     kept.pop();
+
     const trimmedLines = [
       "## Company Vault",
       "",
@@ -262,6 +264,7 @@ export function composeVaultCatalog(
       "",
       `…and ${notes.length - kept.length} more. Call vault_list or vault_search.`,
     ];
+
     text = trimmedLines.join("\n");
 
     if (encoder.encode(text).byteLength <= byteCap) {

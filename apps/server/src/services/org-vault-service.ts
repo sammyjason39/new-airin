@@ -111,10 +111,12 @@ export class OrgVaultService {
   ): Promise<VaultLink[]> {
     const { linksPath } = await this.ensureDirs(orgId);
     const links = buildVaultLinksFromNotes(notes);
+
     const payload: LinksIndexFile = {
       links,
       updatedAt: new Date().toISOString(),
     };
+
     await writeTextFile(linksPath, `${JSON.stringify(payload, null, 2)}\n`);
 
     return links;
@@ -131,6 +133,7 @@ export class OrgVaultService {
     }
 
     try {
+      // SAFETY: links.json is written by writeLinksIndex using LinksIndexFile; invalid shape is rebuilt below.
       const parsed = JSON.parse(raw) as LinksIndexFile;
 
       if (!Array.isArray(parsed.links)) {
@@ -178,11 +181,14 @@ export class OrgVaultService {
 
   async search(orgId: string, query: string, limit = 5) {
     const notes = await this.listNotes(orgId);
+
     const rag = retrieveVaultRAG(notes, query, {
       maxChunks: Math.max(limit, 5),
       maxNotes: limit,
     });
+
     const titleSet = new Set(rag.titles.map((t) => t.toLowerCase()));
+
     const matched = notes
       .filter((n) => titleSet.has(n.title.toLowerCase()))
       .slice(0, limit);
@@ -220,6 +226,7 @@ export class OrgVaultService {
         input.noteType && isVaultNoteType(input.noteType)
           ? input.noteType
           : "note";
+
       const note = buildVaultNote({
         content: input.content,
         noteType,
@@ -278,6 +285,7 @@ export class OrgVaultService {
           : current.noteType;
 
       const nextSlug = (patch.slug ?? current.slug).trim();
+
       const updated: VaultNote = {
         ...current,
         content: patch.content ?? current.content,
@@ -360,6 +368,7 @@ export class OrgVaultService {
     }
 
     const title = fact.length > 80 ? `${fact.slice(0, 77).trimEnd()}…` : fact;
+
     const content = [
       options.pin ? "> Pinned org memory fact" : "> Org memory fact",
       "",
@@ -377,6 +386,7 @@ export class OrgVaultService {
 
     return this.locked(orgId, async () => {
       const existing = await this.listNotes(orgId);
+
       const hit = existing.find(
         (n) =>
           n.title.toLowerCase() === title.toLowerCase() ||
@@ -401,6 +411,7 @@ export class OrgVaultService {
           tags: ["org-memory"],
           title: "Org Memory",
         });
+
         const { notesDir } = await this.ensureDirs(orgId);
         await writeTextFile(
           noteFilePath(notesDir, hub.slug),
@@ -422,6 +433,7 @@ export class OrgVaultService {
         tags: ["org-memory", options.pin ? "pinned" : "log"],
         title,
       });
+
       const { notesDir } = await this.ensureDirs(orgId);
       await writeTextFile(
         noteFilePath(notesDir, note.slug),
@@ -445,6 +457,7 @@ export class OrgVaultService {
       noteType: patch.noteType ?? current.noteType,
       updatedAt: new Date().toISOString(),
     };
+
     const { notesDir } = await this.ensureDirs(orgId);
     await writeTextFile(
       noteFilePath(notesDir, updated.slug),

@@ -28,6 +28,7 @@ describe("vault wikilinks", () => {
       { id: "1", slug: "org-memory", title: "Org Memory" },
       { id: "2", slug: "sop-laundry", title: "SOP Laundry" },
     ];
+
     expect(matchVaultNoteByLinkTitle(notes, "Org Memory")?.id).toBe("1");
     expect(matchVaultNoteByLinkTitle(notes, "sop-laundry")?.id).toBe("2");
   });
@@ -41,6 +42,7 @@ describe("vault note format", () => {
       tags: ["ops"],
       title: "SOP Laundry",
     });
+
     const raw = serializeVaultNote(note);
     const parsed = parseVaultNoteFile(raw, note.slug);
     expect(parsed?.title).toBe("SOP Laundry");
@@ -56,10 +58,12 @@ describe("vault graph", () => {
       content: "See [[B Note]]",
       title: "A Note",
     });
+
     const b = buildVaultNote({
       content: "Back",
       title: "B Note",
     });
+
     const links = buildVaultLinksFromNotes([a, b]);
     const graph = buildVaultGraph([a, b], links);
     expect(graph.nodes).toHaveLength(2);
@@ -83,6 +87,7 @@ describe("vault rag", () => {
         title: "Marketing Plan",
       }),
     ];
+
     const result = retrieveVaultRAG(notes, "laundry pickup weekday");
     expect(result.titles).toContain("SOP Laundry");
     expect(result.context).toContain("Laundry pickup");
@@ -92,6 +97,7 @@ describe("vault rag", () => {
     const catalog = composeVaultCatalog([
       { noteType: "sop", title: "SOP Laundry" },
     ]);
+
     expect(catalog).toContain("## Company Vault");
     expect(catalog).toContain("SOP Laundry");
   });

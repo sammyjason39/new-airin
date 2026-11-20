@@ -6,6 +6,7 @@ interface DesignModelCatalog {
   video: DesignModel[];
 }
 
+// SAFETY: higgsfield-models.json is a committed catalog that matches DesignModelCatalog.
 const catalog = rawCatalog as DesignModelCatalog;
 
 const modelsById = new Map<string, DesignModel>();
@@ -27,15 +28,18 @@ export function defaultModelId(kind: DesignOutputKind): string {
 
   if (kind === "image") {
     const preferred = models.find((model) => model.id === "nano_banana");
+
     return preferred?.id ?? models[0]?.id ?? "";
   }
 
   const seedanceMini = models.find((model) => model.id === "seedance_2_0_mini");
+
   if (seedanceMini) {
     return seedanceMini.id;
   }
 
   const cheapest = models.find((model) => model.id.includes("mini"));
+
   return cheapest?.id ?? models[0]?.id ?? "";
 }
 

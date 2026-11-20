@@ -91,9 +91,11 @@ export function MarketplacePage() {
 
   const agents = catalog.data?.agents;
   const canInstall = activeOrg?.role === "admin";
+
   const installingAgent = (agents ?? []).find(
     (agent) => agent.id === installingId
   );
+
   const needle = search.trim().toLowerCase();
 
   const myAgents = useMemo(() => {
