@@ -216,6 +216,7 @@ export class AgentMarketplaceService {
     }
 
     const existing = await this.db.listProfileComposioToolkits(profileId);
+
     const byToolkitId = new Map(
       existing.map((row) => [row.toolkitId, row] as const)
     );

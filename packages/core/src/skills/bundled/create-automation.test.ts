@@ -539,8 +539,10 @@ describe("ensureBundledSkillFiles", () => {
       "utf8"
     );
 
-    expect(skill).toContain("google-workspace-docs");
+    expect(skill).toContain("name: google-workspace-docs");
     expect(skill).toContain("googledocs");
-    expect(skill).toContain("No HTML deliverable");
+    expect(skill).toContain("googlesheets");
+    expect(skill).toContain("googleslides");
+    expect(skill).toContain("write_docx");
   });
 });
