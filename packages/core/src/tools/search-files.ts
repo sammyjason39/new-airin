@@ -1,5 +1,6 @@
 import { z } from "zod";
 import type { ToolContext, ToolDefinition } from "../contract";
+import { getGlobalSkillsDir } from "../skills/paths";
 import { getProfileSoulDir } from "../soul/resolve";
 import { guardFilePath, resolveWorkspaceRoot } from "./paths";
 import { buildRipgrepArgs, type RipgrepMatch, runRipgrep } from "./ripgrep";
@@ -41,7 +42,7 @@ export const searchFilesTool: ToolDefinition<
   SearchFilesOutput
 > = {
   description:
-    "Search text in files under the active profile workspace and return compact matching snippets.",
+    "Search text in files under the active profile workspace or installed global skills (e.g. skill references/) and return compact matching snippets.",
   name: "search_files",
   parallelSafe: true,
   parameters: jsonSchemaFromZod(searchFilesInputSchema),
@@ -68,9 +69,14 @@ export async function runSearchFiles(
     options.workspaceRoot ?? getProfileSoulDir(orgId, profileId)
   );
 
+  // Same allow-list as read_file: profile workspace + global bundled skills
+  // (Alya’s hr-uu-ketenagakerjaan references live under agent/skills/).
+  const allowedDirs = [workspaceRoot, getGlobalSkillsDir()];
+
   const searchRoot = await resolveSearchRoot(
     workspaceRoot,
-    parsed.path ?? null
+    parsed.path ?? null,
+    allowedDirs
   );
 
   const args = buildRipgrepArgs({
@@ -98,14 +104,15 @@ export async function runSearchFiles(
 
 async function resolveSearchRoot(
   workspaceRoot: string,
-  subPath: string | null
+  subPath: string | null,
+  allowedDirs: string[]
 ): Promise<string> {
   if (!subPath) {
     return workspaceRoot;
   }
 
   const guarded = await guardFilePath(subPath, workspaceRoot, undefined, {
-    allowedDirs: [workspaceRoot],
+    allowedDirs,
     cwd: workspaceRoot,
   });
 

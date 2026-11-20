@@ -2,13 +2,23 @@ import { afterEach, describe, expect, test } from "bun:test";
 import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
+import { getGlobalSkillsDir } from "../skills/paths";
 import { PathGuardError } from "./builtin";
 import { runSearchFiles } from "./search-files";
 
 describe("search_files tool", () => {
   let workspaceRoot = "";
+  let previousConfigDir: string | undefined;
 
   afterEach(async () => {
+    if (previousConfigDir === undefined) {
+      delete process.env.AIRIN_CONFIG_DIR;
+    } else {
+      process.env.AIRIN_CONFIG_DIR = previousConfigDir;
+    }
+
+    previousConfigDir = undefined;
+
     if (workspaceRoot) {
       await rm(workspaceRoot, { force: true, recursive: true });
       workspaceRoot = "";
@@ -121,6 +131,37 @@ describe("search_files tool", () => {
         { workspaceRoot }
       )
     ).rejects.toThrow(PathGuardError);
+  });
+
+  test("searches installed global skill references like read_file allows", async () => {
+    previousConfigDir = process.env.AIRIN_CONFIG_DIR;
+    const configDir = await mkdtemp(path.join(os.tmpdir(), "airin-cfg-"));
+    process.env.AIRIN_CONFIG_DIR = configDir;
+    workspaceRoot = await mkdtemp(path.join(os.tmpdir(), "airin-search-"));
+
+    const skillRef = path.join(
+      getGlobalSkillsDir(),
+      "hr-uu-ketenagakerjaan",
+      "references",
+      "pp-35-2021.md"
+    );
+    await mkdir(path.dirname(skillRef), { recursive: true });
+    await writeFile(
+      skillRef,
+      "Pasal tentang mengundurkan diri dan PHK.\n",
+      "utf8"
+    );
+
+    const result = await runSearchFiles(
+      { path: skillRef, query: "mengundurkan diri" },
+      { orgId: "org_test", profileId: "profile_test" },
+      { workspaceRoot }
+    );
+
+    expect(result.matchCount).toBe(1);
+    expect(result.matches[0]?.text).toContain("mengundurkan diri");
+
+    await rm(configDir, { force: true, recursive: true });
   });
 
   test("requires profileId", async () => {
