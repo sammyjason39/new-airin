@@ -80,8 +80,10 @@ function extractHttpUrlFromText(value: string): string | null {
 }
 
 export function extractResultUrl<Value>(value: Value): string | null {
-  if (typeof value === "string") {
-    return isHttpUrl(value) ? value : extractHttpUrlFromText(value);
+  const asString = readString(value);
+
+  if (asString !== undefined) {
+    return isHttpUrl(asString) ? asString : extractHttpUrlFromText(asString);
   }
 
   const record = readUnknownRecord(value);
@@ -342,8 +344,10 @@ function statusFromText(value: string): string | null {
 }
 
 export function readToolStatus<Value>(raw: Value): string | null {
-  if (typeof raw === "string") {
-    return statusFromText(raw);
+  const asText = readString(raw);
+
+  if (asText !== undefined) {
+    return statusFromText(asText);
   }
 
   const record = readUnknownRecord(raw);
