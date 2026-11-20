@@ -14,7 +14,7 @@ import { ThemeContext } from "@/context/theme-context-shared";
 import { UiModeContext } from "@/context/ui-mode-context-shared";
 import { translate } from "@/lib/i18n";
 
-async function openMenuWithVersion(version: string): Promise<string | null> {
+test("account menu does not show What's new", async () => {
   // SAFETY: The menu reads only user, activeOrg, logout and refreshSession.
   const auth: AuthContextValue = {
     activeOrg: null,
@@ -25,7 +25,7 @@ async function openMenuWithVersion(version: string): Promise<string | null> {
 
   // SAFETY: The menu reads only health.version and health.updateCheckEnabled.
   const app: AppContextValue = {
-    health: { updateCheckEnabled: false, version },
+    health: { updateCheckEnabled: false, version: "0.4.74" },
   } as never;
 
   const container = document.createElement("div");
@@ -80,25 +80,14 @@ async function openMenuWithVersion(version: string): Promise<string | null> {
       await new Promise((resolve) => setTimeout(resolve, 50));
     });
 
-    const link = [...document.querySelectorAll("a")].find((anchor) =>
-      anchor.textContent?.includes("What's new")
-    );
-
-    return link?.getAttribute("href") ?? null;
+    expect(container.textContent?.includes("What's new")).toBe(false);
+    expect(
+      [...document.querySelectorAll("a")].some((anchor) =>
+        anchor.textContent?.includes("What's new")
+      )
+    ).toBe(false);
   } finally {
     act(() => root.unmount());
     container.remove();
   }
-}
-
-test("What's new opens the release notes of the running version", async () => {
-  expect(await openMenuWithVersion("0.4.69")).toBe(
-    "https://github.com/ahmadrosid/airin/releases/tag/v0.4.69"
-  );
-});
-
-test("What's new opens the release list for a build with no release", async () => {
-  expect(await openMenuWithVersion("0.4.69-dev")).toBe(
-    "https://github.com/ahmadrosid/airin/releases"
-  );
 });

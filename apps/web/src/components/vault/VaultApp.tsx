@@ -1,8 +1,8 @@
-import { matchVaultNoteByLinkTitle } from "@airin/core";
 import type {
   VaultNoteResponse,
   VaultNoteTypeContract,
 } from "@airin/core/contract";
+import { matchVaultNoteByLinkTitle } from "@airin/core/soul/vault-wikilinks";
 import { Button } from "@airin/ui/button";
 import { toast } from "@airin/ui/toast";
 import { cn } from "@airin/ui/utils";

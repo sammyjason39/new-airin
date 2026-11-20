@@ -21,7 +21,6 @@ import {
   ComputerIcon,
   Logout03Icon,
   MoonIcon,
-  NewReleasesIcon,
   SparklesIcon,
   Sun01Icon,
   UserIcon,
@@ -39,8 +38,6 @@ import { client, formatError } from "@/lib/client";
 import { canAccessOrganizationPage, PAGE_PATHS } from "@/lib/navigation";
 import type { Theme } from "@/lib/theme";
 import type { UiMode } from "@/lib/ui-mode";
-
-const RELEASES_URL = "https://github.com/ahmadrosid/airin/releases";
 
 const THEME_OPTIONS: {
   id: Theme;
@@ -83,12 +80,6 @@ export function SidebarUserMenu({
   const [profileOpen, setProfileOpen] = useState(false);
   const [personalisationOpen, setPersonalisationOpen] = useState(false);
   const version = health?.version?.trim();
-
-  // A dev or custom build has no release of its own, so it gets the list.
-  const releaseNotesUrl =
-    version && /^\d+\.\d+\.\d+$/.test(version)
-      ? `${RELEASES_URL}/tag/v${version}`
-      : RELEASES_URL;
 
   const canCheckUpdates =
     user?.isPlatformAdmin === true && health?.updateCheckEnabled === true;
@@ -189,23 +180,6 @@ export function SidebarUserMenu({
                         Organization
                       </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem
-                      className="px-2.5 py-1.5"
-                      render={
-                        <a
-                          aria-label="What's new"
-                          href={releaseNotesUrl}
-                          rel="noreferrer"
-                          target="_blank"
-                        />
-                      }
-                    >
-                      <NewReleasesIcon
-                        aria-hidden="true"
-                        className="size-4 text-muted-foreground"
-                      />
-                      What's new
-                    </DropdownMenuItem>
                   </div>
 
                   <div className="h-px bg-border" />

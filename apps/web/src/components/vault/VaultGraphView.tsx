@@ -1,12 +1,12 @@
-import {
-  computeForceLayout,
-  FORCE_LAYOUT_CANVAS,
-  nodeRadius,
-} from "@airin/core";
 import type {
   VaultGraphEdgeResponse,
   VaultGraphNodeResponse,
 } from "@airin/core/contract";
+import {
+  computeForceLayout,
+  FORCE_LAYOUT_CANVAS,
+  nodeRadius,
+} from "@airin/core/soul/vault-force-layout";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { NOTE_TYPE_COLORS } from "@/components/vault/vault-shared";
 import { useVaultGraph } from "@/hooks/use-org-vault";

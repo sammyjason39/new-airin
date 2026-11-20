@@ -1,8 +1,8 @@
+import type { VaultNoteResponse } from "@airin/core/contract";
 import {
   matchVaultNoteByLinkTitle,
   preprocessVaultWikilinks,
-} from "@airin/core";
-import type { VaultNoteResponse } from "@airin/core/contract";
+} from "@airin/core/soul/vault-wikilinks";
 import { useMemo } from "react";
 import { MessageResponse } from "@/components/ai-elements/message";
 
