@@ -106,6 +106,7 @@
 - Org admin+ mengelola; member memakai setelah assign.
 - Status: Connected / Not connected / Connecting / Error.
 - Preinstall umum: **exa**, **firecrawl**; **Airin Library** bila dikonfigurasi.
+- One-click popular: **Notion**, **Higgsfield**, **Supabase** (sign-in ke MCP hosted mereka).
 - Sign-in butuh URL publik; dynamic client registration saja (client_id/secret paste belum didukung).
 - Hapus custom: **Force delete** (lepas dari semua profil). Preinstalled tidak bisa dihapus.
 
