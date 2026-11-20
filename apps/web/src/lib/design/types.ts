@@ -53,6 +53,13 @@ export interface DesignResult {
   videoUrl?: string;
 }
 
+export interface DesignPendingGeneration {
+  id: string;
+  kind: DesignOutputKind;
+  model: string;
+  prompt: string;
+}
+
 export interface DesignSourceFile {
   data: string;
   filename: string;

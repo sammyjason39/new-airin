@@ -82,6 +82,7 @@ export function DesignPage() {
           {page.tab === "results" ? (
             <DesignResultsPanel
               onClear={page.clearResults}
+              pendingGeneration={page.pendingGeneration}
               results={page.results}
             />
           ) : null}

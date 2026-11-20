@@ -25,6 +25,7 @@ import type {
   DesignGenerateRequest,
   DesignLocalSource,
   DesignOutputKind,
+  DesignPendingGeneration,
   DesignPrompt,
   DesignTab,
 } from "@/lib/design/types";
@@ -59,6 +60,10 @@ export function useDesignPageController() {
   const [statusNote, setStatusNote] = useState<string | null>(null);
   const [estimateNote, setEstimateNote] = useState<string | null>(null);
   const [busy, setBusy] = useState<"estimate" | "generate" | null>(null);
+
+  const [pendingGeneration, setPendingGeneration] =
+    useState<DesignPendingGeneration | null>(null);
+
   const [results, setResults] = useState(() => listDesignResults());
   const localSourcesRef = useRef(localSources);
 
@@ -227,23 +232,35 @@ export function useDesignPageController() {
     setStatusNote(null);
     setEstimateNote(null);
 
-    if (!prompt.trim()) {
+    const trimmedPrompt = prompt.trim();
+
+    if (!trimmedPrompt) {
       setError("Enter a prompt before generating.");
 
       return;
     }
 
+    const pending: DesignPendingGeneration = {
+      id: crypto.randomUUID(),
+      kind,
+      model: modelId,
+      prompt: trimmedPrompt,
+    };
+
     setBusy("generate");
+    setPendingGeneration(pending);
+    setTab("results");
 
     try {
       const request = await buildRequest();
       const result = await generateDesign(request);
       setResults(addDesignResult(result));
       setStatusNote("Saved to Results.");
-      setTab("results");
     } catch (failure) {
       setError(formatError(failure));
+      setTab("studio");
     } finally {
+      setPendingGeneration(null);
       setBusy(null);
     }
   };
@@ -255,6 +272,10 @@ export function useDesignPageController() {
   };
 
   const clearResults = () => {
+    if (pendingGeneration) {
+      return;
+    }
+
     clearDesignResults();
     setResults([]);
   };
@@ -280,6 +301,7 @@ export function useDesignPageController() {
     onLocalFilesSelected,
     onRemoveLocalSource,
     paramValues,
+    pendingGeneration,
     pickPrompt,
     prompt,
     recommended,

@@ -439,11 +439,68 @@
   background: color-mix(in oklab, var(--muted) 70%, transparent);
 }
 
-.design-page__card-media img {
+.design-page__card-media img,
+.design-page__card-media video {
   display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.design-page__card-media--pending {
+  isolation: isolate;
+}
+
+.design-page__media-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    color-mix(in oklab, var(--muted) 55%, transparent) 25%,
+    color-mix(in oklab, var(--background) 80%, transparent) 45%,
+    color-mix(in oklab, var(--muted) 55%, transparent) 65%
+  );
+  background-size: 200% 100%;
+  animation: design-page-shimmer 1.35s ease-in-out infinite;
+}
+
+.design-page__media-loading {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted-foreground);
+}
+
+.design-page__media-pending {
+  opacity: 0;
+}
+
+.design-page__media-ready {
+  opacity: 1;
+  transition: opacity 280ms ease;
+}
+
+@keyframes design-page-shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .design-page__media-shimmer {
+    animation: none;
+  }
+
+  .design-page__media-ready {
+    transition: none;
+  }
 }
 
 .design-page__card-play {
