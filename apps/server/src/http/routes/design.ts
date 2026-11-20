@@ -6,7 +6,7 @@ import {
   requireActiveOrgIdFromContext,
   requireOrgMemberFromContext,
 } from "../org-guards";
-import { errorResponse, json, readJson } from "../shared";
+import { errorResponse, json } from "../shared";
 import type { HonoApp } from "../types";
 
 const generateBodySchema = z
@@ -129,7 +129,8 @@ export function registerDesignRoutes(
       const orgId = requireActiveOrgIdFromContext(c);
 
       try {
-        const body = await readJson(c.req.raw, generateBodySchema);
+        // OpenAPI already validated this body; reading c.req.raw again fails.
+        const body = c.req.valid("json");
         const output = await design.generate(orgId, body);
 
         return json(output);
