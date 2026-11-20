@@ -30,10 +30,19 @@ describe("design page helpers", () => {
       [],
       files.slice(0, MAX_DESIGN_LOCAL_FILES)
     );
+
     expect(first.error).toBeNull();
     expect(first.sources).toHaveLength(MAX_DESIGN_LOCAL_FILES);
 
-    const overflow = appendDesignLocalSources(first.sources, [files.at(-1)!]);
+    const last = files.at(-1);
+
+    expect(last).toBeDefined();
+
+    const overflow = appendDesignLocalSources(
+      first.sources,
+      last ? [last] : []
+    );
+
     expect(overflow.error).toContain("up to");
     expect(overflow.sources).toHaveLength(MAX_DESIGN_LOCAL_FILES);
 

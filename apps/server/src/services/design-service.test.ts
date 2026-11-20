@@ -106,6 +106,7 @@ describe("DesignService results store", () => {
     const calls: string[] = [];
     const originalFetch = globalThis.fetch;
 
+    // SAFETY: Test double matches fetch's call signature for the PUT path under test.
     globalThis.fetch = (async (input, init) => {
       expect(String(input)).toBe("https://upload.higgsfield.ai/put");
       expect(init?.method).toBe("PUT");
