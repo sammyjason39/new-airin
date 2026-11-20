@@ -92,8 +92,14 @@
 
 .design-page__mascot {
   justify-self: end;
-  width: 104px;
-  height: 120px;
+  width: 112px;
+  height: 112px;
+  object-fit: cover;
+  object-position: center top;
+  background: color-mix(in oklab, var(--muted) 70%, transparent);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  box-shadow: 0 8px 24px color-mix(in oklab, var(--foreground) 8%, transparent);
 }
 
 @media (max-width: 767px) {
