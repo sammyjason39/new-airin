@@ -145,6 +145,7 @@ describe("search_files tool", () => {
       "references",
       "pp-35-2021.md"
     );
+
     await mkdir(path.dirname(skillRef), { recursive: true });
     await writeFile(
       skillRef,
