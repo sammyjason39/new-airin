@@ -6,7 +6,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@airin/ui/tooltip";
 import { cn } from "@airin/ui/utils";
 import { ContextMenu } from "@base-ui/react/context-menu";
 import {
-  BookOpen01Icon,
   Calendar03Icon,
   Delete02Icon,
   Notebook01Icon,
@@ -15,7 +14,6 @@ import {
   PinIcon,
   PinOffIcon,
   PlusSignIcon,
-  Settings01Icon,
   Store01Icon,
 } from "hugeicons-react";
 import { type ReactElement, useEffect, useState } from "react";
@@ -266,22 +264,6 @@ export function OwnerTeamSidebar({
           href={pathForPage("vault")}
           icon={Notebook01Icon}
           label={t("owner.vault")}
-          largeType={ownerSimple}
-          onNavigate={onNavigate}
-        />
-        <OwnerFooterLink
-          active={location.pathname.startsWith(PAGE_PATHS.guide)}
-          href={pathForPage("guide")}
-          icon={BookOpen01Icon}
-          label={t("owner.guide")}
-          largeType={ownerSimple}
-          onNavigate={onNavigate}
-        />
-        <OwnerFooterLink
-          active={location.pathname.startsWith(PAGE_PATHS.settings)}
-          href={pathForPage("settings")}
-          icon={Settings01Icon}
-          label={t("owner.settings")}
           largeType={ownerSimple}
           onNavigate={onNavigate}
         />

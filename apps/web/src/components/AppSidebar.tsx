@@ -4,10 +4,8 @@ import { cn } from "@airin/ui/utils";
 import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
-  BookOpen01Icon,
   Home01Icon,
   Notebook01Icon,
-  Settings01Icon,
 } from "hugeicons-react";
 import type { ElementType } from "react";
 import { Link, useLocation } from "react-router-dom";
@@ -187,8 +185,6 @@ function AppSidebarFooter({
   setUiMode: (mode: UiMode) => void;
   t: (key: MessageKey) => string;
 }) {
-  const guideActive = pathname.startsWith(PAGE_PATHS.guide);
-  const settingsActive = pathname.startsWith("/settings");
   const vaultActive = pathname.startsWith(PAGE_PATHS.vault);
 
   return (
@@ -215,34 +211,6 @@ function AppSidebarFooter({
               <Notebook01Icon aria-hidden="true" className="size-4" />
             </TooltipTrigger>
             <TooltipContent side="right">{t("owner.vault")}</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Link
-                  aria-label={t("owner.guide")}
-                  className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background/70 hover:text-foreground"
-                  to={pathForPage("guide")}
-                />
-              }
-            >
-              <BookOpen01Icon aria-hidden="true" className="size-4" />
-            </TooltipTrigger>
-            <TooltipContent side="right">{t("owner.guide")}</TooltipContent>
-          </Tooltip>
-          <Tooltip>
-            <TooltipTrigger
-              render={
-                <Link
-                  aria-label="Settings"
-                  className="flex size-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-background/70 hover:text-foreground"
-                  to={pathForPage("settings")}
-                />
-              }
-            >
-              <Settings01Icon aria-hidden="true" className="size-4" />
-            </TooltipTrigger>
-            <TooltipContent side="right">{t("owner.settings")}</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger
@@ -275,32 +243,6 @@ function AppSidebarFooter({
           >
             <Notebook01Icon aria-hidden="true" className="size-4 shrink-0" />
             {t("owner.vault")}
-          </Link>
-          <Link
-            aria-current={guideActive ? "page" : undefined}
-            className={cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              guideActive
-                ? "bg-background font-medium text-foreground shadow-sm"
-                : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
-            )}
-            to={pathForPage("guide")}
-          >
-            <BookOpen01Icon aria-hidden="true" className="size-4 shrink-0" />
-            {t("owner.guide")}
-          </Link>
-          <Link
-            aria-current={settingsActive ? "page" : undefined}
-            className={cn(
-              "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
-              settingsActive
-                ? "bg-background font-medium text-foreground shadow-sm"
-                : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
-            )}
-            to={pathForPage("settings")}
-          >
-            <Settings01Icon aria-hidden="true" className="size-4 shrink-0" />
-            {t("owner.settings")}
           </Link>
           <button
             className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-muted-foreground text-sm transition-colors hover:bg-background/70 hover:text-foreground"

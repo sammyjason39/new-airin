@@ -6,20 +6,21 @@
 
 ## Screenshot cepat
 
-### 1. Sidebar Simple — klik **Panduan** atau **Pengaturan**
+### 1. Menu akun — klik **Panduan** atau **Pengaturan**
 
-![Sidebar Simple: Marketplace, Panduan, Pengaturan](/user-guide/sidebar-simple.png)
+![Sidebar Simple: Marketplace, Vault, menu akun](/user-guide/sidebar-simple.png)
 
-1. Di kiri bawah, klik **Panduan** untuk membuka [Panduan](/guide).
-2. Klik **Pengaturan** untuk membuka [Preferences](/settings/preferences).
-3. Klik **Marketplace** untuk membuka [Marketplace](/marketplace).
-4. Di **Tim Anda**, klik **Airin** (subtitle **Bantu kelola platform**) untuk tanya cara setup — Airin menjawab dengan tautan yang bisa diklik dan bisa ikut mengatur lewat tools.
+1. Klik avatar akun di kiri bawah.
+2. Klik **Panduan** untuk membuka [Panduan](/guide).
+3. Klik **Pengaturan** untuk membuka [Preferences](/settings/preferences).
+4. Klik **Marketplace** di sidebar untuk membuka [Marketplace](/marketplace).
+5. Di **Tim Anda**, klik **Airin** (subtitle **Bantu kelola platform**) untuk tanya cara setup — Airin menjawab dengan tautan yang bisa diklik dan bisa ikut mengatur lewat tools.
 
 ### 2. Hub Settings (mode Advanced)
 
 ![Hub Settings](/user-guide/settings-hub.png)
 
-1. Mode **Advanced**: sidebar → **Settings** → [hub Settings](/settings).
+1. Mode **Advanced**: menu akun → **Pengaturan**, atau buka [hub Settings](/settings).
 2. Pilih kartu halaman (Organization, Providers, Tools, …).
 
 ### 3. Marketplace

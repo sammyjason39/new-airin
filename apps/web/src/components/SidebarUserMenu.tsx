@@ -17,10 +17,12 @@ import { Input } from "@airin/ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@airin/ui/tooltip";
 import { cn } from "@airin/ui/utils";
 import {
+  BookOpen01Icon,
   Building03Icon,
   ComputerIcon,
   Logout03Icon,
   MoonIcon,
+  Settings01Icon,
   SparklesIcon,
   Sun01Icon,
   UserIcon,
@@ -180,6 +182,26 @@ export function SidebarUserMenu({
                         Organization
                       </DropdownMenuItem>
                     )}
+                    <DropdownMenuItem
+                      className="px-2.5 py-1.5"
+                      render={<Link to={PAGE_PATHS.guide} />}
+                    >
+                      <BookOpen01Icon
+                        aria-hidden="true"
+                        className="size-4 text-muted-foreground"
+                      />
+                      {t("owner.guide")}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      className="px-2.5 py-1.5"
+                      render={<Link to={PAGE_PATHS.settings} />}
+                    >
+                      <Settings01Icon
+                        aria-hidden="true"
+                        className="size-4 text-muted-foreground"
+                      />
+                      {t("owner.settings")}
+                    </DropdownMenuItem>
                   </div>
 
                   <div className="h-px bg-border" />

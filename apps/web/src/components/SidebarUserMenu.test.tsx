@@ -80,12 +80,19 @@ test("account menu does not show What's new", async () => {
       await new Promise((resolve) => setTimeout(resolve, 50));
     });
 
-    expect(container.textContent?.includes("What's new")).toBe(false);
+    const links = [...document.querySelectorAll("a")];
+
     expect(
-      [...document.querySelectorAll("a")].some((anchor) =>
-        anchor.textContent?.includes("What's new")
-      )
+      links.some((anchor) => anchor.textContent?.includes("What's new"))
     ).toBe(false);
+    expect(
+      links.some((anchor) => anchor.getAttribute("href") === "/guide")
+    ).toBe(true);
+    expect(
+      links.some(
+        (anchor) => anchor.getAttribute("href") === "/settings/preferences"
+      )
+    ).toBe(true);
   } finally {
     act(() => root.unmount());
     container.remove();
