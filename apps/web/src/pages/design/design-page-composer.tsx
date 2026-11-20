@@ -3,7 +3,6 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@airin/ui/dropdown-menu";
-import { cn } from "@airin/ui/utils";
 import {
   Add01Icon,
   ArrowUp02Icon,
@@ -93,13 +92,14 @@ export function DesignStudioComposer({
 
         <span className="design-page__toolbar-spacer" />
 
-        <div className="inline-flex items-center gap-1">
+        <div
+          aria-label="Output type"
+          className="design-page__kind"
+          role="group"
+        >
           <button
             aria-pressed={kind === "image"}
-            className={cn(
-              "design-page__tool design-page__tool--chip",
-              kind === "image" && "text-foreground"
-            )}
+            className="design-page__tool"
             onClick={() => onKindChange("image")}
             type="button"
           >
@@ -107,10 +107,7 @@ export function DesignStudioComposer({
           </button>
           <button
             aria-pressed={kind === "video"}
-            className={cn(
-              "design-page__tool design-page__tool--chip",
-              kind === "video" && "text-foreground"
-            )}
+            className="design-page__tool"
             onClick={() => onKindChange("video")}
             type="button"
           >

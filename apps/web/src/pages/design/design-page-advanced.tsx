@@ -141,9 +141,9 @@ export function DesignStudioAdvanced({
           </div>
         </div>
       ) : (
-        <div className="mt-3 flex justify-end">
+        <div className="design-page__composer-foot">
           <button
-            className="design-page__tool"
+            className="design-page__tool design-page__tool--chip"
             onClick={() => setShowAdvanced(true)}
             type="button"
           >
