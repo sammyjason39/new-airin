@@ -405,7 +405,7 @@ export class SettingsClient extends SystemClient {
     prompt: string;
     sourceMediaUrls?: string[];
   }): Promise<{
-    estimate?: unknown;
+    estimate?: JsonValue;
     result?: {
       createdAt?: string;
       id?: string;

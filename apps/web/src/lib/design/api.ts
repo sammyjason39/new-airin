@@ -9,7 +9,7 @@ import type {
 export type DesignCostEstimate = JsonValue;
 
 type DesignGenerateResponse = {
-  estimate?: unknown;
+  estimate?: JsonValue;
   result?: {
     createdAt?: string;
     id?: string;
@@ -94,5 +94,11 @@ export async function estimateDesignCost(
 ): Promise<DesignCostEstimate> {
   const payload = await client.generateDesign(toBody(request, true));
 
-  return payload.estimate ?? payload;
+  if (payload.estimate === undefined || payload.estimate === null) {
+    throw new Error(
+      "Cost estimate was empty. Try again or check Design status."
+    );
+  }
+
+  return payload.estimate;
 }
