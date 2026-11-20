@@ -147,12 +147,6 @@ const NAV_GROUPS: NavGroup[] = [
         "Members, memory, and org settings",
         Building03Icon
       ),
-      navItem(
-        "vault",
-        "Company Vault",
-        "Second brain — notes, wikilinks, and graph",
-        BookOpen01Icon
-      ),
     ],
     label: "Organization",
   },
@@ -233,6 +227,12 @@ export const STANDALONE_PAGES: Partial<Record<PageId, NavItem>> = {
     "Notifications",
     "Automation runs and org memory proposals",
     Notification01Icon
+  ),
+  vault: navItem(
+    "vault",
+    "Company Vault",
+    "Second brain — notes, wikilinks, and graph",
+    BookOpen01Icon
   ),
 };
 

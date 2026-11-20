@@ -9,6 +9,7 @@ import {
   BookOpen01Icon,
   Calendar03Icon,
   Delete02Icon,
+  Notebook01Icon,
   NotificationOff01Icon,
   PanelLeftCloseIcon,
   PinIcon,
@@ -260,6 +261,14 @@ export function OwnerTeamSidebar({
             onNavigate={onNavigate}
           />
         )}
+        <OwnerFooterLink
+          active={location.pathname.startsWith(PAGE_PATHS.vault)}
+          href={pathForPage("vault")}
+          icon={Notebook01Icon}
+          label={t("owner.vault")}
+          largeType={ownerSimple}
+          onNavigate={onNavigate}
+        />
         <OwnerFooterLink
           active={location.pathname.startsWith(PAGE_PATHS.guide)}
           href={pathForPage("guide")}

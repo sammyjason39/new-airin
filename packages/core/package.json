@@ -77,6 +77,8 @@
     "./skills/profile-org-override": "./src/skills/profile-org-override.ts",
     "./skills/write": "./src/skills/write.ts",
     "./soul/org-memory": "./src/soul/org-memory.ts",
+    "./soul/vault-force-layout": "./src/soul/vault-force-layout.ts",
+    "./soul/vault-wikilinks": "./src/soul/vault-wikilinks.ts",
     "./tools/protected": "./src/tools/protected.ts",
     "./tools/email": "./src/tools/email.ts",
     "./tools/custom-web-search": "./src/tools/custom-web-search.ts",
